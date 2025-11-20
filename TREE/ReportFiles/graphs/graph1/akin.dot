@@ -1,0 +1,23 @@
+digraph G {
+	label=<<B>Tree from main()</B>>;
+	fontcolor="#008000";
+	fontname="Arial";
+	labelloc="top";
+	labeljust="center";
+	fontsize=20;
+	rankdir=TB;
+	center=true;
+	nodesep=0.5;
+	ranksep=0.5;
+	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
+
+	n0 [shape=record, label="{ptr = 0x603000001c30 | parent = 0x0 | data = Is it  ? | {<left> left = 0x603000001c60 | <right> right = 0x603000001c90}}", fillcolor="#87CEEB", color="black"]
+	n1 [shape=record, label="{ptr = 0x603000001c60 | parent = 0x603000001c30 | data = Is it  nil nil) ? | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n0:left -> n1
+ [label="yes", color="#008000", fontcolor="#008000"]	n2 [shape=record, label="{ptr = 0x603000001c90 | parent = 0x603000001c30 | data = Is it  (? | {<left> left = 0x603000001cc0 | <right> right = 0x603000001cf0}}", fillcolor="#87CEEB", color="black"]
+	n0:right -> n2 [label="no", color="#B22222", fontcolor="#B22222"]
+	n3 [shape=record, label="{ptr = 0x603000001cc0 | parent = 0x603000001c90 | data = Is it  nil nil ) (? | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:left -> n3
+ [label="yes", color="#008000", fontcolor="#008000"]	n4 [shape=record, label="{ptr = 0x603000001cf0 | parent = 0x603000001c90 | data = Is it  nil nil ) ) ) ? | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:right -> n4 [label="no", color="#B22222", fontcolor="#B22222"]
+}
