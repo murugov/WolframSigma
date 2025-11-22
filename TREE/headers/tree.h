@@ -7,17 +7,27 @@
 #include <string.h>
 #include <ctype.h>
 #include "IsBadPtr.h"
+#include "HashStr.h"
 #include "logger.h"
 #include "CONFIG.h"
 #include "DEBUG_MOD.h"
 #include "ERR_FIND_MOD.h"
 #include "stack.h"
 
-#define TREE_POISON 0
+#define TREE_POISON -1
 
 
+typedef int    arg_t;
 typedef size_t tree_canary_t;
 typedef size_t tree_err_t;
+typedef size_t hash_t;
+
+enum ArgTypes
+{
+    ARG_OP  = 0x00,
+    ARG_VAR = 0x01,
+    ARG_NUM = 0x02
+};
 
 enum TreeErr_t
 {
@@ -65,67 +75,56 @@ struct tree_id
     const char *name;
     const char *file;
     const char *func;
-    size_t line;
+    size_t     line;
 };
 
-template <typename treeElem_T>
+union val
+{
+    double num;
+    int    op;
+    char*  var;
+};
+
 struct node_t
 {
-    treeElem_T  item;
-    node_t      *parent;
-    node_t      *left;
-    node_t      *right;
+    arg_t  type;
+    val    item;
+    node_t *parent;
+    node_t *left;
+    node_t *right;
 };
 
-template <typename treeElem_T>
 struct tree_t
 {
-    tree_canary_t      canary_1;
-    node_t<treeElem_T> *root;
-    ssize_t            size;
-    ssize_t            capacity;
-    tree_id            id;
-    tree_err_t         error;
-    tree_canary_t      canary_2;
+    tree_canary_t canary_1;
+    node_t        *root;
+    ssize_t       size;
+    ssize_t       capacity;
+    tree_id       id;
+    tree_err_t    error;
+    tree_canary_t canary_2;
 };
 
-template <typename treeElem_T>
-TreeErr_t TreeInit (tree_t<treeElem_T> *tree, const char *name, const char *file, const char *func, size_t line);
 
-template <typename treeElem_T>
-TreeErr_t TreeCtor (tree_t<treeElem_T> *tree);
+TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line);
+TreeErr_t TreeCtor (tree_t *tree);
 
-template <typename treeElem_T>
-node_t<treeElem_T>* NewNode (treeElem_T item);
+node_t* NewNode(char* item, ArgTypes type);
+TreeErr_t InsrtLeaf(tree_t *tree, arg_t item);
 
-template <typename treeElem_T>
-TreeErr_t InsrtLeaf(tree_t<treeElem_T> *tree, treeElem_T item);
+TreeErr_t FreeNodes(node_t *node);
+TreeErr_t TreeDtor (tree_t *tree);
 
-template <typename treeElem_T>
-TreeErr_t FreeNodes(node_t<treeElem_T> *node);
+ArgTypes DetType(char* str);
 
-template <typename treeElem_T>
-TreeErr_t TreeDtor (tree_t<treeElem_T> *tree);
+TreeErr_t HashSearch(hash_t hash, size_t *index);
+int CmpForBinSearch(const void *a, const void *b);
 
 // TreeErr_t ErrDetect(tree_t *tree, tree_context context, const char *file, const char *func, size_t line);
 // TreeErr_t ListVerify(tree_t *tree, tree_context context);
 // TreeErr_t ListDump(tree_t *tree, const char* FuncName, const char *file, const char *func, size_t line);
 
-
-extern int number_graph;
-
-TreeErr_t GenHTML();
-
-template <typename treeElem_T>
-TreeErr_t GenGraphs(tree_t<treeElem_T> *tree, const char *func);
-
-template <typename treeElem_T>
-TreeErr_t GenDot(FILE *src, tree_t<treeElem_T> *tree, const char *func);
-
 #define IS_BAD_PTR(ptr) IsBadPtr((void*)ptr)
 #define TREE_INIT(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(tree)
-
-#include "TreeFunc.hpp"
-#include "GenGraphs.hpp"
 
 #endif
