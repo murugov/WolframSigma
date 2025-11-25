@@ -1,10 +1,10 @@
 #include "wolfram.h"
-
 #include "OpInstrSet.cpp"
+
 
 double CalcExpression(node_t *node)
 {
-    if (node == NULL) return 0.0;
+    if (node == NULL) return NAN;
     
     switch (node->type) 
     {
@@ -12,19 +12,20 @@ double CalcExpression(node_t *node)
         {
             double left_val  = CalcExpression(node->left);
             double right_val = CalcExpression(node->right);
-            
+
+            if (isnan(left_val) || isnan(right_val)) return NAN;
+
             hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
 
             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
             {
-                op_context context = {node->left, node->right, NULL};
-                return op_instr_set[index].func(&context);
+                calc_context context = {left_val, right_val};
+                return op_instr_set[index].calc(&context);
             }
 
-            return 0.0;
+            return NAN;
         }
-        
         case ARG_VAR:
         {
             hash_t node_hash = HashStr(node->item.var);
@@ -34,15 +35,12 @@ double CalcExpression(node_t *node)
                     return variables[i].value;
             }
 
-            return 0.0;
+            return NAN;
         }
-        
         case ARG_NUM:
-        {
             return node->item.num;
-        }
-        
+
         default:
-            return 0.0;
+            return NAN;
     }
 }

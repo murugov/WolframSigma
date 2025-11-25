@@ -1,15 +1,13 @@
 #ifndef DSL_H
 #define DSL_H
 
-#define dL DerivativeNode(op_params->node_left, op_params->hash_indep_var)
-#define dR DerivativeNode(op_params->node_right, op_params->hash_indep_var)
-#define L  CopyNode(op_params->node_left)
-#define R  CopyNode(op_params->node_right)
+#define dL DerivativeNode(diff_params->node_left, diff_params->hash_indep_var)
+#define dR DerivativeNode(diff_params->node_right, diff_params->hash_indep_var)
+#define L  CopyNode(diff_params->node_left)
+#define R  CopyNode(diff_params->node_right)
 
-#define NUM_(num) NewNode(ARG_NUM, #num, NULL, NULL)
 
 // #define COMP_FUNC_() 
-
 
 
 #define ADD_(node_left, node_right) NewNode(ARG_OP, "+", node_left, node_right)

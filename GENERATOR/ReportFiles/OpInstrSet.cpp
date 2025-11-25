@@ -3,32 +3,30 @@
 
 const op_t op_instr_set[] =
 {
-	{HASH_MUL,     "*",       funcMUL,     diffMUL},
-	{HASH_ADD,     "+",       funcADD,     diffADD},
-	{HASH_SUB,     "-",       funcSUB,     diffSUB},
-	{HASH_DIV,     "/",       funcDIV,     diffDIV},
-	{HASH_POW,     "^",       funcPOW,     diffPOW},
-	{HAHS_E,       "e",       funcEXP,     diffEXP},
-	{HASH_LG,      "lg",      funcLG,      diffLG},
-	{HASH_COS,     "cos",     funcCOS,     diffCOS},
-	{HASH_COT,     "cot",     funcCOT,     diffCOT},
-	{HASH_LOG,     "log",     funcLOG,     diffLOG},
-	{HASH_SIN,     "sin",     funcSIN,     diffSIN},
-	{HASH_TAN,     "tan",     funcTAN,     diffTAN},
-	{HASH_COSH,    "tanh",    funcCOSH,    diffCOSH},
-	{HASH_COTH,    "coth",    funcCOTH,    diffCOTH},
-	{HASH_SINH,    "sinh",    funcSINH,    diffSINH},
-	{HASH_TANH,    "tanh",    funcTANH,    diffTANH},
-	{HASH_ARCCOS,  "arccos",  funcARCCOS,  diffARCCOS},
-	{HASH_ARCCOT,  "arccot",  funcARCCOT,  diffARCCOT},
-	{HASH_ARCSIN,  "arcsin",  funcARCSIN,  diffARCSIN},
-	{HAHS_ARCTAN,  "arctan",  funcARCTAN,  diffARCTAN},
-	{HASH_ARCCOSH, "arccosh", funcARCCOSH, diffARCCOSH},
-	{HASH_ARCCOTH, "arccoth", funcARCCOTH, diffARCCOTH},
-	{HASH_ARCSINH, "arcsinh", funcARCSINH, diffARCSINH},
-	{HAHS_ARCTANH, "arctanh", funcARCTANH, diffARCTANH}
-
-
+	{HASH_MUL,     "*",       calcMUL,     diffMUL},
+	{HASH_ADD,     "+",       calcADD,     diffADD},
+	{HASH_SUB,     "-",       calcSUB,     diffSUB},
+	{HASH_DIV,     "/",       calcDIV,     diffDIV},
+	{HASH_POW,     "^",       calcPOW,     diffPOW},
+	{HAHS_E,       "e",       calcEXP,     diffEXP},
+	{HASH_LG,      "lg",      calcLG,      diffLG},
+	{HASH_COS,     "cos",     calcCOS,     diffCOS},
+	{HASH_COT,     "cot",     calcCOT,     diffCOT},
+	{HASH_LOG,     "log",     calcLOG,     diffLOG},
+	{HASH_SIN,     "sin",     calcSIN,     diffSIN},
+	{HASH_TAN,     "tan",     calcTAN,     diffTAN},
+	{HASH_COSH,    "tanh",    calcCOSH,    diffCOSH},
+	{HASH_COTH,    "coth",    calcCOTH,    diffCOTH},
+	{HASH_SINH,    "sinh",    calcSINH,    diffSINH},
+	{HASH_TANH,    "tanh",    calcTANH,    diffTANH},
+	{HASH_ARCCOS,  "arccos",  calcARCCOS,  diffARCCOS},
+	{HASH_ARCCOT,  "arccot",  calcARCCOT,  diffARCCOT},
+	{HASH_ARCSIN,  "arcsin",  calcARCSIN,  diffARCSIN},
+	{HAHS_ARCTAN,  "arctan",  calcARCTAN,  diffARCTAN},
+	{HASH_ARCCOSH, "arccosh", calcARCCOSH, diffARCCOSH},
+	{HASH_ARCCOTH, "arccoth", calcARCCOTH, diffARCCOTH},
+	{HASH_ARCSINH, "arcsinh", calcARCSINH, diffARCSINH},
+	{HAHS_ARCTANH, "arctanh", calcARCTANH, diffARCTANH}
 };
 
 #define LEN_INSTR_SET sizeof(op_instr_set) / sizeof(*op_instr_set)

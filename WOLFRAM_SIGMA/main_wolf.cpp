@@ -20,9 +20,13 @@ int main()
     node_t *diff_node = DerivativeNode(wolf_tree->root, HashStr("x"));
     diff_tree->root = diff_node;
 
+    SimplifyTree(diff_tree);
+
     GenGraphs(wolf_tree, __func__);
     GenGraphs(diff_tree, __func__);
 
+    // double res = CalcExpression(diff_tree->root);
+    // printf("res = %g\n", res);
 
     WolfDtor(wolf_tree);    
     WolfDtor(diff_tree);    

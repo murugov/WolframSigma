@@ -1,4 +1,5 @@
 #include "wolfram.h"
+#include "DSL.h"
 #include "OpInstrSet.cpp"
 
 var_t variables[MAX_NUM_VAR] = 
@@ -62,31 +63,28 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 
             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
             {
-                op_context context = {node->left, node->right, hash_indep_var};
+                diff_context context = {node->left, node->right, hash_indep_var};
                 tmp = op_instr_set[index].diff(&context);
+                set_parents(tmp, NULL);
                 return tmp;
             }
             
-            return NewNode(ARG_NUM, "0", NULL, NULL);
+            return NULL;
         }
-
         case ARG_VAR:
         {
             hash_t hash_var = HashStr(node->item.var);
             
             if (hash_var == hash_indep_var)
-                return NewNode(ARG_NUM, "1", NULL, NULL);
+                return NUM_(1);
             
-            char char_tmp[8] = {0};
-            snprintf(char_tmp, 3, "%s'", node->item.var); // 3 - magic number is len variable
-            return NewNode(ARG_VAR, char_tmp, NULL, NULL);
+            return NUM_(0);
         }
-
         case ARG_NUM:
-            return NewNode(ARG_NUM, "0", NULL, NULL);
-    
+            return NUM_(0);
+            
         default:
-            return NewNode(ARG_NUM, "0", NULL, NULL);
+            return NULL;
     }
 }
 
@@ -129,4 +127,14 @@ node_t *CopyNode(node_t *node)
     new_node->right = CopyNode(node->right);
 
     return new_node;
+}
+
+
+void set_parents(node_t *node, node_t *parent)
+{
+    if (node == NULL) return;
+    
+    node->parent = parent;
+    set_parents(node->left, node);
+    set_parents(node->right, node);
 }

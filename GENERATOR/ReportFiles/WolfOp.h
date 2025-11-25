@@ -38,7 +38,14 @@ enum HashOp
     HAHS_ARCTANH = 0x14D2C1EB9 
 };
 
-struct op_context
+struct calc_context
+{
+    double left_val;
+    double right_val;
+};
+
+
+struct diff_context
 {
     node_t *node_left;
     node_t *node_right;
@@ -48,102 +55,102 @@ struct op_context
 
 // elementary functions
 
-double funcADD(op_context *op_params);
-node_t *diffADD(op_context *op_params);
+double calcADD(calc_context *calc_params);
+node_t *diffADD(diff_context *diff_params);
 
-double funcSUB(op_context *op_params);
-node_t *diffSUB(op_context *op_params);
+double calcSUB(calc_context *calc_params);
+node_t *diffSUB(diff_context *diff_params);
 
-double funcMUL(op_context *op_params);
-node_t *diffMUL(op_context *op_params);
+double calcMUL(calc_context *calc_params);
+node_t *diffMUL(diff_context *diff_params);
 
-double funcDIV(op_context *op_params);
-node_t *diffDIV(op_context *op_params);
+double calcDIV(calc_context *calc_params);
+node_t *diffDIV(diff_context *diff_params);
 
-double funcPOW(op_context *op_params);
-node_t *diffPOW(op_context *op_params);
+double calcPOW(calc_context *calc_params);
+node_t *diffPOW(diff_context *diff_params);
 
 
 // exponential functions
 
-double funcEXP(op_context *op_params);
-node_t *diffEXP(op_context *op_params);
+double calcEXP(calc_context *calc_params);
+node_t *diffEXP(diff_context *diff_params);
 
-double funcLG(op_context *op_params);
-node_t *diffLG(op_context *op_params);
+double calcLG(calc_context *calc_params);
+node_t *diffLG(diff_context *diff_params);
 
-double funcLOG(op_context *op_params);
-node_t *diffLOG(op_context *op_params);
+double calcLOG(calc_context *calc_params);
+node_t *diffLOG(diff_context *diff_params);
 
 
 // trigonometric functions
 
-double funcSIN(op_context *op_params);
-node_t *diffSIN(op_context *op_params);
+double calcSIN(calc_context *calc_params);
+node_t *diffSIN(diff_context *diff_params);
 
-double funcCOS(op_context *op_params);
-node_t *diffCOS(op_context *op_params);
+double calcCOS(calc_context *calc_params);
+node_t *diffCOS(diff_context *diff_params);
 
-double funcTAN(op_context *op_params);
-node_t *diffTAN(op_context *op_params);
+double calcTAN(calc_context *calc_params);
+node_t *diffTAN(diff_context *diff_params);
 
-double funcCOT(op_context *op_params);
-node_t *diffCOT(op_context *op_params);
+double calcCOT(calc_context *calc_params);
+node_t *diffCOT(diff_context *diff_params);
 
 
 // hyperbolic functions
 
-double funcSINH(op_context *op_params);
-node_t *diffSINH(op_context *op_params);
+double calcSINH(calc_context *calc_params);
+node_t *diffSINH(diff_context *diff_params);
 
-double funcCOSH(op_context *op_params);
-node_t *diffCOSH(op_context *op_params);
+double calcCOSH(calc_context *calc_params);
+node_t *diffCOSH(diff_context *diff_params);
 
-double funcTANH(op_context *op_params);
-node_t *diffTANH(op_context *op_params);
+double calcTANH(calc_context *calc_params);
+node_t *diffTANH(diff_context *diff_params);
 
-double funcCOTH(op_context *op_params);
-node_t *diffCOTH(op_context *op_params);
+double calcCOTH(calc_context *calc_params);
+node_t *diffCOTH(diff_context *diff_params);
 
 
 // inverse trigonometric functions
 
-double funcARCSIN(op_context *op_params);
-node_t *diffARCSIN(op_context *op_params);
+double calcARCSIN(calc_context *calc_params);
+node_t *diffARCSIN(diff_context *diff_params);
 
-double funcARCCOS(op_context *op_params);
-node_t *diffARCCOS(op_context *op_params);
+double calcARCCOS(calc_context *calc_params);
+node_t *diffARCCOS(diff_context *diff_params);
 
-double funcARCTAN(op_context *op_params);
-node_t *diffARCTAN(op_context *op_params);
+double calcARCTAN(calc_context *calc_params);
+node_t *diffARCTAN(diff_context *diff_params);
 
-double funcARCCOT(op_context *op_params);
-node_t *diffARCCOT(op_context *op_params);
+double calcARCCOT(calc_context *calc_params);
+node_t *diffARCCOT(diff_context *diff_params);
 
 
 // inverse hyperbolic functions
 
-double funcARCSINH(op_context *op_params);
-node_t *diffARCSINH(op_context *op_params);
+double calcARCSINH(calc_context *calc_params);
+node_t *diffARCSINH(diff_context *diff_params);
 
-double funcARCCOSH(op_context *op_params);
-node_t *diffARCCOSH(op_context *op_params);
+double calcARCCOSH(calc_context *calc_params);
+node_t *diffARCCOSH(diff_context *diff_params);
 
-double funcARCTANH(op_context *op_params);
-node_t *diffARCTANH(op_context *op_params);
+double calcARCTANH(calc_context *calc_params);
+node_t *diffARCTANH(diff_context *diff_params);
 
-double funcARCCOTH(op_context *op_params);
-node_t *diffARCCOTH(op_context *op_params);
+double calcARCCOTH(calc_context *calc_params);
+node_t *diffARCCOTH(diff_context *diff_params);
 
 
-typedef double (*func_t)(op_context *op_params);
-typedef node_t *(*diff_t)(op_context *op_params);
+typedef double (*calc_t)(calc_context *calc_params);
+typedef node_t *(*diff_t)(diff_context *diff_params);
 
 struct op_t
 {
     HashOp  hash;
     char name[8];
-    func_t  func;
+    calc_t  calc;
     diff_t  diff;
 };
 

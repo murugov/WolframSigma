@@ -9,7 +9,7 @@ WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
 COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
-WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp
+WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp
 
 all: help
 
