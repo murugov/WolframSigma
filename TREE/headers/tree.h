@@ -81,7 +81,7 @@ struct tree_id
 union val
 {
     double num;
-    int    op;
+    char*  op;
     char*  var;
 };
 
@@ -109,8 +109,7 @@ struct tree_t
 TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line);
 TreeErr_t TreeCtor (tree_t *tree);
 
-node_t* NewNode(char* item, ArgTypes type);
-TreeErr_t InsrtLeaf(tree_t *tree, arg_t item);
+node_t* NewNode(ArgTypes type, const char* item, node_t *left, node_t *right);
 
 TreeErr_t FreeNodes(node_t *node);
 TreeErr_t TreeDtor (tree_t *tree);
@@ -120,9 +119,6 @@ ArgTypes DetType(char* str);
 TreeErr_t HashSearch(hash_t hash, size_t *index);
 int CmpForBinSearch(const void *a, const void *b);
 
-// TreeErr_t ErrDetect(tree_t *tree, tree_context context, const char *file, const char *func, size_t line);
-// TreeErr_t ListVerify(tree_t *tree, tree_context context);
-// TreeErr_t ListDump(tree_t *tree, const char* FuncName, const char *file, const char *func, size_t line);
 
 #define IS_BAD_PTR(ptr) IsBadPtr((void*)ptr)
 #define TREE_INIT(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(tree)

@@ -4,39 +4,147 @@
 #ifndef WOLF_OP_H
 #define WOLF_OP_H
 
+enum WolfErr_t
+{
+    WOLF_SUCCESS = 0,
+    WOLF_ERROR   = 1
+};
+
 enum HashOp
 {
-    HASH_MUL = 42,
-    HASH_ADD = 43,
-    HASH_SUB = 45,
-    HASH_DIV = 47,
-    HASH_POW = 94,
-    HASH_COS = 98695,
-    HASH_SIN = 113880,
-    HASH_TAN = 114593
+    HASH_MUL     = 0x2A,     
+    HASH_ADD     = 0x2B,     
+    HASH_SUB     = 0x2D,     
+    HASH_DIV     = 0x2F,     
+    HASH_POW     = 0x5E,     
+    HAHS_E       = 0x65, 
+    HASH_LG      = 0xD7B, 
+    HASH_COS     = 0x181E7,
+    HASH_COT     = 0x181E8,
+    HASH_LOG     = 0x1A344,  
+    HASH_SIN     = 0x1BC78,  
+    HASH_TAN     = 0x1BFA1,  
+    HASH_COSH    = 0x2EAC1,  
+    HASH_COTH    = 0x2EAE0,  
+    HASH_SINH    = 0x35D50,  
+    HASH_TANH    = 0x36367,  
+    HASH_ARCCOS  = 0xABFBF75,
+    HASH_ARCCOT  = 0xABFBF76,
+    HASH_ARCSIN  = 0xABFC246,
+    HAHS_ARCTAN  = 0xABFC48F,
+    HASH_ARCCOSH = 0x14D29FE53,
+    HASH_ARCCOTH = 0x14D29FE62,
+    HASH_ARCSINH = 0x14D2C1D62,
+    HAHS_ARCTANH = 0x14D2C1EB9 
 };
 
 struct op_context
 {
-    node_t  *node_1;
-    node_t  *node_2;
+    node_t *node_left;
+    node_t *node_right;
+    hash_t hash_indep_var;
 };
 
-WolfErr_t funcADD(op_context *op_params);
-WolfErr_t funcSUB(op_context *op_params);
-WolfErr_t funcMUL(op_context *op_params);
-WolfErr_t funcDIV(op_context *op_params);
-WolfErr_t funcPOW(op_context *op_params);
-WolfErr_t funcSIN(op_context *op_params);
-WolfErr_t funcCOS(op_context *op_params);
-WolfErr_t funcTAN(op_context *op_params);
 
-typedef WolfErr_t (*func_t)(op_context *op_params);
+// elementary functions
+
+double funcADD(op_context *op_params);
+node_t *diffADD(op_context *op_params);
+
+double funcSUB(op_context *op_params);
+node_t *diffSUB(op_context *op_params);
+
+double funcMUL(op_context *op_params);
+node_t *diffMUL(op_context *op_params);
+
+double funcDIV(op_context *op_params);
+node_t *diffDIV(op_context *op_params);
+
+double funcPOW(op_context *op_params);
+node_t *diffPOW(op_context *op_params);
+
+
+// exponential functions
+
+double funcEXP(op_context *op_params);
+node_t *diffEXP(op_context *op_params);
+
+double funcLG(op_context *op_params);
+node_t *diffLG(op_context *op_params);
+
+double funcLOG(op_context *op_params);
+node_t *diffLOG(op_context *op_params);
+
+
+// trigonometric functions
+
+double funcSIN(op_context *op_params);
+node_t *diffSIN(op_context *op_params);
+
+double funcCOS(op_context *op_params);
+node_t *diffCOS(op_context *op_params);
+
+double funcTAN(op_context *op_params);
+node_t *diffTAN(op_context *op_params);
+
+double funcCOT(op_context *op_params);
+node_t *diffCOT(op_context *op_params);
+
+
+// hyperbolic functions
+
+double funcSINH(op_context *op_params);
+node_t *diffSINH(op_context *op_params);
+
+double funcCOSH(op_context *op_params);
+node_t *diffCOSH(op_context *op_params);
+
+double funcTANH(op_context *op_params);
+node_t *diffTANH(op_context *op_params);
+
+double funcCOTH(op_context *op_params);
+node_t *diffCOTH(op_context *op_params);
+
+
+// inverse trigonometric functions
+
+double funcARCSIN(op_context *op_params);
+node_t *diffARCSIN(op_context *op_params);
+
+double funcARCCOS(op_context *op_params);
+node_t *diffARCCOS(op_context *op_params);
+
+double funcARCTAN(op_context *op_params);
+node_t *diffARCTAN(op_context *op_params);
+
+double funcARCCOT(op_context *op_params);
+node_t *diffARCCOT(op_context *op_params);
+
+
+// inverse hyperbolic functions
+
+double funcARCSINH(op_context *op_params);
+node_t *diffARCSINH(op_context *op_params);
+
+double funcARCCOSH(op_context *op_params);
+node_t *diffARCCOSH(op_context *op_params);
+
+double funcARCTANH(op_context *op_params);
+node_t *diffARCTANH(op_context *op_params);
+
+double funcARCCOTH(op_context *op_params);
+node_t *diffARCCOTH(op_context *op_params);
+
+
+typedef double (*func_t)(op_context *op_params);
+typedef node_t *(*diff_t)(op_context *op_params);
 
 struct op_t
 {
     HashOp  hash;
+    char name[8];
     func_t  func;
+    diff_t  diff;
 };
 
 #endif

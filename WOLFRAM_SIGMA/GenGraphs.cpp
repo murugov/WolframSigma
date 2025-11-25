@@ -91,18 +91,19 @@ WolfErr_t GenGraphs(tree_t *tree, const char *func)
     return WOLF_SUCCESS;
 }
 
+//Надо вставить в код, будет классно работать
 
-WolfErr_t CreateNode(FILE *src, node_t *node, int node_id)
-{
-    ON_DEBUG(
-        if (IS_BAD_PTR(src))  return WOLF_ERROR;
-        if (IS_BAD_PTR(node)) return WOLF_ERROR;
-    )
+// WolfErr_t CreateNode(FILE *src, node_t *node, int node_id)
+// {
+//     ON_DEBUG(
+//         if (IS_BAD_PTR(src))  return WOLF_ERROR;
+//         if (IS_BAD_PTR(node)) return WOLF_ERROR;
+//     )
 
-    fprintf(src, "\tn%d [shape=record, label=\"{ptr = %p | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", node_id, (void*)node, node->item, (void*)node->left, (void*)node->right);
+//     fprintf(src, "\tn%d [shape=record, label=\"{ptr = %p | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", node_id, (void*)node, node->item, (void*)node->left, (void*)node->right);
     
-    return WOLF_SUCCESS;
-}
+//     return WOLF_SUCCESS;
+// }
 
 
 WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
@@ -113,7 +114,7 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
     )
 
     fprintf(src,"digraph G {\n"
-                "\tlabel=<<B>Tree from %s()</B>>;\n"
+                "\tlabel=<<B>WolfTree from %s()</B>>;\n"
                 "\tfontcolor=\"%s\";\n"
                 "\tfontname=\"Arial\";\n"
                 "\tlabelloc=\"top\";\n"
@@ -139,8 +140,18 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
     StackPush(&stk_ret, tree->root);
     StackPush(&stk_ids, number_nodes);
     
-    fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
-            number_nodes, tree->root, tree->root->parent, tree->root->item, tree->root->left, tree->root->right);
+    #pragma GCC diagnostic push          
+    #pragma GCC diagnostic ignored "-Wformat"
+
+    if (tree->root->type == ARG_NUM)
+        fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+            number_nodes, tree->root, tree->root->parent, tree->root->type, tree->root->item, tree->root->left, tree->root->right);
+    else
+        fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+            number_nodes, tree->root, tree->root->parent, tree->root->type, tree->root->item, tree->root->left, tree->root->right);
+    
+    #pragma GCC diagnostic pop  
+
     number_nodes++;
 
     while (stk_ret.size > 0)
@@ -155,9 +166,18 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
 
         if (current_node->left != NULL)
         {
-            fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
-                    number_nodes, current_node->left, current_node->left->parent, current_node->left->item, current_node->left->left, current_node->left->right);
+            #pragma GCC diagnostic push          
+            #pragma GCC diagnostic ignored "-Wformat"
+
+            if (current_node->left->type == ARG_NUM)
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->left, current_node->left->parent, current_node->left->type, current_node->left->item, current_node->left->left, current_node->left->right);
+            else
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->left, current_node->left->parent, current_node->left->type, current_node->left->item, current_node->left->left, current_node->left->right);
             
+            #pragma GCC diagnostic pop  
+
             fprintf(src, "\tn%zu:left -> n%zu\n", current_id, number_nodes);
             
             StackPush(&stk_ret, current_node->left);
@@ -167,9 +187,18 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
 
         if (current_node->right != NULL)
         {
-            fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
-                    number_nodes, current_node->right, current_node->right->parent, current_node->right->item, current_node->right->left, current_node->right->right);
+            #pragma GCC diagnostic push          
+            #pragma GCC diagnostic ignored "-Wformat"
+
+            if (current_node->right->type == ARG_NUM)
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->right, current_node->right->parent, current_node->right->type, current_node->right->item, current_node->right->left, current_node->right->right);
+            else
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->right, current_node->right->parent, current_node->right->type, current_node->right->item, current_node->right->left, current_node->right->right);
             
+            #pragma GCC diagnostic pop  
+
             fprintf(src, "\tn%zu:right -> n%zu\n", current_id, number_nodes);
             
             StackPush(&stk_ret, current_node->right);

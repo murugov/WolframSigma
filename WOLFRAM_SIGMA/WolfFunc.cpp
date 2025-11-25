@@ -1,17 +1,27 @@
 #include "wolfram.h"
 #include "OpInstrSet.cpp"
 
+var_t variables[MAX_NUM_VAR] = 
+{
+    {119, "w", 0, false},
+    {120, "x", 0, false},
+    {121, "y", 0, false},
+    {122, "z", 0, false}
+};
+
 
 WolfErr_t WolfCtor(tree_t **tree)
 {
     *tree = (tree_t*)calloc(1, sizeof(tree_t));
     if (IS_BAD_PTR(tree)) return WOLF_ERROR;
 
+    (*tree)->root = NULL;
+    (*tree)->size = 0;
+    (*tree)->capacity = 0;
+
     TREE_INIT((*tree));
 
-    // (*tree)->root = NewNode(0, ARG_NUM);
-
-    return (IS_BAD_PTR((*tree)->root)) ? WOLF_ERROR: WOLF_SUCCESS;
+    return WOLF_SUCCESS;
 }
 
 
@@ -24,26 +34,99 @@ WolfErr_t WolfDtor(tree_t *tree)
 }
 
 
-TreeErr_t HashSearch(hash_t hash, size_t *index)
+void EnterVar()
 {
-    ON_DEBUG( if (IS_BAD_PTR(index)) return TREE_ERROR; )
-
-    op_t *found = (op_t*)bsearch(&hash, op_instr_set, LEN_INSTR_SET, sizeof(op_instr_set[0]), CmpForBinSearch);
-    if (found == NULL)
-        return TREE_ERROR;
-    
-    *index = (size_t)(found - op_instr_set);
-    return TREE_SUCCESS;
+    for (int i = 0; i < MAX_NUM_VAR; ++i)
+    {
+        if (variables[i].is_used)
+        {
+            printf("Enter the value of the %s: ", variables[i].name);
+            scanf("%lg", &(variables[i].value));
+        }
+    }
 }
 
 
-int CmpForBinSearch(const void *a, const void *b)
+node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 {
-    const hash_t *hash_a = (const hash_t*)a;
-    const op_t   *op_b   = (const op_t*)b;
-    if (*hash_a - op_b->hash > 0)
-        return 1;
-    if (*hash_a - op_b->hash < 0)
-        return -1;
-    return 0;
+    if (node == NULL) return NULL;
+    
+    node_t *tmp = NULL;
+
+    switch (node->type)
+    {
+        case ARG_OP:
+        {   
+            hash_t op_hash = HashStr(node->item.op);
+            size_t index   = 0;
+
+            if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+            {
+                op_context context = {node->left, node->right, hash_indep_var};
+                tmp = op_instr_set[index].diff(&context);
+                return tmp;
+            }
+            
+            return NewNode(ARG_NUM, "0", NULL, NULL);
+        }
+
+        case ARG_VAR:
+        {
+            hash_t hash_var = HashStr(node->item.var);
+            
+            if (hash_var == hash_indep_var)
+                return NewNode(ARG_NUM, "1", NULL, NULL);
+            
+            char char_tmp[8] = {0};
+            snprintf(char_tmp, 3, "%s'", node->item.var); // 3 - magic number is len variable
+            return NewNode(ARG_VAR, char_tmp, NULL, NULL);
+        }
+
+        case ARG_NUM:
+            return NewNode(ARG_NUM, "0", NULL, NULL);
+    
+        default:
+            return NewNode(ARG_NUM, "0", NULL, NULL);
+    }
+}
+
+
+node_t *CopyNode(node_t *node)
+{
+    if (node == NULL) return NULL;
+
+    node_t *new_node = (node_t*)calloc(1, sizeof(node_t));
+    if (IS_BAD_PTR(new_node)) { free(new_node); return NULL; }
+
+    new_node->type = node->type;
+    new_node->parent = NULL;
+
+    switch (node->type)
+    {
+        case ARG_OP:
+        {
+            new_node->item.op = strdup(node->item.op);
+            break;
+        }
+        case ARG_VAR:
+        {
+            new_node->item.var = strdup(node->item.var);
+            break;
+        }
+        case ARG_NUM:
+        {
+            new_node->item.num = node->item.num;
+            break;
+        }
+        default:
+        {
+            free(new_node);
+            return NULL;
+        }
+    }
+
+    new_node->left  = CopyNode(node->left);
+    new_node->right = CopyNode(node->right);
+
+    return new_node;
 }

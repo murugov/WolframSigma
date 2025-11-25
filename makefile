@@ -7,7 +7,7 @@ TREE_INCLUDES		= -I./TREE/headers
 GEN_INCLUDES		= -I./GENERATOR/headers -I./GENERATOR/src -I./GENERATOR/ReportFiles
 WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
-COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/Speak.cpp COMMON/TXTreader.cpp
+COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
 WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp
 
@@ -32,7 +32,7 @@ run-gen: gen
 run: run-wolf
 
 clean:
-	rm -f wolf_program
+	rm -f wolf_program gen_program
 
 help:
 	@echo "Available commands:"
@@ -43,4 +43,4 @@ help:
 	@echo ""
 	@echo "  make clean                    - remove compiled programs"
 
-.PHONY: wolf run-wolfrun clean help
+.PHONY: wolf gen run-wolf run-gen run clean help

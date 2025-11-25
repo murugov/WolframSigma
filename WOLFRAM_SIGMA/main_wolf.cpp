@@ -8,20 +8,25 @@ int main()
 {
     LogFileOpener(PATH_TO_LOGFILE);
 
-    tree_t *akin_tree = {0};
-    WolfCtor(&akin_tree);
+    tree_t *wolf_tree = {0};
+    WolfCtor(&wolf_tree);
 
-    DataReader(PATH_TO_DATA, akin_tree);
-    // GenGraphs(akin_tree, __func__);
+    DataReader(PATH_TO_DATA, wolf_tree);
 
-    // Akinator(akin_tree);
+    EnterVar();
 
-    // GenGraphs(akin_tree, __func__);
+    tree_t *diff_tree = {0};
+    WolfCtor(&diff_tree);
+    node_t *diff_node = DerivativeNode(wolf_tree->root, HashStr("x"));
+    diff_tree->root = diff_node;
 
-    // DataUpdate(PATH_TO_DATA, akin_tree);
+    GenGraphs(wolf_tree, __func__);
+    GenGraphs(diff_tree, __func__);
 
-    WolfDtor(akin_tree);    
-    // GenHTML();
+
+    WolfDtor(wolf_tree);    
+    WolfDtor(diff_tree);    
+    GenHTML();
 
     LogFileCloser();
 

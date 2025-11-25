@@ -1,4 +1,5 @@
-#include "tree.h"
+#include "wolfram.h"
+#include "OpInstrSet.cpp"
 
 TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line)
 {
@@ -31,31 +32,67 @@ TreeErr_t TreeCtor(tree_t *tree)
 
 ArgTypes DetType(char* str)
 {
-    char tmp[8] = {0};
-    if (sscanf(str, "%lg", tmp)) return ARG_NUM;
-
     hash_t hash = HashStr(str);
+    for (int i = 0; i < MAX_NUM_VAR; ++i)
+    {
+        if (variables[i].hash == hash)
+        {
+            variables[i].is_used = true;
+            return ARG_VAR; 
+        }
+    }
+
     size_t index = 0;
     if (HashSearch(hash, &index) == TREE_SUCCESS) return ARG_OP;
 
-    printf("index: %zu\n", index);
-    return ARG_VAR;
+    return ARG_NUM;
 }
 
-node_t* NewNode(char* item, ArgTypes type)
+
+TreeErr_t HashSearch(hash_t hash, size_t *index)
+{
+    ON_DEBUG( if (IS_BAD_PTR(index)) return TREE_ERROR; )
+
+    op_t *found = (op_t*)bsearch(&hash, op_instr_set, LEN_INSTR_SET, sizeof(op_instr_set[0]), CmpForBinSearch);
+    if (found == NULL)
+        return TREE_ERROR;
+    
+    *index = (size_t)(found - op_instr_set);
+    return TREE_SUCCESS;
+}
+
+
+int CmpForBinSearch(const void *a, const void *b)
+{
+    const hash_t *hash_a = (const hash_t*)a;
+    const op_t   *op_b   = (const op_t*)b;
+    
+    if (*hash_a > op_b->hash)
+        return 1;
+    if (*hash_a < op_b->hash)
+        return -1;
+    return 0;
+}
+
+
+node_t* NewNode(ArgTypes type, const char* item, node_t *left, node_t *right)
 {
     node_t *new_node = (node_t*)calloc(1, sizeof(node_t));
-    if (IS_BAD_PTR(new_node)) return NULL;
-    
+    if (IS_BAD_PTR(new_node)) { free(new_node); return NULL; }
+
+    char *tmp = NULL;
     switch (type)
     {
     case ARG_OP:
-        new_node->item.op = atoi(item);
+        new_node->type = ARG_OP;
+        new_node->item.op = strdup(item);
         break;
     case ARG_NUM:
-        new_node->item.num = atof(item);
+        new_node->type = ARG_NUM;
+        new_node->item.num = strtod(item, &tmp);
         break;
     case ARG_VAR:
+        new_node->type = ARG_VAR;
         new_node->item.var = strdup(item);
         break;    
     
@@ -65,52 +102,9 @@ node_t* NewNode(char* item, ArgTypes type)
     }
 
     new_node->parent = NULL;
-    new_node->left   = NULL;
-    new_node->right  = NULL;
+    new_node->left   = left;
+    new_node->right  = right;
     return new_node;
-}
-
-
-TreeErr_t InsrtLeaf(tree_t *tree, arg_t item)
-{
-    ON_DEBUG( if (IS_BAD_PTR(tree)) return TREE_ERROR; )
-
-    // if (tree->root == NULL)
-    // { 
-    //     tree->root = NewNode(item); 
-    //     tree->root->parent = NULL; 
-    //     tree->size++; 
-    //     ON_DEBUG( LOG(INFO, "Created root: %p", tree->root); )
-    //     return TREE_SUCCESS; 
-    // }
-    // ON_DEBUG( else if (IS_BAD_PTR(tree->root)) return TREE_ERROR; )
-
-    // node_t* current = tree->root;
-    // node_t* parent  = NULL;
-
-    // while (current != NULL)
-    // {
-    //     ON_DEBUG( if (IS_BAD_PTR(current)) return TREE_ERROR; )
-    //     parent = current;
-    //     if (item < current->item) 
-    //         current = current->left;
-    //     else if (item >= current->item) 
-    //         current = current->right;
-    // }
-
-    // node_t* new_node = NewNode(item);
-    // if (new_node == NULL) return TREE_ERROR;
-    
-    // new_node->parent = parent;
-
-    // if (item < parent->item)
-    //     parent->left = new_node;
-    // else
-    //     parent->right = new_node;
-        
-    // tree->size++;
-    
-    return TREE_SUCCESS;
 }
 
 
@@ -130,7 +124,7 @@ TreeErr_t FreeNodes(node_t *node)
 {
     ON_DEBUG( if (IS_BAD_PTR(node)) return TREE_ERROR; )
 
-    if (!IS_BAD_PTR(node->left)) FreeNodes(node->left);
+    if (!IS_BAD_PTR(node->left))  FreeNodes(node->left);
     if (!IS_BAD_PTR(node->right)) FreeNodes(node->right);
     free(node);
 
