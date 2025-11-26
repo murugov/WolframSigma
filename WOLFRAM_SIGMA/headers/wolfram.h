@@ -29,10 +29,12 @@ void set_parents(node_t *node, node_t *parent);
 node_t *CopyNode(node_t *node);
 
 void SimplifyTree(tree_t* tree);
-double ConstFold(node_t *node);
-double RemoveNeutralElem(node_t *node);
-void ReplaceNode(node_t *old_node, node_t *new_node);
-void ReplaceNodeWithChild(node_t *parent, node_t *child);
+double ConstFold(tree_t* tree);
+double ConstFoldNode(tree_t* tree, node_t *node);
+double RemoveNeutralElem(tree_t* tree);
+double RemoveNeutralElemNode(tree_t* tree, node_t *node);
+void ReplaceNode(tree_t *tree, node_t *old_node, node_t *new_node);
+void ReplaceNodeWithChild(tree_t *tree, node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
