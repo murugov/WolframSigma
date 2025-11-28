@@ -1,8 +1,30 @@
-ADD: "+";
-SUB: "-";
-MUL: "*";
+# elementary functions
+ADD: "+";    
+SUB: "-";    
+MUL: "*";   
 DIV: "/";
 POW: "^";
+# exponential functions    
+E:   "e";
+LN:  "ln";
+LOG: "log";
+# trigonometric functions  
 SIN: "sin";
 COS: "cos";
 TAN: "tan";
+COT: "cot";
+# hyperbolic functions
+SINH: "sinh";
+COSH: "cosh";
+TANH: "tanh";
+COTH: "coth";
+# inverse trigonometric functions  
+ARCSIN: "arcsin";
+ARCCOS: "arccos";
+ARCTAN: "arctan";
+ARCCOT: "arccot";
+# inverse hyperbolic functions
+ARCSINH: "arcsinh";
+ARCCOSH: "arccosh";
+ARCTANH: "arctanh";
+ARCCOTH: "arccoth";

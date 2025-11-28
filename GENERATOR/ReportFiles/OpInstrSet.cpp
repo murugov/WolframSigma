@@ -8,8 +8,8 @@ const op_t op_instr_set[] =
 	{HASH_SUB,     "-",       calcSUB,     diffSUB},
 	{HASH_DIV,     "/",       calcDIV,     diffDIV},
 	{HASH_POW,     "^",       calcPOW,     diffPOW},
-	{HAHS_E,       "e",       calcEXP,     diffEXP},
-	{HASH_LG,      "lg",      calcLG,      diffLG},
+	{HASH_E,       "e",       calcE,       diffE},
+	{HASH_LN,      "ln",      calcLN,      diffLN},
 	{HASH_COS,     "cos",     calcCOS,     diffCOS},
 	{HASH_COT,     "cot",     calcCOT,     diffCOT},
 	{HASH_LOG,     "log",     calcLOG,     diffLOG},
@@ -22,11 +22,11 @@ const op_t op_instr_set[] =
 	{HASH_ARCCOS,  "arccos",  calcARCCOS,  diffARCCOS},
 	{HASH_ARCCOT,  "arccot",  calcARCCOT,  diffARCCOT},
 	{HASH_ARCSIN,  "arcsin",  calcARCSIN,  diffARCSIN},
-	{HAHS_ARCTAN,  "arctan",  calcARCTAN,  diffARCTAN},
+	{HASH_ARCTAN,  "arctan",  calcARCTAN,  diffARCTAN},
 	{HASH_ARCCOSH, "arccosh", calcARCCOSH, diffARCCOSH},
 	{HASH_ARCCOTH, "arccoth", calcARCCOTH, diffARCCOTH},
 	{HASH_ARCSINH, "arcsinh", calcARCSINH, diffARCSINH},
-	{HAHS_ARCTANH, "arctanh", calcARCTANH, diffARCTANH}
+	{HASH_ARCTANH, "arctanh", calcARCTANH, diffARCTANH}
 };
 
 #define LEN_INSTR_SET sizeof(op_instr_set) / sizeof(*op_instr_set)

@@ -10,6 +10,8 @@
 #include "HashStr.h"
 #include "colors.h"
 
+#define MAX_LEN_NAME_FUNC 8
+
 enum GenErr_t
 {
     GEN_SUCCESS = 0,

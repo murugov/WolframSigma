@@ -1,5 +1,4 @@
 #include "wolfram.h"
-#include "DSL.h"
 
 
 // elementary functions
@@ -24,13 +23,13 @@ node_t *diffPOW(diff_context *diff_params)
     node_t *exponent = diff_params->node_right;
     
     if (base->type == ARG_NUM)
-        return MUL_(MUL_(LG_(L), POW_(L, R)), dR);
+        return MUL_(MUL_(LN_(L), POW_(L, R)), dR);
 
     else if (exponent->type == ARG_NUM)
         return MUL_(MUL_(R, POW_(L, SUB_(R, NUM_(1)))), dL);
 
     else 
-        return MUL_(POW_(L, R), ADD_(MUL_(dR, LG_(L)), MUL_(dL, DIV_(R, L))));
+        return MUL_(POW_(L, R), ADD_(MUL_(dR, LN_(L)), MUL_(dL, DIV_(R, L))));
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,14 +39,14 @@ node_t *diffPOW(diff_context *diff_params)
 // exponential functions
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-double calcEXP(calc_context *calc_params) { return exp(calc_params->left_val); }
-node_t *diffEXP(diff_context *diff_params) { return MUL_(EXP_(L), dL); }
+double calcE(calc_context *calc_params) { return exp(calc_params->right_val); }
+node_t *diffE(diff_context *diff_params) { return MUL_(E_(R), dR); }
 
-double calcLG(calc_context *calc_params) { return log(calc_params->left_val); }
-node_t *diffLG(diff_context *diff_params) { return DIV_(dL, L); }
+double calcLN(calc_context *calc_params) { return log(calc_params->right_val); }
+node_t *diffLN(diff_context *diff_params) { return DIV_(dR, R); }
 
-double calcLOG(calc_context *calc_params) { return log(calc_params->right_val) / log(calc_params->left_val); }
-node_t *diffLOG(diff_context *diff_params) { return DIV_(dR, MUL_(L, LG_(L))); }
+double calcLOG(calc_context *calc_params) { return log(calc_params->left_val) / log(calc_params->right_val); }
+node_t *diffLOG(diff_context *diff_params) { return DIV_(dL, MUL_(R, LN_(R))); }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -55,17 +54,17 @@ node_t *diffLOG(diff_context *diff_params) { return DIV_(dR, MUL_(L, LG_(L))); }
 // trigonometric functions
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-double calcSIN(calc_context *calc_params) { return sin(calc_params->left_val); }
-node_t *diffSIN(diff_context *diff_params) { return MUL_(COS_(L), dL); }
+double calcSIN(calc_context *calc_params) { return sin(calc_params->right_val); }
+node_t *diffSIN(diff_context *diff_params) { return MUL_(COS_(R), dR); }
 
-double calcCOS(calc_context *calc_params) { return cos(calc_params->left_val); }
-node_t *diffCOS(diff_context *diff_params) { return MUL_(NUM_(-1), MUL_(SIN_(L), dL)); }
+double calcCOS(calc_context *calc_params) { return cos(calc_params->right_val); }
+node_t *diffCOS(diff_context *diff_params) { return MUL_(NUM_(-1), MUL_(SIN_(R), dR)); }
 
-double calcTAN(calc_context *calc_params) { return tan(calc_params->left_val); }
-node_t *diffTAN(diff_context *diff_params) { return DIV_(dL, MUL_(COS_(L), COS_(L))); }
+double calcTAN(calc_context *calc_params) { return tan(calc_params->right_val); }
+node_t *diffTAN(diff_context *diff_params) { return DIV_(dR, POW_(COS_(R), NUM_(2))); }
 
-double calcCOT(calc_context *calc_params) { return 1 / tan(calc_params->left_val); }
-node_t *diffCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SIN_(L), SIN_(L))), dL); }
+double calcCOT(calc_context *calc_params) { return 1 / tan(calc_params->right_val); }
+node_t *diffCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SIN_(R), SIN_(R))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -74,17 +73,17 @@ node_t *diffCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SIN
 // hyperbolic functions
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-double calcSINH(calc_context *calc_params) { return (exp(calc_params->left_val) - exp(-calc_params->left_val)) / 2; }
-node_t *diffSINH(diff_context *diff_params) { return MUL_(COSH_(L), dL); }
+double calcSINH(calc_context *calc_params) { return (exp(calc_params->right_val) - exp(-calc_params->right_val)) / 2; }
+node_t *diffSINH(diff_context *diff_params) { return MUL_(COSH_(R), dR); }
 
-double calcCOSH(calc_context *calc_params) { return (exp(calc_params->left_val) + exp(-calc_params->left_val)) / 2; }
-node_t *diffCOSH(diff_context *diff_params) { return MUL_(SINH_(L), dL); }
+double calcCOSH(calc_context *calc_params) { return (exp(calc_params->right_val) + exp(-calc_params->right_val)) / 2; }
+node_t *diffCOSH(diff_context *diff_params) { return MUL_(SINH_(R), dR); }
 
 double calcTANH(calc_context *calc_params) { return calcSINH(calc_params) / calcCOSH(calc_params); }
-node_t *diffTANH(diff_context *diff_params) { return DIV_(dL, MUL_(COSH_(L), COSH_(L))); }
+node_t *diffTANH(diff_context *diff_params) { return DIV_(dR, MUL_(COSH_(R), COSH_(R))); }
 
 double calcCOTH(calc_context *calc_params) { return calcCOSH(calc_params) / calcSINH(calc_params); }
-node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SINH_(L), SINH_(L))), dL); }
+node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SINH_(R), SINH_(R))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,17 +92,17 @@ node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SI
 // inverse trigonometric functions
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-double calcARCSIN(calc_context *calc_params) { return asin(calc_params->left_val); }
-node_t *diffARCSIN(diff_context *diff_params) { return DIV_(dL, POW_(SUB_(NUM_(1), MUL_(L, L)), NUM_(0.5))); }
+double calcARCSIN(calc_context *calc_params) { return asin(calc_params->right_val); }
+node_t *diffARCSIN(diff_context *diff_params) { return DIV_(dR, POW_(SUB_(NUM_(1), MUL_(R, R)), NUM_(0.5))); }
 
-double calcARCCOS(calc_context *calc_params) { return acos(calc_params->left_val); }
-node_t *diffARCCOS(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(NUM_(1), MUL_(L, L)), NUM_(0.5))), dL); }
+double calcARCCOS(calc_context *calc_params) { return acos(calc_params->right_val); }
+node_t *diffARCCOS(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(NUM_(1), MUL_(R, R)), NUM_(0.5))), dR); }
 
-double calcARCTAN(calc_context *calc_params) { return atan(calc_params->left_val); }
-node_t *diffARCTAN(diff_context *diff_params) { return DIV_(dL, ADD_(NUM_(1), MUL_(L, L))); }
+double calcARCTAN(calc_context *calc_params) { return atan(calc_params->right_val); }
+node_t *diffARCTAN(diff_context *diff_params) { return DIV_(dR, ADD_(NUM_(1), MUL_(R, R))); }
 
-double calcARCCOT(calc_context *calc_params) { return acot(calc_params->left_val); }
-node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(NUM_(1), MUL_(L, L))), dL); }
+double calcARCCOT(calc_context *calc_params) { return acot(calc_params->right_val); }
+node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(NUM_(1), MUL_(R, R))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -111,16 +110,16 @@ node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(
 // inverse hyperbolic functions
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-double calcARCSINH(calc_context *calc_params) { return asinh(calc_params->left_val); }
-node_t *diffARCSINH(diff_context *diff_params) { return DIV_(dL, POW_(ADD_(NUM_(1), MUL_(L, L)), NUM_(0.5))); }
+double calcARCSINH(calc_context *calc_params) { return asinh(calc_params->right_val); }
+node_t *diffARCSINH(diff_context *diff_params) { return DIV_(dR, POW_(ADD_(NUM_(1), MUL_(R, R)), NUM_(0.5))); }
 
-double calcARCCOSH(calc_context *calc_params) { return acosh(calc_params->left_val); }
-node_t *diffARCCOSH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(MUL_(L, L), NUM_(1)), NUM_(0.5))), dL); }
+double calcARCCOSH(calc_context *calc_params) { return acosh(calc_params->right_val); }
+node_t *diffARCCOSH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(MUL_(R, R), NUM_(1)), NUM_(0.5))), dR); }
 
-double calcARCTANH(calc_context *calc_params) { return atanh(calc_params->left_val); }
-node_t *diffARCTANH(diff_context *diff_params) { return DIV_(dL, SUB_(NUM_(1), MUL_(L, L))); }
+double calcARCTANH(calc_context *calc_params) { return atanh(calc_params->right_val); }
+node_t *diffARCTANH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), MUL_(R, R))); }
 
-double calcARCCOTH(calc_context *calc_params) { return acoth(calc_params->left_val); }
-node_t *diffARCCOTH(diff_context *diff_params) { return DIV_(dL, SUB_(NUM_(1), MUL_(L, L))); }
+double calcARCCOTH(calc_context *calc_params) { return acoth(calc_params->right_val); }
+node_t *diffARCCOTH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), MUL_(R, R))); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

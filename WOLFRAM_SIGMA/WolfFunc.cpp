@@ -2,7 +2,7 @@
 #include "DSL.h"
 #include "OpInstrSet.cpp"
 
-var_t variables[MAX_NUM_VAR] = 
+var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
 {
     {119, "w", 0, false},
     {120, "x", 0, false},
@@ -98,30 +98,7 @@ node_t *CopyNode(node_t *node)
 
     new_node->type = node->type;
     new_node->parent = NULL;
-
-    switch (node->type)
-    {
-        case ARG_OP:
-        {
-            new_node->item.op = strdup(node->item.op);
-            break;
-        }
-        case ARG_VAR:
-        {
-            new_node->item.var = strdup(node->item.var);
-            break;
-        }
-        case ARG_NUM:
-        {
-            new_node->item.num = node->item.num;
-            break;
-        }
-        default:
-        {
-            free(new_node);
-            return NULL;
-        }
-    }
+    new_node->item = node->item;
 
     new_node->left  = CopyNode(node->left);
     new_node->right = CopyNode(node->right);

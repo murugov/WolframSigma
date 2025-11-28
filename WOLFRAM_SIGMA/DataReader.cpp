@@ -2,7 +2,6 @@
 #include "SizeFile.h"
 #include "LineCounter.h"
 
-#define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
 
 node_t* NodeReader(char* cur_pos, char** next_pos, node_t *parent)
 {
@@ -50,8 +49,6 @@ node_t* NodeReader(char* cur_pos, char** next_pos, node_t *parent)
     return NULL;
 }
 
-#undef SKIP_SPACES
-
 
 int NameNodeReader(char* cur_pos)
 {
@@ -86,3 +83,20 @@ WolfErr_t DataReader(const char *src, tree_t *tree)
 
     return WOLF_SUCCESS;
 }
+
+
+// WolfErr_t InOrder(FILE *data, const node_t *node)
+// {
+//     ON_DEBUG( if (IS_BAD_PTR(data) || IS_BAD_PTR(node)) return WOLF_ERROR; )
+
+//     fprintf(data, "( \"%s\" ", node->item);
+    
+//     if (!IS_BAD_PTR(node->left))  { if (InOrder(data, node->left))  return WOLF_ERROR; }
+//     else fprintf(data, "nil ");
+//     if (!IS_BAD_PTR(node->right)) { if (InOrder(data, node->right)) return WOLF_ERROR; }
+//     else fprintf(data, "nil ");
+
+//     fprintf(data, ") ");
+
+//     return WOLF_SUCCESS;
+// }

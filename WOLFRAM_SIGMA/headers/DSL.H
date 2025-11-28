@@ -18,37 +18,37 @@
 
 
 
-#define EXP_(node_left) NewNode(ARG_OP, "e", node_left, NULL)
-#define LG_(node_left)  NewNode(ARG_OP, "lg", node_left, NULL)
+#define E_(node_right) NewNode(ARG_OP, "e", NULL, node_right)
+#define LN_(node_right)  NewNode(ARG_OP, "ln", NULL, node_right)
 #define LOG_(node_left, node_right) NewNode(ARG_OP, "log", node_left, node_right)
 
 
 
-#define SIN_(node_left) NewNode(ARG_OP, "sin", node_left, NULL)
-#define COS_(node_left) NewNode(ARG_OP, "cos", node_left, NULL)
-#define TAN_(node_left) NewNode(ARG_OP, "tan", node_left, NULL)
-#define COT_(node_left) NewNode(ARG_OP, "cot", node_left, NULL)
+#define SIN_(node_right) NewNode(ARG_OP, "sin", NULL, node_right)
+#define COS_(node_right) NewNode(ARG_OP, "cos", NULL, node_right)
+#define TAN_(node_right) NewNode(ARG_OP, "tan", NULL, node_right)
+#define COT_(node_right) NewNode(ARG_OP, "cot", NULL, node_right)
 
 
 
-#define COSH_(node_left) NewNode(ARG_OP, "cosh", node_left, NULL)
-#define SINH_(node_left) NewNode(ARG_OP, "sinh", node_left, NULL)
-#define TANH_(node_left) NewNode(ARG_OP, "tanh", node_left, NULL)
-#define COTH_(node_left) NewNode(ARG_OP, "coth", node_left, NULL)
+#define COSH_(node_right) NewNode(ARG_OP, "cosh", NULL, node_right)
+#define SINH_(node_right) NewNode(ARG_OP, "sinh", NULL, node_right)
+#define TANH_(node_right) NewNode(ARG_OP, "tanh", NULL, node_right)
+#define COTH_(node_right) NewNode(ARG_OP, "coth", NULL, node_right)
 
 
 
-#define ARCSIN_(node_left) NewNode(ARG_OP, "arcsin", node_left, NULL)
-#define ARCCOS_(node_left) NewNode(ARG_OP, "arccos", node_left, NULL)
-#define ARCTAN_(node_left) NewNode(ARG_OP, "arctan", node_left, NULL)
-#define ARCCOT_(node_left) NewNode(ARG_OP, "arccot", node_left, NULL)
+#define ARCSIN_(node_right) NewNode(ARG_OP, "arcsin", NULL, node_right)
+#define ARCCOS_(node_right) NewNode(ARG_OP, "arccos", NULL, node_right)
+#define ARCTAN_(node_right) NewNode(ARG_OP, "arctan", NULL, node_right)
+#define ARCCOT_(node_right) NewNode(ARG_OP, "arccot", NULL, node_right)
 
 
 
-#define ARCSINH_(node_left) NewNode(ARG_OP, "arcsinh", node_left, NULL)
-#define ARCCOSH_(node_left) NewNode(ARG_OP, "arccosh", node_left, NULL)
-#define ARCTANH_(node_left) NewNode(ARG_OP, "arctanh", node_left, NULL)
-#define ARCCOTH_(node_left) NewNode(ARG_OP, "arccoth", node_left, NULL)
+#define ARCSINH_(node_right) NewNode(ARG_OP, "arcsinh", NULL, node_right)
+#define ARCCOSH_(node_right) NewNode(ARG_OP, "arccosh", NULL, node_right)
+#define ARCTANH_(node_right) NewNode(ARG_OP, "arctanh", NULL, node_right)
+#define ARCCOTH_(node_right) NewNode(ARG_OP, "arccoth", NULL, node_right)
 
 
 

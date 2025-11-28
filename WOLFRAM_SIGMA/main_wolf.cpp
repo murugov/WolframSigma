@@ -13,7 +13,7 @@ int main()
 
     DataReader(PATH_TO_DATA, wolf_tree);
 
-    EnterVar();
+    // EnterVar();
 
     tree_t *diff_tree = {0};
     WolfCtor(&diff_tree);

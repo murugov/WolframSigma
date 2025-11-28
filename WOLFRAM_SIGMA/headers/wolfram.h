@@ -5,6 +5,7 @@
 #include "tree.h"
 #include "is_zero.h"
 #include "colors.h"
+#include "DSL.h"
 
 #include "WolfOp.h"
 
@@ -20,6 +21,14 @@ struct var_t
 
 extern var_t variables[MAX_NUM_VAR];
 
+
+enum WolfErr_t
+{
+    WOLF_SUCCESS = 0,
+    WOLF_ERROR   = 1
+};
+
+
 WolfErr_t WolfCtor(tree_t **tree);
 WolfErr_t WolfDtor(tree_t *tree);
 
@@ -29,12 +38,10 @@ void set_parents(node_t *node, node_t *parent);
 node_t *CopyNode(node_t *node);
 
 void SimplifyTree(tree_t* tree);
-double ConstFold(tree_t* tree);
-double ConstFoldNode(tree_t* tree, node_t *node);
-double RemoveNeutralElem(tree_t* tree);
-double RemoveNeutralElemNode(tree_t* tree, node_t *node);
+double ConstFold(tree_t* tree, node_t *node);
+node_t *RemoveNeutralElem(tree_t* tree, node_t *node);
 void ReplaceNode(tree_t *tree, node_t *old_node, node_t *new_node);
-void ReplaceNodeWithChild(tree_t *tree, node_t *parent, node_t *child);
+node_t *SwapParentAndChild(tree_t *tree, node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
@@ -46,6 +53,7 @@ WolfErr_t GenHTML();
 WolfErr_t GenGraphs(tree_t *tree, const char *func);
 WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 
+#define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
 #define NUM_(num) NewNode(ARG_NUM, #num, NULL, NULL)
 
 #endif

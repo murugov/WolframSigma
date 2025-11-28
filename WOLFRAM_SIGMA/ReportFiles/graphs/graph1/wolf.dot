@@ -11,9 +11,13 @@ digraph G {
 	ranksep=0.5;
 	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
 
-	n0 [shape=record, label="{ptr = 0x604000000790 | parent = 0x0 | type = 0 | data = + | {<left> left = 0x6040000007d0 | <right> right = 0x604000000810}}", fillcolor="#87CEEB", color="black"]
-	n1 [shape=record, label="{ptr = 0x6040000007d0 | parent = 0x604000000790 | type = 1 | data = y | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n0 [shape=record, label="{ptr = 0x6040000009d0 | parent = 0x0 | type = 0 | data = * | {<left> left = 0x604000000a10 | <right> right = 0x604000000a50}}", fillcolor="#87CEEB", color="black"]
+	n1 [shape=record, label="{ptr = 0x604000000a10 | parent = 0x0 | type = 2 | data = 3 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
 	n0:left -> n1
-	n2 [shape=record, label="{ptr = 0x604000000810 | parent = 0x604000000790 | type = 2 | data = 6 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2 [shape=record, label="{ptr = 0x604000000a50 | parent = 0x0 | type = 0 | data = ^ | {<left> left = 0x604000000a90 | <right> right = 0x604000000ad0}}", fillcolor="#87CEEB", color="black"]
 	n0:right -> n2
+	n3 [shape=record, label="{ptr = 0x604000000a90 | parent = 0x0 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:left -> n3
+	n4 [shape=record, label="{ptr = 0x604000000ad0 | parent = 0x0 | type = 2 | data = 2 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:right -> n4
 }
