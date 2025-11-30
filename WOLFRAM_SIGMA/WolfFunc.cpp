@@ -89,6 +89,18 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 }
 
 
+node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
+{
+    if (count == 0) return CopyNode(node);
+
+    node_t *current = DerivativeNode(CopyNode(node), hash_indep_var);
+    
+    for (int i = 1; i < count; ++i)
+        current = DerivativeNode(current, hash_indep_var);
+    
+    return current;
+}
+
 node_t *CopyNode(node_t *node)
 {
     if (node == NULL) return NULL;
@@ -114,4 +126,64 @@ void set_parents(node_t *node, node_t *parent)
     node->parent = parent;
     set_parents(node->left, node);
     set_parents(node->right, node);
+}
+
+
+void TaylorSeries(tree_t *tree, const char* indep_var, int point, int order)
+{
+    tree_t *taylor_tree = {0};
+    WolfCtor(&taylor_tree);
+    
+    node_t *series_sum = NUM_(0);
+    hash_t hash_indep_var = HashStr(indep_var);
+    node_t *x0 = NUM_(point);
+    
+    for (int n = 0; n <= order; ++n)
+    {
+        node_t *derivative_at_point = NULL;
+        
+        if (n == 0)
+        {
+            derivative_at_point = Substitute_x0(CopyNode(tree->root), hash_indep_var, x0);
+        }
+        else
+        {
+            node_t *nth_derivative = NDerivativeNode(CopyNode(tree->root), hash_indep_var, n);
+            derivative_at_point = Substitute_x0(nth_derivative, hash_indep_var, x0);
+        }
+        
+        node_t *coeff = DIV_(derivative_at_point, NUM_(Factorial(n)));
+        
+        node_t *x_var = NewNode(ARG_VAR, indep_var, NULL, NULL);
+        node_t *x_minus_x0 = SUB_(x_var, CopyNode(x0));
+        node_t *power_term = POW_(x_minus_x0, NUM_(n));
+        
+        node_t *new_term = MUL_(coeff, power_term);
+        
+        series_sum = ADD_(series_sum, new_term);
+    }
+        
+    taylor_tree->root = series_sum;
+    SimplifyTree(taylor_tree);
+
+    GenGraphs(taylor_tree, __func__);
+    TreeToLatex(taylor_tree, "WOLFRAM_SIGMA/ReportFiles/LatexDump.tex");
+    WolfDtor(taylor_tree);
+}
+
+
+node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
+{
+    if (IS_BAD_PTR(node)) return NULL;
+    
+    if (node->type == ARG_VAR && HashStr(node->item.var) == var_hash)
+    {
+        return CopyNode(value);
+    }
+    
+    node_t *new_node = CopyNode(node);
+    new_node->left  = Substitute_x0(node->left,  var_hash, value);
+    new_node->right = Substitute_x0(node->right, var_hash, value);
+
+    return new_node;
 }

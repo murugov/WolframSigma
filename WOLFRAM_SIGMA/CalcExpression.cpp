@@ -13,13 +13,15 @@ double CalcExpression(node_t *node)
             double left_val  = CalcExpression(node->left);
             double right_val = CalcExpression(node->right);
 
-            if (isnan(left_val) || isnan(right_val)) return NAN;
-
+            if (isnan(right_val)) return NAN;
+            
             hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
 
             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
             {
+                if (isnan(right_val) && op_instr_set[index].num_args == 2) return NAN;
+                
                 calc_context context = {left_val, right_val};
                 return op_instr_set[index].calc(&context);
             }

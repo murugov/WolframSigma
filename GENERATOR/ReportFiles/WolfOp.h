@@ -126,6 +126,7 @@ struct op_t
 {
 	HashOp hash;
 	char   name[8];
+	int    num_args;
 	calc_t calc;
 	diff_t diff;
 };

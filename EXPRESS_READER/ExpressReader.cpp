@@ -1,82 +1,93 @@
 #include "ExpressReader.h"
 
 
-const char* express = "0.5/12$";
+const char* express = "6*/12$";
 
 int main()
 {
-    double res = GetG();
+    double res = 0.0;
+    printf("verd = %d\n", GetG(&res));
     printf("res = %g\n", res);
 }
 
 
-double GetG()
+ebnfErr_t GetG(double *val)
 {
-    double val = GetE();
+    ebnfErr_t syntax_verd = GetE(val);
     if (*express != '$')
-        return 0;
+        return EBNF_ERROR;
         
     express++;
-    return val;
+    return syntax_verd;
 }
 
-double GetE()
+ebnfErr_t GetE(double *val)
 {
-    double val_1 = GetT();
+    double val_1 = 0.0;
+    GetT(&val_1);
+
     while (*express == '+' || *express == '-')
     {
         int op = *express;
         express++;
-        double val_2 = GetT();
+        double val_2 = 0.0;
+        GetT(&val_2);
         if (op == '+')
             val_1 += val_2;
         else
             val_1 -= val_2;
     }
 
-    return val_1;
+    *val = val_1;
+    return EBNF_SUCCESS;
 }
 
-double GetT()
+ebnfErr_t GetT(double *val)
 {
-    double val_1 = GetP();
+    double val_1 = 0.0;
+    GetP(&val_1);
+
     while (*express == '*' || *express == '/')
     {
         int op = *express;
         express++;
-        double val_2 = GetP();
+        double val_2 = 0.0;
+        GetP(&val_2);
         if (op == '*')
             val_1 *= val_2;
         else
             val_1 /= val_2;
     }
 
-    return val_1;
+    *val = val_1;
+    return EBNF_SUCCESS;
 }
 
-double GetP()
+ebnfErr_t GetP(double *val)
 {
     if (*express == '(')
     {
         express++;
-        double val = GetE();
-        //if != ')'
-        express++;
-        return val;
+        GetE(val);
+
+        if (*express == ')')
+        {
+            express++;
+            return EBNF_SUCCESS;
+        }
+
+        return EBNF_ERROR;
     }
-    return GetN();
+
+    return GetN(val);
 }
 
-double GetN()
+ebnfErr_t GetN(double *val)
 {
-    double val = 0;
     int num_digits = 0;
-    if (sscanf(express, "%lg%n", &val, &num_digits) != 1)
-    {
-        printf("SyntaxError\n");
-        return 0.0;
-    }
+    if (sscanf(express, "%lg%n", val, &num_digits) != 1)
+        return EBNF_ERROR;
 
     express += num_digits;
-    return val;
+    return EBNF_SUCCESS;
 }

@@ -4,6 +4,7 @@
 #include "math_func.h"
 #include "tree.h"
 #include "is_zero.h"
+#include "Factorial.h"
 #include "colors.h"
 #include "DSL.h"
 
@@ -37,6 +38,11 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var);
 void set_parents(node_t *node, node_t *parent);
 node_t *CopyNode(node_t *node);
 
+node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count);
+
+void TaylorSeries(tree_t *tree, const char* indep_var, int point, int order);
+node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value);
+
 void SimplifyTree(tree_t* tree);
 double ConstFold(tree_t* tree, node_t *node);
 node_t *RemoveNeutralElem(tree_t* tree, node_t *node);
@@ -49,9 +55,15 @@ node_t* NodeReader(char* cur_pos, char** next_pos, node_t *parent);
 int NameNodeReader(char* cur_pos);
 WolfErr_t DataReader(const char *src, tree_t *tree);
 
+void PrintEquation(node_t *node);
+
 WolfErr_t GenHTML();
 WolfErr_t GenGraphs(tree_t *tree, const char *func);
 WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
+
+void TreeToLatex(tree_t *tree, const char *filename);
+void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent = NULL, bool is_left = true);
+
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
 #define NUM_(num) NewNode(ARG_NUM, #num, NULL, NULL)

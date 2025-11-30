@@ -14,7 +14,7 @@ double calcMUL(calc_context *calc_params) { return calc_params->left_val * calc_
 node_t *diffMUL(diff_context *diff_params) { return ADD_(MUL_(dL, R), MUL_(L, dR)); }
 
 double calcDIV(calc_context *calc_params) { return calc_params->left_val / calc_params->right_val; } // div by zero!!!
-node_t *diffDIV(diff_context *diff_params) { return DIV_(SUB_(MUL_(dL, R), MUL_(dR, L)), MUL_(R, R)); }
+node_t *diffDIV(diff_context *diff_params) { return DIV_(SUB_(MUL_(dL, R), MUL_(dR, L)), POW_(R, NUM_(2))); }
 
 double calcPOW(calc_context *calc_params) { return pow(calc_params->left_val, calc_params->right_val); } // zero to the power of zero!!!
 node_t *diffPOW(diff_context *diff_params) 
@@ -64,7 +64,7 @@ double calcTAN(calc_context *calc_params) { return tan(calc_params->right_val); 
 node_t *diffTAN(diff_context *diff_params) { return DIV_(dR, POW_(COS_(R), NUM_(2))); }
 
 double calcCOT(calc_context *calc_params) { return 1 / tan(calc_params->right_val); }
-node_t *diffCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SIN_(R), SIN_(R))), dR); }
+node_t *diffCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SIN_(R), NUM_(2))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -80,10 +80,10 @@ double calcCOSH(calc_context *calc_params) { return (exp(calc_params->right_val)
 node_t *diffCOSH(diff_context *diff_params) { return MUL_(SINH_(R), dR); }
 
 double calcTANH(calc_context *calc_params) { return calcSINH(calc_params) / calcCOSH(calc_params); }
-node_t *diffTANH(diff_context *diff_params) { return DIV_(dR, MUL_(COSH_(R), COSH_(R))); }
+node_t *diffTANH(diff_context *diff_params) { return DIV_(dR, POW_(COSH_(R), NUM_(2))); }
 
 double calcCOTH(calc_context *calc_params) { return calcCOSH(calc_params) / calcSINH(calc_params); }
-node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SINH_(R), SINH_(R))), dR); }
+node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SINH_(R), NUM_(2))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,16 +93,16 @@ node_t *diffCOTH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), MUL_(SI
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 double calcARCSIN(calc_context *calc_params) { return asin(calc_params->right_val); }
-node_t *diffARCSIN(diff_context *diff_params) { return DIV_(dR, POW_(SUB_(NUM_(1), MUL_(R, R)), NUM_(0.5))); }
+node_t *diffARCSIN(diff_context *diff_params) { return DIV_(dR, POW_(SUB_(NUM_(1), POW_(R, NUM_(2))), NUM_(0.5))); }
 
 double calcARCCOS(calc_context *calc_params) { return acos(calc_params->right_val); }
-node_t *diffARCCOS(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(NUM_(1), MUL_(R, R)), NUM_(0.5))), dR); }
+node_t *diffARCCOS(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(NUM_(1), POW_(R, NUM_(2))), NUM_(0.5))), dR); }
 
 double calcARCTAN(calc_context *calc_params) { return atan(calc_params->right_val); }
-node_t *diffARCTAN(diff_context *diff_params) { return DIV_(dR, ADD_(NUM_(1), MUL_(R, R))); }
+node_t *diffARCTAN(diff_context *diff_params) { return DIV_(dR, ADD_(NUM_(1), POW_(R, NUM_(2)))); }
 
 double calcARCCOT(calc_context *calc_params) { return acot(calc_params->right_val); }
-node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(NUM_(1), MUL_(R, R))), dR); }
+node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(NUM_(1), POW_(R, NUM_(2)))), dR); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -111,15 +111,15 @@ node_t *diffARCCOT(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), ADD_(
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 double calcARCSINH(calc_context *calc_params) { return asinh(calc_params->right_val); }
-node_t *diffARCSINH(diff_context *diff_params) { return DIV_(dR, POW_(ADD_(NUM_(1), MUL_(R, R)), NUM_(0.5))); }
+node_t *diffARCSINH(diff_context *diff_params) { return DIV_(dR, POW_(ADD_(NUM_(1), POW_(R, NUM_(2))), NUM_(0.5))); }
 
 double calcARCCOSH(calc_context *calc_params) { return acosh(calc_params->right_val); }
-node_t *diffARCCOSH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(MUL_(R, R), NUM_(1)), NUM_(0.5))), dR); }
+node_t *diffARCCOSH(diff_context *diff_params) { return MUL_(DIV_(NUM_(-1), POW_(SUB_(POW_(R, NUM_(2)), NUM_(1)), NUM_(0.5))), dR); }
 
 double calcARCTANH(calc_context *calc_params) { return atanh(calc_params->right_val); }
-node_t *diffARCTANH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), MUL_(R, R))); }
+node_t *diffARCTANH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), POW_(R, NUM_(2)))); }
 
 double calcARCCOTH(calc_context *calc_params) { return acoth(calc_params->right_val); }
-node_t *diffARCCOTH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), MUL_(R, R))); }
+node_t *diffARCCOTH(diff_context *diff_params) { return DIV_(dR, SUB_(NUM_(1), POW_(R, NUM_(2)))); }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
