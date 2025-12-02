@@ -51,7 +51,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 {
     if (node == NULL) return NULL;
     
-    node_t *tmp = NULL;
+    node_t *tmp = NULL; // rename
 
     switch (node->type)
     {
@@ -65,6 +65,10 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
                 diff_context context = {node->left, node->right, hash_indep_var};
                 tmp = op_instr_set[index].diff(&context);
                 set_parents(tmp, NULL);
+
+                // must simplify tree here
+                // SimplifyTree(tmp);
+
                 return tmp;
             }
             
@@ -88,7 +92,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 }
 
 
-node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
+node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count) // stack to save N-derivate of function
 {
     if (count == 0) return CopyNode(node);
 
@@ -98,8 +102,9 @@ node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
     {
         // LATEX(current);
         node_t *next = DerivativeNode(CopyNode(current), hash_indep_var);
+
         FreeNodes(current);
-        current = next;
+        current = next;        
     }
     
     return current;
@@ -135,10 +140,7 @@ void set_parents(node_t *node, node_t *parent)
 
 
 void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
-{
-    tree_t *taylor_tree = {0};
-    WolfCtor(&taylor_tree);
-    
+{   
     node_t *series_sum = NUM_(0.0);
     hash_t hash_indep_var = HashStr(indep_var);
     node_t *x0 = NUM_(point);
@@ -147,10 +149,12 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
     {
         node_t *nth_derivative = NDerivativeNode(CopyNode(tree->root), hash_indep_var, n);
         node_t *derivative_at_point = Substitute_x0(nth_derivative, hash_indep_var, x0);
-        
-        node_t *coeff = DIV_(derivative_at_point, NUM_((double)Factorial(n)));
-        node_t *x_var = NewNode(ARG_VAR, valVAR(indep_var), NULL, NULL);
-        node_t *x_minus_x0 = SUB_(x_var, CopyNode(x0));
+
+        TreeToLatex(derivative_at_point);
+        printf("%d: coeff = %g, fact = %g\n", n, CalcExpression(derivative_at_point), (double)Factorial(n));
+        node_t *coeff = NUM_(CalcExpression(derivative_at_point) / (double)Factorial(n));
+
+        node_t *x_minus_x0 = SUB_(VAR_(indep_var), CopyNode(x0));
 
         node_t *power_term = POW_(x_minus_x0, NUM_((double)n));
         
@@ -160,12 +164,12 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
         series_sum = ADD_(old_sum, new_term);
     }
         
-    taylor_tree->root = series_sum;
-    SimplifyTree(taylor_tree);
+    set_parents(series_sum, NULL);
+    SimplifyTree(series_sum);
 
-    GenGraphs(taylor_tree, __func__);
-    // TreeToLatex(taylor_tree, "WOLFRAM_SIGMA/ReportFiles/LatexDump.tex");
-    WolfDtor(taylor_tree);
+    TreeToLatex(series_sum);
+
+    // GenGraphs(taylor_tree, __func__);
 }
 
 
@@ -184,43 +188,3 @@ node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
 
     return new_node;
 }
-
-
-// node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
-// {
-//     if (IS_BAD_PTR(node)) return NULL;
-    
-//     // Если узел - переменная, которую нужно заменить
-//     if (node->type == ARG_VAR && HashStr(node->item.var) == var_hash)
-//     {
-//         return CopyNode(value);
-//     }
-    
-//     if (node->type == ARG_OP)
-//     {
-//         node_t *node_left  = Substitute_x0(node->left, var_hash, value);
-//         node_t *node_right = Substitute_x0(node->right, var_hash, value);
-        
-//         if (node_left && node_right && 
-//             node_left->type == ARG_NUM && node_right->type == ARG_NUM)
-//         {
-//             hash_t op_hash = HashStr(node->item.op);
-//             size_t index   = 0;
-
-//             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
-//             {                
-//                 calc_context context = {node_left->item.num, node_right->item.num};
-//                 double result = op_instr_set[index].calc(&context);
-                
-//                 FreeNodes(node_left);
-//                 FreeNodes(node_right);
-//                 return NUM_(result);
-//             }
-//         }
-        
-//         node_t *new_node = NewNode(ARG_OP, node->item.op, node_left, node_right);
-//         return new_node;
-//     }
-    
-//     return CopyNode(node);
-// }

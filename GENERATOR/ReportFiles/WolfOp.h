@@ -11,6 +11,7 @@ enum HashOp
 	HASH_MUL     = 0x2A,
 	HASH_DIV     = 0x2F,
 	HASH_POW     = 0x5E,
+	HASH_SQRT    = 0x35FD20,
 	HASH_E       = 0x65,
 	HASH_LN      = 0xD82,
 	HASH_LOG     = 0x1A344,
@@ -60,6 +61,9 @@ node_t *diffDIV(diff_context *diff_params);
 
 double calcPOW(calc_context *calc_params);
 node_t *diffPOW(diff_context *diff_params);
+
+double calcSQRT(calc_context *calc_params);
+node_t *diffSQRT(diff_context *diff_params);
 
 double calcE(calc_context *calc_params);
 node_t *diffE(diff_context *diff_params);

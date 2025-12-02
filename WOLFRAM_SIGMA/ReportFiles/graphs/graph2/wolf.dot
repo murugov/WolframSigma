@@ -11,11 +11,3 @@ digraph G {
 	ranksep=0.5;
 	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
 
-	n0 [shape=record, label="{ptr = 0x604000002d10 | parent = 0x0 | type = 0 | data = * | {<left> left = 0x604000002d50 | <right> right = 0x604000002d90}}", fillcolor="#87CEEB", color="black"]
-	n1 [shape=record, label="{ptr = 0x604000002d50 | parent = 0x0 | type = 2 | data = -1 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
-	n0:left -> n1
-	n2 [shape=record, label="{ptr = 0x604000002d90 | parent = 0x0 | type = 0 | data = cos | {<left> left = 0x0 | <right> right = 0x604000002dd0}}", fillcolor="#87CEEB", color="black"]
-	n0:right -> n2
-	n3 [shape=record, label="{ptr = 0x604000002dd0 | parent = 0x0 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
-	n2:right -> n3
-}

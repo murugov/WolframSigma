@@ -1,5 +1,5 @@
 digraph G {
-	label=<<B>WolfTree from main()</B>>;
+	label=<<B>WolfTree from TaylorSeries()</B>>;
 	fontcolor="#008000";
 	fontname="Arial";
 	labelloc="top";
@@ -11,11 +11,17 @@ digraph G {
 	ranksep=0.5;
 	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
 
-	n0 [shape=record, label="{ptr = 0x6040000022d0 | parent = 0x0 | type = 0 | data = * | {<left> left = 0x604000002310 | <right> right = 0x604000002350}}", fillcolor="#87CEEB", color="black"]
-	n1 [shape=record, label="{ptr = 0x604000002310 | parent = 0x0 | type = 2 | data = -1 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n0 [shape=record, label="{ptr = 0x604000008750 | parent = 0x0 | type = 0 | data = + | {<left> left = 0x604000008a10 | <right> right = 0x604000008710}}", fillcolor="#87CEEB", color="black"]
+	n1 [shape=record, label="{ptr = 0x604000008a10 | parent = 0x604000008750 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
 	n0:left -> n1
-	n2 [shape=record, label="{ptr = 0x604000002350 | parent = 0x0 | type = 0 | data = cos | {<left> left = 0x0 | <right> right = 0x604000002390}}", fillcolor="#87CEEB", color="black"]
+	n2 [shape=record, label="{ptr = 0x604000008710 | parent = 0x604000008750 | type = 0 | data = * | {<left> left = 0x604000008590 | <right> right = 0x6040000086d0}}", fillcolor="#87CEEB", color="black"]
 	n0:right -> n2
-	n3 [shape=record, label="{ptr = 0x604000002390 | parent = 0x0 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
-	n2:right -> n3
+	n3 [shape=record, label="{ptr = 0x604000008590 | parent = 0x604000008710 | type = 2 | data = nan | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:left -> n3
+	n4 [shape=record, label="{ptr = 0x6040000086d0 | parent = 0x604000008710 | type = 0 | data = ^ | {<left> left = 0x604000008a50 | <right> right = 0x604000008690}}", fillcolor="#87CEEB", color="black"]
+	n2:right -> n4
+	n5 [shape=record, label="{ptr = 0x604000008a50 | parent = 0x6040000086d0 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n4:left -> n5
+	n6 [shape=record, label="{ptr = 0x604000008690 | parent = 0x6040000086d0 | type = 2 | data = 3 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n4:right -> n6
 }

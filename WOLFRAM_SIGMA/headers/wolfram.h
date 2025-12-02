@@ -45,11 +45,11 @@ node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count);
 void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order);
 node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value);
 
-void SimplifyTree(tree_t* tree);
-double ConstFold(tree_t* tree, node_t *node);
-node_t *RemoveNeutralElem(tree_t* tree, node_t *node);
-void ReplaceNode(tree_t *tree, node_t *old_node, node_t *new_node);
-node_t *SwapParentAndChild(tree_t *tree, node_t *parent, node_t *child);
+void SimplifyTree(node_t* root);
+double ConstFold(node_t *node);
+node_t *RemoveNeutralElem(node_t *node);
+void ReplaceNode(node_t *old_node, node_t *new_node);
+node_t *SwapParentAndChild(node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
@@ -63,7 +63,7 @@ WolfErr_t LatexFileOpener(const char* path);
 WolfErr_t LatexFileCloser();
 
 void TreeToLatex(node_t *node);
-void NodeToLatex(node_t *node, node_t *parent = NULL, bool is_left = true);
+void NodeToLatex(node_t *node);
 
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++

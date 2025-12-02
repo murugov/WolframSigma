@@ -1,9 +1,10 @@
 # elementary functions
-ADD: "+";    
-SUB: "-";    
-MUL: "*";   
-DIV: "/";
-POW: "^";
+ADD:  "+";    
+SUB:  "-";    
+MUL:  "*";   
+DIV:  "/";
+POW:  "^";
+SQRT: "sqrt";
 # exponential functions    
 E:   "e";
 LN:  "ln";

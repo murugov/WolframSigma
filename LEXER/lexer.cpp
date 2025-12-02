@@ -112,18 +112,14 @@ node_t *GetFunc(const char **lex_pos)
         node_name->type = ARG_OP;
 
         node_t *node_arg = GetExpress(lex_pos);
-        if (IS_BAD_PTR(node_arg)) 
-        { 
-            FreeNodes(node_name); 
-            return NULL; 
-        }
+        if (IS_BAD_PTR(node_arg)) { FreeNodes(node_name); return NULL; }
 
         if (op_instr_set[index].num_args == 1)
         {
             node_name->right = node_arg;
             if (**lex_pos != ')')
             {
-                printf(ANSI_COLOR_RED "Expected ')' after function argument\n" ANSI_COLOR_RESET);
+                printf(ANSI_COLOR_RED "Expected ')'\n" ANSI_COLOR_RESET);
                 FreeNodes(node_name);
                 FreeNodes(node_arg);
                 return NULL;
@@ -136,7 +132,7 @@ node_t *GetFunc(const char **lex_pos)
         {
             if (**lex_pos != ',')
             {
-                printf(ANSI_COLOR_RED "Expected ',' for binary function\n" ANSI_COLOR_RESET);
+                printf(ANSI_COLOR_RED "Expected ','\n" ANSI_COLOR_RESET);
                 FreeNodes(node_name);
                 FreeNodes(node_arg);
                 return NULL;
@@ -144,16 +140,11 @@ node_t *GetFunc(const char **lex_pos)
             (*lex_pos)++;
             
             node_t *node_arg2 = GetExpress(lex_pos);
-            if (IS_BAD_PTR(node_arg2)) 
-            { 
-                FreeNodes(node_name); 
-                FreeNodes(node_arg);
-                return NULL; 
-            }
+            if (IS_BAD_PTR(node_arg2)) { FreeNodes(node_name); FreeNodes(node_arg); return NULL; }
             
             if (**lex_pos != ')')
             {
-                printf(ANSI_COLOR_RED "Expected ')' after second function argument\n" ANSI_COLOR_RESET);
+                printf(ANSI_COLOR_RED "Expected ')'\n" ANSI_COLOR_RESET);
                 FreeNodes(node_name);
                 FreeNodes(node_arg);
                 FreeNodes(node_arg2);
@@ -168,7 +159,11 @@ node_t *GetFunc(const char **lex_pos)
         }
     }
 
-    return node_name;
+    IS_USED_VARS(node_name->item.var);
+
+    FreeNodes(node_name);
+    printf(ANSI_COLOR_RED "Non-existent variable name\n" ANSI_COLOR_RESET);
+    return NULL;
 }
 
 
@@ -190,8 +185,7 @@ node_t *GetName(const char **lex_pos)
     int num_symbols = 0;
     char tmp[256] = {0};
     
-    if (sscanf(*lex_pos, "%255[a-zA-Z0-9_]%n", tmp, &num_symbols) != 1) 
-        return NULL;
+    if (sscanf(*lex_pos, "%255[a-zA-Z0-9_]%n", tmp, &num_symbols) != 1) return NULL;
 
     if (!isValidName(tmp)) return NULL;
 
@@ -217,6 +211,7 @@ node_t *GetParen(const char **lex_pos)
             return NULL;
         }
         (*lex_pos)++;
+
         return node;
     }
 
@@ -235,12 +230,8 @@ node_t *GetNum(const char **lex_pos)
     if (IS_BAD_PTR(node_num)) return NULL;
     
     int num_digits = 0;
-    if (sscanf(*lex_pos, "%lg%n", &(node_num->item.num), &num_digits) != 1)
-    {
-        free(node_num);
-        return NULL;
-    }
-    
+    if (sscanf(*lex_pos, "%lg%n", &(node_num->item.num), &num_digits) != 1) { free(node_num); return NULL; }
     (*lex_pos) += num_digits;
+
     return node_num;
 }

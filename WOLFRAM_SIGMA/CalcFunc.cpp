@@ -32,6 +32,9 @@ node_t *diffPOW(diff_context *diff_params)
         return MUL_(POW_(L, R), ADD_(MUL_(dR, LN_(L)), MUL_(dL, DIV_(R, L))));
 }
 
+double calcSQRT(calc_context *calc_params) { return sqrt(calc_params->right_val); } // div by zero!!!
+node_t *diffSQRT(diff_context *diff_params) { return DIV_(dR, MUL_(NUM_(2), SQRT_(R))); }
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

@@ -18,6 +18,7 @@ const op_t op_instr_set[] =
 	{HASH_COSH,    "tanh",    1, calcCOSH,    diffCOSH},
 	{HASH_COTH,    "coth",    1, calcCOTH,    diffCOTH},
 	{HASH_SINH,    "sinh",    1, calcSINH,    diffSINH},
+	{HASH_SQRT,    "sqrt",    1, calcSQRT,    diffSQRT},
 	{HASH_TANH,    "tanh",    1, calcTANH,    diffTANH},
 	{HASH_ARCCOS,  "arccos",  1, calcARCCOS,  diffARCCOS},
 	{HASH_ARCCOT,  "arccot",  1, calcARCCOT,  diffARCCOT},

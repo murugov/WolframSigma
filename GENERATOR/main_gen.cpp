@@ -137,7 +137,8 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
     fprintf(WolfOpFile, "    hash_t hash_indep_var;\n");
     fprintf(WolfOpFile, "};\n\n\n");
 
-    for (int i = 0; i < count_names; ++i) {
+    for (size_t i = 0; i < count_names; ++i)
+    {
         fprintf(WolfOpFile, "double calc%s(calc_context *calc_params);\n", func_names[i]);
         fprintf(WolfOpFile, "node_t *diff%s(diff_context *diff_params);\n\n", func_names[i]);
     }
@@ -149,6 +150,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
     fprintf(WolfOpFile, "{\n");
     fprintf(WolfOpFile, "\tHashOp hash;\n");
     fprintf(WolfOpFile, "\tchar   name[8];\n");
+    fprintf(WolfOpFile, "\tint    num_args;\n");
     fprintf(WolfOpFile, "\tcalc_t calc;\n");
     fprintf(WolfOpFile, "\tdiff_t diff;\n");
     fprintf(WolfOpFile, "};\n\n\n");

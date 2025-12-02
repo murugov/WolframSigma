@@ -40,13 +40,16 @@ bool NeedParentheses(node_t *parent, node_t *child, bool is_left)
 }
 
 
-void NodeToLatex(node_t *node, node_t *parent, bool is_left)
+void NodeToLatex(node_t *node)
 {
     if (node == NULL) return;
 
     switch (node->type) {
         case ARG_NUM:
-            fprintf(file_latex, "{%g}", node->item.num);
+            if (node->item.num < 0)
+                fprintf(file_latex, "{\\left(%g\\right)}", node->item.num);
+            else
+                fprintf(file_latex, "{%g}", node->item.num);
             break;
 
         case ARG_VAR:
@@ -65,23 +68,29 @@ void NodeToLatex(node_t *node, node_t *parent, bool is_left)
                 if (op_hash == HASH_LOG)
                 {
                     fprintf(file_latex, "\\log_{");
-                    NodeToLatex(node->left, node, true);
+                    NodeToLatex(node->left);
                     fprintf(file_latex, "}\\left(");
-                    NodeToLatex(node->right, node, false);
+                    NodeToLatex(node->right);
                     fprintf(file_latex, "\\right)");
                 }
                 else if (op_hash == HASH_E)
                 {
                     fprintf(file_latex, "e^{");
-                    NodeToLatex(node->right, node, false);
+                    NodeToLatex(node->right);
+                    fprintf(file_latex, "}");
+                }
+                else if (op_hash == HASH_SQRT) // TODO: beautiful latex dump
+                {
+                    fprintf(file_latex, "\\sqrt^{");
+                    NodeToLatex(node->right);
                     fprintf(file_latex, "}");
                 }
                 else if (op_hash == HASH_DIV)
                 {
                     fprintf(file_latex, "\\frac{");
-                    NodeToLatex(node->left, node, false);
+                    NodeToLatex(node->left);
                     fprintf(file_latex, "}{");
-                    NodeToLatex(node->right, node, false);
+                    NodeToLatex(node->right);
                     fprintf(file_latex, "}");
                 }
                 else if (op_instr_set[index].num_args == 2)
@@ -89,23 +98,23 @@ void NodeToLatex(node_t *node, node_t *parent, bool is_left)
                     bool left_paren  = NeedParentheses(node, node->left, true);
                     bool right_paren = NeedParentheses(node, node->right, false);
                     
-                    if (left_paren) fprintf(file_latex, "(");
-                    NodeToLatex(node->left, node, true);
-                    if (left_paren) fprintf(file_latex, ")");
+                    if (left_paren) fprintf(file_latex, "\\left(");
+                    NodeToLatex(node->left);
+                    if (left_paren) fprintf(file_latex, "\\right)");
                     
                     if (op_hash == HASH_MUL)
                         fprintf(file_latex, " \\cdot ");
                     else
                         fprintf(file_latex, " %s ", op_symbols);
                     
-                    if (right_paren) fprintf(file_latex, "(");
-                    NodeToLatex(node->right, node, false);
-                    if (right_paren) fprintf(file_latex, ")");
+                    if (right_paren) fprintf(file_latex, "\\left(");
+                    NodeToLatex(node->right);
+                    if (right_paren) fprintf(file_latex, "\\right)");
                 }
                 else if (op_instr_set[index].num_args == 1)
                 {
                     fprintf(file_latex, "%s\\left(", op_symbols);
-                    NodeToLatex(node->right, node, false);
+                    NodeToLatex(node->right);
                     fprintf(file_latex, "\\right)");
                 }
             }

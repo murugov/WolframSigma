@@ -7,14 +7,13 @@
 #define R  CopyNode(diff_params->node_right)
 
 
-// #define COMP_FUNC_() 
-
 
 #define ADD_(node_left, node_right) NewNode(ARG_OP, valOP("+"), node_left, node_right)
 #define SUB_(node_left, node_right) NewNode(ARG_OP, valOP("-"), node_left, node_right)
 #define MUL_(node_left, node_right) NewNode(ARG_OP, valOP("*"), node_left, node_right)
 #define DIV_(node_left, node_right) NewNode(ARG_OP, valOP("/"), node_left, node_right)
 #define POW_(node_left, node_right) NewNode(ARG_OP, valOP("^"), node_left, node_right)
+#define SQRT_(node_right) NewNode(ARG_OP, valOP("sqrt"), NULL, node_right)
 
 
 

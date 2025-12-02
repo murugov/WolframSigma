@@ -11,7 +11,7 @@ digraph G {
 	ranksep=0.5;
 	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
 
-	n0 [shape=record, label="{ptr = 0x604000000610 | parent = 0x0 | type = 0 | data = sin | {<left> left = 0x0 | <right> right = 0x604000000650}}", fillcolor="#87CEEB", color="black"]
+	n0 [shape=record, label="{ptr = 0x604000000610 | parent = 0x0 | type = 0 | data = arcsinh | {<left> left = 0x0 | <right> right = 0x604000000650}}", fillcolor="#87CEEB", color="black"]
 	n1 [shape=record, label="{ptr = 0x604000000650 | parent = 0x604000000610 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
 	n0:right -> n1
 }
