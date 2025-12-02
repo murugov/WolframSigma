@@ -1,16 +1,78 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
+\documentclass[a4paper,10pt]{extarticle}
+\usepackage{icomma}
 \usepackage{amsmath}
-\usepackage{amssymb}
-\title{Expression Tree}
-\author{Wolfram}
-\date{\today}
-\begin{document}
-\maketitle
+\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage[export]{adjustbox}
+\usepackage{subcaption}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts,amssymb,amsthm,mathtools}
+\usepackage[paperheight=16cm,paperwidth=12cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{titlesec}
 
-\section{Mathematical Expression}
-\[
-({-1} \cdot (cos\left({0}\right))) \over {0}
-\]
+\titleformat{\section}
+  {\normalfont\fontsize{14}{16}\bfseries}{\thesection}{1em}{}
+
+\begin{document}
+\thispagestyle{empty}
+\vspace*{80px}
+\begingroup
+\fontsize{16pt}{14pt}
+\selectfont
+\begin{center}
+Московский физико-технический институт\\
+\textbf{"Нахождение производной функции"}
+\end{center}
+\endgroup
+\begin{center}
+\normalsize
+\textit{Муругов А.Р., студент 1 курса ФРКТ}\\
+\today
+\end{center}
+\newpage
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[LO]{\text{Нахождение производной функции}\hfill}
+
+\begingroup
+\fontsize{16pt}{14pt}
+\section{Цели работы:}
+\normalsize
+\begin{enumerate}
+    \item Найти производную функции
+\end{enumerate}
+\endgroup
+
+\begingroup
+\fontsize{16pt}{14pt}
+\renewcommand{\baselinestretch}{1.5}
+\section{Оборудование:}
+\normalsize
+\begin{enumerate}
+    \item Мой любимый Mac
+\end{enumerate}
+\endgroup
+\begingroup
+\renewcommand{\baselinestretch}{1.5}
+\section{Теоретическая часть}
+\normalsize
+\endgroup
+
+\begingroup
+\fontsize{16pt}{14pt}
+\renewcommand{\baselinestretch}{1.5}
+\section{Список используемой литературы}
+\normalsize
+\begin{enumerate}
+    \item А.Ю. Петрович "Лекции по математическому анализу"
+    \item Л.Д. Кудрявцев "Сборник задач по математическому анализу"
+    \item Мои записи с семинаров по матану
+\end{enumerate}
+\endgroup
 
 \end{document}

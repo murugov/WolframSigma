@@ -1,5 +1,5 @@
 digraph G {
-	label=<<B>WolfTree from TaylorSeries()</B>>;
+	label=<<B>WolfTree from main()</B>>;
 	fontcolor="#008000";
 	fontname="Arial";
 	labelloc="top";
@@ -11,15 +11,11 @@ digraph G {
 	ranksep=0.5;
 	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
 
-	n0 [shape=record, label="{ptr = 0x604000008650 | parent = 0x0 | type = 0 | data = / | {<left> left = 0x604000008690 | <right> right = 0x604000008790}}", fillcolor="#87CEEB", color="black"]
-	n1 [shape=record, label="{ptr = 0x604000008690 | parent = 0x0 | type = 0 | data = * | {<left> left = 0x6040000086d0 | <right> right = 0x604000008710}}", fillcolor="#87CEEB", color="black"]
+	n0 [shape=record, label="{ptr = 0x6040000022d0 | parent = 0x0 | type = 0 | data = * | {<left> left = 0x604000002310 | <right> right = 0x604000002350}}", fillcolor="#87CEEB", color="black"]
+	n1 [shape=record, label="{ptr = 0x604000002310 | parent = 0x0 | type = 2 | data = -1 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
 	n0:left -> n1
-	n2 [shape=record, label="{ptr = 0x604000008790 | parent = 0x0 | type = 2 | data = 0 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2 [shape=record, label="{ptr = 0x604000002350 | parent = 0x0 | type = 0 | data = cos | {<left> left = 0x0 | <right> right = 0x604000002390}}", fillcolor="#87CEEB", color="black"]
 	n0:right -> n2
-	n3 [shape=record, label="{ptr = 0x6040000086d0 | parent = 0x0 | type = 2 | data = -1 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
-	n1:left -> n3
-	n4 [shape=record, label="{ptr = 0x604000008710 | parent = 0x0 | type = 0 | data = cos | {<left> left = 0x0 | <right> right = 0x604000008750}}", fillcolor="#87CEEB", color="black"]
-	n1:right -> n4
-	n5 [shape=record, label="{ptr = 0x604000008750 | parent = 0x0 | type = 2 | data = 0 | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
-	n4:right -> n5
+	n3 [shape=record, label="{ptr = 0x604000002390 | parent = 0x0 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n2:right -> n3
 }

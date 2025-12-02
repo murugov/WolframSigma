@@ -75,25 +75,21 @@ int CmpForBinSearch(const void *a, const void *b)
 }
 
 
-node_t* NewNode(ArgTypes type, const char* item, node_t *left, node_t *right)
+node_t *NewNode(ArgTypes type, val item, node_t *left, node_t *right)
 {
     node_t *new_node = (node_t*)calloc(1, sizeof(node_t));
     if (IS_BAD_PTR(new_node)) { free(new_node); return NULL; }
 
-    char *tmp = NULL;
     switch (type)
     {
     case ARG_OP:
-        new_node->type = ARG_OP;
-        new_node->item.op = strdup(item);
+        new_node->item.op = strdup(item.op);
         break;
     case ARG_NUM:
-        new_node->type = ARG_NUM;
-        new_node->item.num = strtod(item, &tmp);
+        new_node->item.num = item.num;
         break;
     case ARG_VAR:
-        new_node->type = ARG_VAR;
-        new_node->item.var = strdup(item);
+        new_node->item.var = strdup(item.var);
         break;    
     
     default:
@@ -101,11 +97,15 @@ node_t* NewNode(ArgTypes type, const char* item, node_t *left, node_t *right)
         return NULL;
     }
 
+    new_node->type = type;
     new_node->parent = NULL;
     new_node->left   = left;
     new_node->right  = right;
     return new_node;
 }
+
+val valOP(const char* s)  { val v; v.op  = const_cast<char*>(s); return v; }
+val valVAR(const char* s) { val v; v.var = const_cast<char*>(s); return v; }
 
 
 TreeErr_t TreeDtor(tree_t *tree)

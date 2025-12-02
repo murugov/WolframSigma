@@ -28,21 +28,16 @@ double ConstFold(tree_t* tree, node_t *node)
             double left_val  = ConstFold(tree, node->left);
             double right_val = ConstFold(tree, node->right);
 
-            if (isnan(left_val) || isnan(right_val)) return NAN;
-
             hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
-
+            
+            if ((op_instr_set[index].num_args == 2 && isnan(left_val)) || isnan(right_val)) return NAN;
+            
             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
             {
                 calc_context context = {left_val, right_val};
                 double result = op_instr_set[index].calc(&context);
-                
-                char result_str[sizeof(result)] = {0};
-                snprintf(result_str, sizeof(result), "%lg", result);
-
-                node_t *num_node = NewNode(ARG_NUM, result_str, NULL, NULL);
-                ReplaceNode(tree, node, num_node);
+                ReplaceNode(tree, node, NUM_(result));
                 return result;
             }
 
@@ -87,9 +82,17 @@ node_t *RemoveNeutralElem(tree_t* tree, node_t *node)
         else if ((left_is_num  && is_zero(node->left->item.num)) || 
                  (right_is_num && is_zero(node->right->item.num)))
         {
-            node_t* zero_node = NUM_(0);
+            node_t* zero_node = NUM_(0.0);
             ReplaceNode(tree, node, zero_node);
             return zero_node;
+        }
+    }
+
+    if (op_hash == HASH_DIV)
+    {
+        if (right_is_num && is_zero(node->right->item.num - 1.0))
+        {
+            return SwapParentAndChild(tree, node, node->left);
         }
     }
 
@@ -105,17 +108,29 @@ node_t *RemoveNeutralElem(tree_t* tree, node_t *node)
         }
     }
 
+    else if (op_hash == HASH_SUB)
+    {
+        if (left_is_num && is_zero(node->left->item.num))
+        {
+            return MUL_(SwapParentAndChild(tree, node, node->right), NUM_(-1.0));
+        }
+        else if (right_is_num && is_zero(node->right->item.num))
+        {
+            return SwapParentAndChild(tree, node, node->left);
+        }
+    }
+
     else if (op_hash == HASH_POW)
     {
         if (right_is_num && is_zero(node->right->item.num))
         {
-            node_t* one_node = NUM_(1);
+            node_t* one_node = NUM_(1.0);
             ReplaceNode(tree, node, one_node);
             return one_node;
         }
         else if (left_is_num && is_zero(node->left->item.num - 1.0))
         {
-            node_t* one_node = NUM_(1);
+            node_t* one_node = NUM_(1.0);
             ReplaceNode(tree, node, one_node);
             return one_node;
         }

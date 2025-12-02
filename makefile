@@ -3,30 +3,26 @@ FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-compat -W
 COMMON_INCLUDES		= -I./COMMON/headers
 CONFIG_INCLUDES 	= -I./CONFIG
 STK_INCLUDES		= -I./STACK/headers
-TREE_INCLUDES		= -I./TREE/headers
 GEN_INCLUDES		= -I./GENERATOR/headers -I./GENERATOR/src -I./GENERATOR/ReportFiles
+TREE_INCLUDES		= -I./TREE/headers
+LEX_INCLUDES		= -I./LEXER/headers
 WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
-EXPRESS_INCLUDES	= -I./EXPRESS_READER/headers
 
 COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
-WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp WOLFRAM_SIGMA/LatexDump.cpp
+LEX_FILES	  = LEXER/lexer.cpp
+WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp WOLFRAM_SIGMA/LatexDump.cpp WOLFRAM_SIGMA/LatexFileOpenClose.cpp
 
 all: help
 
-wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(TREE_FILES) $(WOLFRAM_FILES)
+wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
-	g++ -o wolf_program $(FLAGS) WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(GEN_INCLUDES) $(STK_INCLUDES) $(TREE_INCLUDES) $(WOLFRAM_INCLUDES) $(COMMON_FILES) $(TREE_FILES) $(WOLFRAM_FILES)
+	g++ -o wolf_program $(FLAGS) WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(GEN_INCLUDES) $(STK_INCLUDES) $(TREE_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) $(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 gen: GENERATOR/main_gen.cpp $(COMMON_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 	g++ -o gen_program $(FLAGS) GENERATOR/main_gen.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(GEN_INCLUDES) $(COMMON_FILES)
-	@echo "-----------------------------------------------------------------------------------------"
-
-exp: EXPRESS_READER/ExpressReader.cpp
-	@echo "-----------------------------------------------------------------------------------------"
-	g++ -o exp_program $(FLAGS) EXPRESS_READER/ExpressReader.cpp $(EXPRESS_INCLUDES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 
@@ -36,13 +32,10 @@ run-wolf: wolf
 run-gen: gen
 	./gen_program
 
-run-exp: exp
-	./exp_program
-
 run: run-wolf
 
 clean:
-	rm -f wolf_program gen_program exp_program
+	rm -f wolf_program gen_program
 
 help:
 	@echo "Available commands:"
@@ -53,4 +46,4 @@ help:
 	@echo ""
 	@echo "  make clean                    - remove compiled programs"
 
-.PHONY: wolf gen exp run-wolf run-gen run-exp run clean help
+.PHONY: wolf gen run-wolf run-gen run clean help

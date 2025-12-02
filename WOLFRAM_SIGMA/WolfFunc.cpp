@@ -1,5 +1,4 @@
 #include "wolfram.h"
-#include "DSL.h"
 #include "OpInstrSet.cpp"
 
 var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
@@ -76,12 +75,12 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
             hash_t hash_var = HashStr(node->item.var);
             
             if (hash_var == hash_indep_var)
-                return NUM_(1);
+                return NUM_(1.0);
             
-            return NUM_(0);
+            return NUM_(0.0);
         }
         case ARG_NUM:
-            return NUM_(0);
+            return NUM_(0.0);
             
         default:
             return NULL;
@@ -96,10 +95,16 @@ node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
     node_t *current = DerivativeNode(CopyNode(node), hash_indep_var);
     
     for (int i = 1; i < count; ++i)
-        current = DerivativeNode(current, hash_indep_var);
+    {
+        // LATEX(current);
+        node_t *next = DerivativeNode(CopyNode(current), hash_indep_var);
+        FreeNodes(current);
+        current = next;
+    }
     
     return current;
 }
+
 
 node_t *CopyNode(node_t *node)
 {
@@ -129,52 +134,44 @@ void set_parents(node_t *node, node_t *parent)
 }
 
 
-void TaylorSeries(tree_t *tree, const char* indep_var, int point, int order)
+void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
 {
     tree_t *taylor_tree = {0};
     WolfCtor(&taylor_tree);
     
-    node_t *series_sum = NUM_(0);
+    node_t *series_sum = NUM_(0.0);
     hash_t hash_indep_var = HashStr(indep_var);
     node_t *x0 = NUM_(point);
     
     for (int n = 0; n <= order; ++n)
     {
-        node_t *derivative_at_point = NULL;
+        node_t *nth_derivative = NDerivativeNode(CopyNode(tree->root), hash_indep_var, n);
+        node_t *derivative_at_point = Substitute_x0(nth_derivative, hash_indep_var, x0);
         
-        if (n == 0)
-        {
-            derivative_at_point = Substitute_x0(CopyNode(tree->root), hash_indep_var, x0);
-        }
-        else
-        {
-            node_t *nth_derivative = NDerivativeNode(CopyNode(tree->root), hash_indep_var, n);
-            derivative_at_point = Substitute_x0(nth_derivative, hash_indep_var, x0);
-        }
-        
-        node_t *coeff = DIV_(derivative_at_point, NUM_(Factorial(n)));
-        
-        node_t *x_var = NewNode(ARG_VAR, indep_var, NULL, NULL);
+        node_t *coeff = DIV_(derivative_at_point, NUM_((double)Factorial(n)));
+        node_t *x_var = NewNode(ARG_VAR, valVAR(indep_var), NULL, NULL);
         node_t *x_minus_x0 = SUB_(x_var, CopyNode(x0));
-        node_t *power_term = POW_(x_minus_x0, NUM_(n));
+
+        node_t *power_term = POW_(x_minus_x0, NUM_((double)n));
         
         node_t *new_term = MUL_(coeff, power_term);
         
-        series_sum = ADD_(series_sum, new_term);
+        node_t *old_sum = series_sum;
+        series_sum = ADD_(old_sum, new_term);
     }
         
     taylor_tree->root = series_sum;
     SimplifyTree(taylor_tree);
 
     GenGraphs(taylor_tree, __func__);
-    TreeToLatex(taylor_tree, "WOLFRAM_SIGMA/ReportFiles/LatexDump.tex");
+    // TreeToLatex(taylor_tree, "WOLFRAM_SIGMA/ReportFiles/LatexDump.tex");
     WolfDtor(taylor_tree);
 }
 
 
 node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
 {
-    if (IS_BAD_PTR(node)) return NULL;
+    if (!node) return NULL;
     
     if (node->type == ARG_VAR && HashStr(node->item.var) == var_hash)
     {
@@ -182,8 +179,48 @@ node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
     }
     
     node_t *new_node = CopyNode(node);
-    new_node->left  = Substitute_x0(node->left,  var_hash, value);
+    new_node->left  = Substitute_x0(node->left, var_hash, value);
     new_node->right = Substitute_x0(node->right, var_hash, value);
 
     return new_node;
 }
+
+
+// node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
+// {
+//     if (IS_BAD_PTR(node)) return NULL;
+    
+//     // Если узел - переменная, которую нужно заменить
+//     if (node->type == ARG_VAR && HashStr(node->item.var) == var_hash)
+//     {
+//         return CopyNode(value);
+//     }
+    
+//     if (node->type == ARG_OP)
+//     {
+//         node_t *node_left  = Substitute_x0(node->left, var_hash, value);
+//         node_t *node_right = Substitute_x0(node->right, var_hash, value);
+        
+//         if (node_left && node_right && 
+//             node_left->type == ARG_NUM && node_right->type == ARG_NUM)
+//         {
+//             hash_t op_hash = HashStr(node->item.op);
+//             size_t index   = 0;
+
+//             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+//             {                
+//                 calc_context context = {node_left->item.num, node_right->item.num};
+//                 double result = op_instr_set[index].calc(&context);
+                
+//                 FreeNodes(node_left);
+//                 FreeNodes(node_right);
+//                 return NUM_(result);
+//             }
+//         }
+        
+//         node_t *new_node = NewNode(ARG_OP, node->item.op, node_left, node_right);
+//         return new_node;
+//     }
+    
+//     return CopyNode(node);
+// }

@@ -83,7 +83,14 @@ union val
     double num;
     char*  op;
     char*  var;
+
+    val() : num(0) {}
+    val(double n) : num(n) {}
 };
+
+val valOP(const char* s);
+val valVAR(const char* s);
+
 
 struct node_t
 {
@@ -109,7 +116,7 @@ struct tree_t
 TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line);
 TreeErr_t TreeCtor (tree_t *tree);
 
-node_t* NewNode(ArgTypes type, const char* item, node_t *left, node_t *right);
+node_t *NewNode(ArgTypes type, val item, node_t *left, node_t *right);
 
 TreeErr_t FreeNodes(node_t *node);
 TreeErr_t TreeDtor (tree_t *tree);

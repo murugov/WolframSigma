@@ -40,7 +40,7 @@ bool NeedParentheses(node_t *parent, node_t *child, bool is_left)
 }
 
 
-void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent, bool is_left)
+void NodeToLatex(node_t *node, node_t *parent, bool is_left)
 {
     if (node == NULL) return;
 
@@ -50,7 +50,7 @@ void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent, bool is_left)
             break;
 
         case ARG_VAR:
-            fprintf(file_latex, "%s", node->item.var);
+            fprintf(file_latex, "{%s}", node->item.var);
             break;
 
         case ARG_OP:
@@ -65,15 +65,23 @@ void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent, bool is_left)
                 if (op_hash == HASH_LOG)
                 {
                     fprintf(file_latex, "\\log_{");
-                    NodeToLatex(node->left, file_latex, node, true);
+                    NodeToLatex(node->left, node, true);
                     fprintf(file_latex, "}\\left(");
-                    NodeToLatex(node->right, file_latex, node, false);
+                    NodeToLatex(node->right, node, false);
                     fprintf(file_latex, "\\right)");
                 }
                 else if (op_hash == HASH_E)
                 {
                     fprintf(file_latex, "e^{");
-                    NodeToLatex(node->right, file_latex, node, false);
+                    NodeToLatex(node->right, node, false);
+                    fprintf(file_latex, "}");
+                }
+                else if (op_hash == HASH_DIV)
+                {
+                    fprintf(file_latex, "\\frac{");
+                    NodeToLatex(node->left, node, false);
+                    fprintf(file_latex, "}{");
+                    NodeToLatex(node->right, node, false);
                     fprintf(file_latex, "}");
                 }
                 else if (op_instr_set[index].num_args == 2)
@@ -82,25 +90,22 @@ void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent, bool is_left)
                     bool right_paren = NeedParentheses(node, node->right, false);
                     
                     if (left_paren) fprintf(file_latex, "(");
-                    NodeToLatex(node->left, file_latex, node, true);
+                    NodeToLatex(node->left, node, true);
                     if (left_paren) fprintf(file_latex, ")");
                     
                     if (op_hash == HASH_MUL)
                         fprintf(file_latex, " \\cdot ");
-                    else if (op_hash == HASH_DIV)
-                        fprintf(file_latex, " \\over ");
-                    else {
+                    else
                         fprintf(file_latex, " %s ", op_symbols);
-                    }
                     
                     if (right_paren) fprintf(file_latex, "(");
-                    NodeToLatex(node->right, file_latex, node, false);
+                    NodeToLatex(node->right, node, false);
                     if (right_paren) fprintf(file_latex, ")");
                 }
                 else if (op_instr_set[index].num_args == 1)
                 {
                     fprintf(file_latex, "%s\\left(", op_symbols);
-                    NodeToLatex(node->right, file_latex, node, false);
+                    NodeToLatex(node->right, node, false);
                     fprintf(file_latex, "\\right)");
                 }
             }
@@ -113,35 +118,12 @@ void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent, bool is_left)
     }
 }
 
-void TreeToLatex(tree_t *tree, const char *filename)
+void TreeToLatex(node_t *node)
 {
-    if (IS_BAD_PTR(tree) || IS_BAD_PTR(filename)) return;
-
-    FILE *file_latex = fopen(filename, "w");
-    if (IS_BAD_PTR(file_latex)) { 
-        printf(ANSI_COLOR_RED "Error: Cannot open file %s\n" ANSI_COLOR_RESET, filename); 
-        return; 
-    }
-
-    fprintf(file_latex, "\\documentclass{article}\n");
-    fprintf(file_latex, "\\usepackage[utf8]{inputenc}\n");
-    fprintf(file_latex, "\\usepackage{amsmath}\n");
-    fprintf(file_latex, "\\usepackage{amssymb}\n");
-    fprintf(file_latex, "\\title{Expression Tree}\n");
-    fprintf(file_latex, "\\author{Wolfram}\n");
-    fprintf(file_latex, "\\date{\\today}\n");
-    fprintf(file_latex, "\\begin{document}\n");
-    fprintf(file_latex, "\\maketitle\n\n");
-
-    fprintf(file_latex, "\\section{Mathematical Expression}\n");
     fprintf(file_latex, "\\[\n");
     
-    if (tree->root) NodeToLatex(tree->root, file_latex);
+    if (!IS_BAD_PTR(node)) NodeToLatex(node);
     else fprintf(file_latex, "\\text{Empty tree}");
     
     fprintf(file_latex, "\n\\]\n\n");
-
-    fprintf(file_latex, "\\end{document}\n");
-    
-    fclose(file_latex);
 }

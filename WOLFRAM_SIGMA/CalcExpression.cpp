@@ -20,7 +20,7 @@ double CalcExpression(node_t *node)
 
             if (HashSearch(op_hash, &index) == TREE_SUCCESS)
             {
-                if (isnan(right_val) && op_instr_set[index].num_args == 2) return NAN;
+                if (isnan(left_val) && op_instr_set[index].num_args == 2) return NAN;
                 
                 calc_context context = {left_val, right_val};
                 return op_instr_set[index].calc(&context);

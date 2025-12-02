@@ -10,6 +10,8 @@
 
 #include "WolfOp.h"
 
+extern FILE *file_latex;
+
 #define MAX_NUM_VAR 4
 
 struct var_t
@@ -40,7 +42,7 @@ node_t *CopyNode(node_t *node);
 
 node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count);
 
-void TaylorSeries(tree_t *tree, const char* indep_var, int point, int order);
+void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order);
 node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value);
 
 void SimplifyTree(tree_t* tree);
@@ -51,21 +53,29 @@ node_t *SwapParentAndChild(tree_t *tree, node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
-node_t* NodeReader(char* cur_pos, char** next_pos, node_t *parent);
-int NameNodeReader(char* cur_pos);
 WolfErr_t DataReader(const char *src, tree_t *tree);
-
-void PrintEquation(node_t *node);
 
 WolfErr_t GenHTML();
 WolfErr_t GenGraphs(tree_t *tree, const char *func);
 WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 
-void TreeToLatex(tree_t *tree, const char *filename);
-void NodeToLatex(node_t *node, FILE *file_latex, node_t *parent = NULL, bool is_left = true);
+WolfErr_t LatexFileOpener(const char* path);
+WolfErr_t LatexFileCloser();
+
+void TreeToLatex(node_t *node);
+void NodeToLatex(node_t *node, node_t *parent = NULL, bool is_left = true);
 
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
-#define NUM_(num) NewNode(ARG_NUM, #num, NULL, NULL)
+
+#define OP_(op)   NewNode(ARG_OP, valVAR(op), NULL, NULL)
+#define VAR_(var) NewNode(ARG_VAR, valVAR(var), NULL, NULL)
+#define NUM_(num) NewNode(ARG_NUM, num, NULL, NULL)
+
+#define LATEX(node) do{ \
+                        fprintf(file_latex, "\\[\n"); \
+                        NodeToLatex(node); \
+                        fprintf(file_latex, "\n\\]\n\n"); \
+                    } while(0)
 
 #endif

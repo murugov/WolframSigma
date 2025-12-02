@@ -1,86 +1,25 @@
-[2025-11-30 17:56:19] DEBUG Created id for tree "*tree)"
-[2025-11-30 17:56:19] DEBUG Created id for stack "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ret" created
-[2025-11-30 17:56:19] DEBUG Created id for stack "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ids" created
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000000610 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 0 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000000610 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0 from "stk_ids"
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000000650 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 1 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000000650 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 1 from "stk_ids"
-[2025-11-30 17:56:19] INFO  Stack "stk_ret" destroed
-[2025-11-30 17:56:19] INFO  Stack "stk_ids" destroed
-[2025-11-30 17:56:19] DEBUG Created id for tree "*tree)"
-[2025-11-30 17:56:19] DEBUG Created id for stack "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ret" created
-[2025-11-30 17:56:19] DEBUG Created id for stack "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ids" created
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000008650 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 0 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000008650 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0 from "stk_ids"
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000008690 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 1 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ret" reallocated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000008790 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Stack "stk_ids" reallocated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 2 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000008790 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 2 from "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000008690 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 1 from "stk_ids"
-[2025-11-30 17:56:19] DEBUG PUSH 0x6040000086d0 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 3 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000008710 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 4 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000008710 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 4 from "stk_ids"
-[2025-11-30 17:56:19] DEBUG PUSH 0x604000008750 in "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG PUSH 5 in "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x604000008750 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 5 from "stk_ids"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 0x6040000086d0 from "stk_ret"
-[2025-11-30 17:56:19] INFO  Hash updated
-[2025-11-30 17:56:19] DEBUG POP 3 from "stk_ids"
-[2025-11-30 17:56:19] INFO  Stack "stk_ret" destroed
-[2025-11-30 17:56:19] INFO  Stack "stk_ids" destroed
+[2025-12-02 20:20:39] DEBUG Created id for tree "*tree)"
+[2025-12-02 20:20:39] DEBUG Created id for stack "stk_ret"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] INFO  Stack "stk_ret" created
+[2025-12-02 20:20:39] DEBUG Created id for stack "stk_ids"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] INFO  Stack "stk_ids" created
+[2025-12-02 20:20:39] DEBUG PUSH 0x604000000610 in "stk_ret"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG PUSH 0 in "stk_ids"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG POP 0x604000000610 from "stk_ret"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG POP 0 from "stk_ids"
+[2025-12-02 20:20:39] DEBUG PUSH 0x604000000650 in "stk_ret"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG PUSH 1 in "stk_ids"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG POP 0x604000000650 from "stk_ret"
+[2025-12-02 20:20:39] INFO  Hash updated
+[2025-12-02 20:20:39] DEBUG POP 1 from "stk_ids"
+[2025-12-02 20:20:39] INFO  Stack "stk_ret" destroed
+[2025-12-02 20:20:39] INFO  Stack "stk_ids" destroed
