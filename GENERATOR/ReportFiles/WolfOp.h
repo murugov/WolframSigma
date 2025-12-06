@@ -6,31 +6,42 @@
 
 enum HashOp
 {
-	HASH_ADD     = 0x2B,
-	HASH_SUB     = 0x2D,
-	HASH_MUL     = 0x2A,
-	HASH_DIV     = 0x2F,
-	HASH_POW     = 0x5E,
-	HASH_SQRT    = 0x35FD20,
-	HASH_E       = 0x65,
-	HASH_LN      = 0xD82,
-	HASH_LOG     = 0x1A344,
-	HASH_SIN     = 0x1BCD8,
-	HASH_COS     = 0x18187,
-	HASH_TAN     = 0x1BFA1,
-	HASH_COT     = 0x18188,
-	HASH_SINH    = 0x35DE90,
-	HASH_COSH    = 0x2EAFC1,
-	HASH_TANH    = 0x3634E7,
-	HASH_COTH    = 0x2EAFE0,
-	HASH_ARCSIN  = 0xABFB4946,
-	HASH_ARCCOS  = 0xABFB0DF5,
-	HASH_ARCTAN  = 0xABFB4C0F,
-	HASH_ARCCOT  = 0xABFB0DF6,
-	HASH_ARCSINH = 0x14D36DDFE2,
-	HASH_ARCCOSH = 0x14D366B113,
-	HASH_ARCTANH = 0x14D36E3639,
-	HASH_ARCCOTH = 0x14D366B132
+	HASH_L_PAREN    = 0x28,
+	HASH_R_PAREN    = 0x29,
+	HASH_L_BRACKET  = 0x5B,
+	HASH_R_BRACKET  = 0x5D,
+	HASH_L_BRACE    = 0x7B,
+	HASH_R_BRACE    = 0x7D,
+	HASH_EQUAL      = 0x3D,
+	HASH_COMMA      = 0x2C,
+	HASH_SEMICOLON  = 0x3B,
+	HASH_DERIVATIVE = 0x44,
+	HASH_PLOT       = 0x348CE1,
+	HASH_ADD        = 0x2B,
+	HASH_SUB        = 0x2D,
+	HASH_MUL        = 0x2A,
+	HASH_DIV        = 0x2F,
+	HASH_POW        = 0x5E,
+	HASH_SQRT       = 0x35FD20,
+	HASH_E          = 0x65,
+	HASH_LN         = 0xD82,
+	HASH_LOG        = 0x1A344,
+	HASH_SIN        = 0x1BCD8,
+	HASH_COS        = 0x18187,
+	HASH_TAN        = 0x1BFA1,
+	HASH_COT        = 0x18188,
+	HASH_SINH       = 0x35DE90,
+	HASH_COSH       = 0x2EAFC1,
+	HASH_TANH       = 0x3634E7,
+	HASH_COTH       = 0x2EAFE0,
+	HASH_ARCSIN     = 0xABFB4946,
+	HASH_ARCCOS     = 0xABFB0DF5,
+	HASH_ARCTAN     = 0xABFB4C0F,
+	HASH_ARCCOT     = 0xABFB0DF6,
+	HASH_ARCSINH    = 0x14D36DDFE2,
+	HASH_ARCCOSH    = 0x14D366B113,
+	HASH_ARCTANH    = 0x14D36E3639,
+	HASH_ARCCOTH    = 0x14D366B132
 };
 
 struct calc_context
@@ -124,16 +135,6 @@ node_t *diffARCCOTH(diff_context *diff_params);
 
 typedef double (*calc_t)(calc_context *calc_params);
 typedef node_t *(*diff_t)(diff_context *diff_params);
-
-
-struct op_t
-{
-	HashOp hash;
-	char   name[8];
-	int    num_args;
-	calc_t calc;
-	diff_t diff;
-};
 
 
 #endif

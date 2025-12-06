@@ -1,237 +1,213 @@
-#include "lexer.h"
-#include "OpInstrSet.cpp"
+#include "lexer.h" 
+
+static token_t* peeked_token = NULL;
+static token_t *ReadNum(lexer_t *lexer);
+static token_t *ReadName(lexer_t *lexer);
 
 
-node_t *GetGeneral(const char **lex_pos)
+lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name)
 {
-    node_t *node = GetExpress(lex_pos);
-    if (node == NULL || **lex_pos != '$')
+    ON_DEBUG( if (IS_BAD_PTR(lines) || IS_BAD_PTR(file_name)) return LEX_ERROR; )
+
+    lexer->lines = lines;
+    lexer->line_count = line_count;
+    lexer->cur_line = 0;
+    lexer->cur_col = 1;
+    lexer->cur_pos = lines[0]; 
+    lexer->file_name = strdup(file_name);
+
+    return LEX_SUCCESS;
+}
+
+
+token_t *NewToken(type_t type, const char* start, int length, int line, int col)
+{
+    token_t *new_token = (token_t*)calloc(1, sizeof(token_t));
+
+    new_token->type   = type;
+    new_token->start  = start;
+    new_token->length = length;
+    new_token->line   = line;
+    new_token->col    = col;
+
+    return new_token;
+}
+
+
+lexerErr_t SkipSpaces(lexer_t* lexer)
+{
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return LEX_ERROR; )
+
+    while (!(IS_END(lexer)))
     {
-        printf(ANSI_COLOR_RED "Syntax error!\n" ANSI_COLOR_RESET);
-        printf("cur_pos: %s\n", *lex_pos);
-        FreeNodes(node);
-        return NULL;
-    }
+        while (*lexer->cur_pos == ' ' || *lexer->cur_pos == '\t') { lexer->cur_pos++; lexer->cur_col++; }
         
-    set_parents(node, NULL);
-    (*lex_pos)++;
-    
-    return node;
-}
-
-
-node_t *GetExpress(const char **lex_pos)
-{
-    node_t *node_1 = GetTerm(lex_pos);
-    if (IS_BAD_PTR(node_1)) return NULL;
-
-    node_t *node_res = node_1;
-    while (**lex_pos == '+' || **lex_pos == '-')
-    {
-        int op = **lex_pos;
-        (*lex_pos)++;
-        node_t *node_2 = GetTerm(lex_pos);
-        if (IS_BAD_PTR(node_2)) { FreeNodes(node_res); return NULL; }
-
-        if (op == '+')
-            node_res = ADD_(node_res, node_2);
-        else
-            node_res = SUB_(node_res, node_2);
-    }
-
-    return node_res;
-}
-
-
-node_t *GetTerm(const char **lex_pos)
-{
-    node_t *node_1 = GetPow(lex_pos);
-    if (IS_BAD_PTR(node_1)) return NULL;
-
-    node_t *node_res = node_1;
-    while (**lex_pos == '*' || **lex_pos == '/')
-    {
-        int op = **lex_pos;
-        (*lex_pos)++;
-        node_t *node_2 = GetPow(lex_pos);
-        if (IS_BAD_PTR(node_2)) { FreeNodes(node_res); return NULL; }
-
-        if (op == '*')
-            node_res = MUL_(node_res, node_2);
-        else
-            node_res = DIV_(node_res, node_2);
-    }
-
-    return node_res;
-}
-
-
-node_t *GetPow(const char **lex_pos)
-{
-    node_t *node_1 = GetFunc(lex_pos);
-    if (IS_BAD_PTR(node_1)) return NULL;
-
-    node_t *node_res = node_1;
-    while (**lex_pos == '^')
-    {
-        (*lex_pos)++;
-        node_t *node_2 = GetFunc(lex_pos);
-        if (IS_BAD_PTR(node_2)) { FreeNodes(node_res); return NULL; }
-
-        node_res = POW_(node_res, node_2);
-    }
-
-    return node_res;
-}
-
-
-node_t *GetFunc(const char **lex_pos)
-{
-    const char* saved_pos = *lex_pos;
-    
-    node_t *node_name = GetName(lex_pos);
-    if (node_name == NULL) 
-    {
-        *lex_pos = saved_pos;
-        return GetParen(lex_pos);
-    }
-
-    hash_t hash_item = HashStr(node_name->item.var);
-    size_t index = 0;
-
-    if (HashSearch(hash_item, &index) == TREE_SUCCESS)
-    {
-        
-        if (**lex_pos != '(')
+        if (*lexer->cur_pos == '\0')
         {
-            printf(ANSI_COLOR_RED "Expected '(' before function argument\n" ANSI_COLOR_RESET);
-            return NULL;
-        }
-        (*lex_pos)++;
-        
-        node_name->type = ARG_OP;
-
-        node_t *node_arg = GetExpress(lex_pos);
-        if (IS_BAD_PTR(node_arg)) { FreeNodes(node_name); return NULL; }
-
-        if (op_instr_set[index].num_args == 1)
-        {
-            node_name->right = node_arg;
-            if (**lex_pos != ')')
+            lexer->cur_line++;
+            if (lexer->cur_line < lexer->line_count)
             {
-                printf(ANSI_COLOR_RED "Expected ')'\n" ANSI_COLOR_RESET);
-                FreeNodes(node_name);
-                FreeNodes(node_arg);
-                return NULL;
-            }
-            (*lex_pos)++;
-
-            return node_name;
+                lexer->cur_pos = lexer->lines[lexer->cur_line];
+                lexer->cur_col = 1;
+            } 
+            else
+                break;
         }
         else
-        {
-            if (**lex_pos != ',')
-            {
-                printf(ANSI_COLOR_RED "Expected ','\n" ANSI_COLOR_RESET);
-                FreeNodes(node_name);
-                FreeNodes(node_arg);
-                return NULL;
-            }
-            (*lex_pos)++;
-            
-            node_t *node_arg2 = GetExpress(lex_pos);
-            if (IS_BAD_PTR(node_arg2)) { FreeNodes(node_name); FreeNodes(node_arg); return NULL; }
-            
-            if (**lex_pos != ')')
-            {
-                printf(ANSI_COLOR_RED "Expected ')'\n" ANSI_COLOR_RESET);
-                FreeNodes(node_name);
-                FreeNodes(node_arg);
-                FreeNodes(node_arg2);
-                return NULL;
-            }
-            (*lex_pos)++;
-
-            node_name->left  = node_arg;
-            node_name->right = node_arg2;
-
-            return node_name;
-        }
+            break;
     }
 
-    IS_USED_VARS(node_name->item.var);
-
-    FreeNodes(node_name);
-    printf(ANSI_COLOR_RED "Non-existent variable name\n" ANSI_COLOR_RESET);
-    return NULL;
+    return LEX_SUCCESS;
 }
 
 
-bool isValidName(const char* name)
+token_t *NextToken(lexer_t* lexer)
 {
-    if (IS_BAD_PTR(name) || name[0] == '\0' || !isalpha(name[0])) return false;
-    
-    if (!isalpha(name[0])) return false;
-    
-    for (int i = 1; name[i] != '\0'; ++i)
-        if (!isalnum(name[i]) && name[i] != '_') return false;
-    
-    return true;
-}
-
-
-node_t *GetName(const char **lex_pos)
-{
-    int num_symbols = 0;
-    char tmp[256] = {0};
-    
-    if (sscanf(*lex_pos, "%255[a-zA-Z0-9_]%n", tmp, &num_symbols) != 1) return NULL;
-
-    if (!isValidName(tmp)) return NULL;
-
-    node_t *node_var = VAR_(tmp);
-    if (IS_BAD_PTR(node_var)) return NULL;
-
-    (*lex_pos) += num_symbols;
-    return node_var;
-}
-
-
-node_t *GetParen(const char **lex_pos)
-{
-    if (**lex_pos == '(')
+    if (peeked_token)
     {
-        (*lex_pos)++;
-        node_t *node = GetExpress(lex_pos);
-
-        if (**lex_pos != ')')
-        {
-            printf(ANSI_COLOR_RED "Expected ')'\n" ANSI_COLOR_RESET);
-            FreeNodes(node);
-            return NULL;
-        }
-        (*lex_pos)++;
-
-        return node;
+        token_t* token = peeked_token;
+        peeked_token = NULL;
+        return token;
     }
 
-    const char* saved_pos = *lex_pos;
-    node_t *node_name = GetName(lex_pos);
-    if (node_name != NULL) return node_name;
+    SkipSpaces(lexer);
+    if (IS_END(lexer)) return NewToken(TOKEN_EOF, "", 0, lexer->cur_line + 1, lexer->cur_col);
     
-    (*lex_pos) = saved_pos;
-    return GetNum(lex_pos);
-}
+    char cur_sym = *lexer->cur_pos;
+    const char* start = lexer->cur_pos;
+    int line = lexer->cur_line + 1;
+    int col  = lexer->cur_col;
+    
+    switch (cur_sym)
+    {
+        case '(':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_LPAREN, start, 1, line, col);
 
+        case ')':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_RPAREN, start, 1, line, col);
 
-node_t *GetNum(const char **lex_pos)
-{
-    node_t *node_num = NUM_(0);
-    if (IS_BAD_PTR(node_num)) return NULL;
+        case ',':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_COMMA, start, 1, line, col);
+
+        case '+':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_ADD, start, 1, line, col);
+
+        case '-':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_SUB, start, 1, line, col);
+
+        case '*':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_MUL, start, 1, line, col);
+
+        case '/':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_DIV, start, 1, line, col);
+
+        case '^':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_POW, start, 1, line, col);
+
+        case '=':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_EQ, start, 1, line, col);
+
+        case '$':
+            lexer->cur_pos++;
+            lexer->cur_col++;
+            return NewToken(TOKEN_DOLLAR, start, 1, line, col);
+
+        default:
+            break;
+    }
     
     int num_digits = 0;
-    if (sscanf(*lex_pos, "%lg%n", &(node_num->item.num), &num_digits) != 1) { free(node_num); return NULL; }
-    (*lex_pos) += num_digits;
+    sscanf(lexer->cur_pos, "%*g%n", &num_digits);
+    if (num_digits)
+        return ReadNum(lexer);
+    
+    if (isalpha(cur_sym))
+        return ReadName(lexer);
+    
+    lexer->cur_pos++;
+    lexer->cur_col++;
+    return NewToken(TOKEN_UNDEF, start, 1, line, col);
+}
 
-    return node_num;
+
+token_t *PeekToken(lexer_t* lexer)
+{
+    if (!peeked_token)
+    {
+        const char* saved_pos = lexer->cur_pos;
+        int saved_line        = lexer->cur_line;
+        int saved_col         = lexer->cur_col;
+        
+        peeked_token = NextToken(lexer);
+        
+        lexer->cur_pos  = saved_pos;
+        lexer->cur_line = saved_line;
+        lexer->cur_col  = saved_col;
+    }
+
+    return peeked_token;
+}
+
+
+static token_t *ReadNum(lexer_t *lexer)
+{
+    double tmp_num = 0.0;
+    int num_digits = 0;
+    if (sscanf(lexer->cur_pos, "%lg%n", &tmp_num, &num_digits) != 1) return NULL;
+
+    token_t* token = NewToken(TOKEN_NUM, lexer->cur_pos, num_digits, lexer->cur_line + 1, lexer->cur_col);
+    
+    lexer->cur_pos += num_digits;
+    lexer->cur_col += num_digits;
+    
+    return token;
+}
+
+
+static token_t *ReadName(lexer_t *lexer)
+{
+    const char* start = lexer->cur_pos;
+    int line = lexer->cur_line + 1;
+    int col = lexer->cur_col;
+    
+    while (isalnum(*lexer->cur_pos) || *lexer->cur_pos == '_')
+    {
+        lexer->cur_pos++;
+        lexer->cur_col++;
+    }
+    
+    int length = (int)(lexer->cur_pos - start);
+    
+    const char* saved_pos = lexer->cur_pos;
+    int saved_col = lexer->cur_col;
+    int saved_line = lexer->cur_line;
+    
+    token_t* next_token = PeekToken(lexer);
+    
+    lexer->cur_pos = saved_pos;
+    lexer->cur_col = saved_col;
+    lexer->cur_line = saved_line;
+    
+    if (next_token && next_token->type == TOKEN_LPAREN)
+        return NewToken(TOKEN_FUNC, start, length, line, col);
+    else
+        return NewToken(TOKEN_VAR, start, length, line, col);
 }

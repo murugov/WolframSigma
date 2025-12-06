@@ -10,8 +10,8 @@ WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
 COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
-LEX_FILES	  = LEXER/lexer.cpp
-WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/DataReader.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp WOLFRAM_SIGMA/LatexDump.cpp WOLFRAM_SIGMA/LatexFileOpenClose.cpp
+LEX_FILES	  = LEXER/lexer.cpp LEXER/token.cpp LEXER/parser.cpp
+WOLFRAM_FILES = WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp
 
 all: help
 
@@ -25,6 +25,11 @@ gen: GENERATOR/main_gen.cpp $(COMMON_FILES)
 	g++ -o gen_program $(FLAGS) GENERATOR/main_gen.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(GEN_INCLUDES) $(COMMON_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
+lex: LEXER/main_lex.cpp $(COMMON_FILES) $(TREE_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
+	@echo "-----------------------------------------------------------------------------------------"
+	g++ -o lex_program $(FLAGS) LEXER/main_lex.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(TREE_INCLUDES) $(GEN_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) $(COMMON_FILES) $(TREE_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
+	@echo "-----------------------------------------------------------------------------------------"
+
 
 run-wolf: wolf
 	./wolf_program
@@ -32,10 +37,13 @@ run-wolf: wolf
 run-gen: gen
 	./gen_program
 
+run-lex: lex
+	./lex_program
+
 run: run-wolf
 
 clean:
-	rm -f wolf_program gen_program
+	rm -f wolf_program gen_program lex_program
 
 help:
 	@echo "Available commands:"
@@ -46,4 +54,4 @@ help:
 	@echo ""
 	@echo "  make clean                    - remove compiled programs"
 
-.PHONY: wolf gen run-wolf run-gen run clean help
+.PHONY: wolf gen run-wolf run-gen run-lex run clean help

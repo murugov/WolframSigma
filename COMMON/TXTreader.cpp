@@ -1,17 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "IsBadPtr.h"
-#include "SizeFile.h"
-#include "LineCounter.h"
+#include "TXTreader.h"
 
 
 int no_change(int c) { return c; }
 
-char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, size_t *count_line, int (*convert)(int))
+char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, int *count_line, int (*convert)(int))
 {
-    if (IsBadPtr((void*)SourceFile)) return NULL;
+    if (IS_BAD_PTR(SourceFile)) return NULL;
 
     ssize_t file_size = SizeFile(SourceFile);
     if (file_size < 0) return NULL;
@@ -32,7 +26,7 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, size_t *cou
     *count_line = LineCounter(buffer);
     if (*count_line == 0) return NULL;
 
-    char **arr_ptr = (char**)calloc(*count_line + 1, sizeof(char*));
+    char **arr_ptr = (char**)calloc((size_t)(*count_line + 1), sizeof(char*));
     if (IsBadPtr((void*)arr_ptr)) return NULL;
     
     size_t line_number = 0;
@@ -53,8 +47,7 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, size_t *cou
             }
         }
         
-        if (has_content)
-            line_number++;
+        if (has_content) line_number++;
         
         line_start = next_n + 1;
 

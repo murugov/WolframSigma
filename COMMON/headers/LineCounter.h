@@ -2,7 +2,10 @@
 #define LINE_COUNTER_H
 
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include "IsBadPtr.h"
 
-size_t LineCounter(char* buffer);
+int LineCounter(char* buffer);
 
 #endif

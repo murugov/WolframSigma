@@ -108,6 +108,16 @@ val valOP(const char* s)  { val v; v.op  = const_cast<char*>(s); return v; }
 val valVAR(const char* s) { val v; v.var = const_cast<char*>(s); return v; }
 
 
+void set_parents(node_t *node, node_t *parent)
+{
+    if (node == NULL) return;
+    
+    node->parent = parent;
+    set_parents(node->left, node);
+    set_parents(node->right, node);
+}
+
+
 TreeErr_t TreeDtor(tree_t *tree)
 {
     ON_DEBUG(

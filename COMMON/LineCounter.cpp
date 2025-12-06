@@ -1,14 +1,11 @@
-#include <string.h>
-#include <ctype.h>
-#include "IsBadPtr.h"
+#include "LineCounter.h"
 
-#include <stdio.h>
-size_t LineCounter(char* buffer)
+
+int LineCounter(char* buffer)
 {
-    if (IsBadPtr((void*)buffer))
-        return 0;
+    if (IS_BAD_PTR(buffer)) return 0;
 
-    size_t count_line = 0;
+    int count_line = 0;
     char* line_start = buffer;
     char* next_n = buffer;
     

@@ -1,45 +1,59 @@
 #include "wolfram.h"
 
-FILE *file_latex = NULL;
 
-int main()
+int main(int argc, char *argv[])
 {
     LogFileOpener(PATH_TO_LOGFILE);
 
-    LatexFileOpener(PATH_TO_LATEX);
+    if (argc >= 3)
+    {
+        FILE *SourceFile = fopen(argv[1], "r");
+        FILE *LatexFile  = fopen(argv[2], "w");
 
-    tree_t *wolf_tree = NULL;
-    WolfCtor(&wolf_tree);
+        if (IS_BAD_PTR(SourceFile))
+        {
+            printf(ANSI_COLOR_RED "Bad pointer \"%s\"\n" ANSI_COLOR_RESET, argv[1]);
+            LOG(ERROR, "Bad pointer \"%s\"", argv[1]);
+            return 1;
+        }
+        if (IS_BAD_PTR(LatexFile))
+        {
+            printf(ANSI_COLOR_RED "Bad pointer \"%s\"\n" ANSI_COLOR_RESET, argv[2]);
+            LOG(ERROR, "Bad pointer \"%s\"", argv[2]);
+            return 1;
+        }
 
-    DataReader(PATH_TO_DATA, wolf_tree);
+        // if (VerifyOpInstrSetSort() != SUCCESS)
+        // {
+        //     printf(ANSI_COLOR_RED "Not sorted op_instr_set!\n" ANSI_COLOR_RESET);
+        //     printf(ANSI_COLOR_RED "TODO: generation OpInstrSet.cpp with using \"make run-gen\"!\n" ANSI_COLOR_RESET);
+        //     LOG(ERROR, "Not sorted op_instr_set!");
+        //     return 1;
+        // }
 
-    GenGraphs(wolf_tree, __func__);
+        // LatexFileOpener(PATH_TO_LATEX);
 
-    
-    // TreeToLatex(wolf_tree);
-    
-    EnterVar();
-    // double res = CalcExpression(wolf_tree->root);
-    // printf("res = %g\n", res);
-     
-    // tree_t *diff_tree = NULL;
-    // WolfCtor(&diff_tree);
-    // node_t *diff_node = NDerivativeNode(CopyNode(wolf_tree->root), HashStr("x"), 3);
-    // diff_tree->root = diff_node;
-    // SimplifyTree(diff_tree);
-    // // TreeToLatex(diff_tree->root);
-    // GenGraphs(diff_tree, __func__);
-    // WolfDtor(diff_tree);
+        // tree_t *wolf_tree = NULL;
+        // WolfCtor(&wolf_tree);
+
+        // DataReader(PATH_TO_DATA, wolf_tree);
+
+        // GenGraphs(wolf_tree->root, __func__);
+
+        // TaylorSeries(wolf_tree, "x", 0.0, 7);
+
+        // WolfDtor(wolf_tree);    
+        // GenHTML();
+
+        // LatexFileCloser();
+
+        fclose(SourceFile);
+        fclose(LatexFile);
+    }
+    else
+        printf(ANSI_COLOR_RED "Incorrect transfer of input files\n" ANSI_COLOR_RESET);
 
 
-    // tree_t *taylor_tree = NULL;
-    TaylorSeries(wolf_tree, "x", 0.0, 3);
-
-    WolfDtor(wolf_tree);    
-    GenHTML();
-
-    LatexFileCloser();
     LogFileCloser();
-
     return 0;
 }

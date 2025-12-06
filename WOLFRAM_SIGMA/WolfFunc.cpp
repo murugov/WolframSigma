@@ -1,6 +1,7 @@
 #include "wolfram.h"
 #include "OpInstrSet.cpp"
 
+
 var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
 {
     {119, "w", 0, false},
@@ -67,7 +68,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
                 set_parents(tmp, NULL);
 
                 // must simplify tree here
-                // SimplifyTree(tmp);
+                SimplifyTree(tmp);
 
                 return tmp;
             }
@@ -92,7 +93,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 }
 
 
-node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count) // stack to save N-derivate of function
+node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
 {
     if (count == 0) return CopyNode(node);
 
@@ -100,8 +101,9 @@ node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count) // stac
     
     for (int i = 1; i < count; ++i)
     {
-        // LATEX(current);
         node_t *next = DerivativeNode(CopyNode(current), hash_indep_var);
+        SimplifyTree(next);
+        // LATEX(current);
 
         FreeNodes(current);
         current = next;        
@@ -129,47 +131,52 @@ node_t *CopyNode(node_t *node)
 }
 
 
-void set_parents(node_t *node, node_t *parent)
-{
-    if (node == NULL) return;
-    
-    node->parent = parent;
-    set_parents(node->left, node);
-    set_parents(node->right, node);
-}
-
-
 void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
 {   
+    ON_DEBUG( if (IS_BAD_PTR(tree)) return; )
+    
     node_t *series_sum = NUM_(0.0);
     hash_t hash_indep_var = HashStr(indep_var);
     node_t *x0 = NUM_(point);
+
+    node_t *current_derivative = CopyNode(tree->root);
     
     for (int n = 0; n <= order; ++n)
-    {
-        node_t *nth_derivative = NDerivativeNode(CopyNode(tree->root), hash_indep_var, n);
-        node_t *derivative_at_point = Substitute_x0(nth_derivative, hash_indep_var, x0);
-
-        TreeToLatex(derivative_at_point);
-        printf("%d: coeff = %g, fact = %g\n", n, CalcExpression(derivative_at_point), (double)Factorial(n));
-        node_t *coeff = NUM_(CalcExpression(derivative_at_point) / (double)Factorial(n));
-
-        node_t *x_minus_x0 = SUB_(VAR_(indep_var), CopyNode(x0));
-
-        node_t *power_term = POW_(x_minus_x0, NUM_((double)n));
+    {        
+        node_t *derivative_at_point = Substitute_x0(current_derivative, hash_indep_var, x0);
+        double derivative_value = CalcExpression(derivative_at_point);   
+        // printf("derivative_value = %g\n", derivative_value);     
+        double coeff_value = derivative_value / (double)Factorial(n);
+        // printf("coeff_value = %g\n", coeff_value);
+        node_t *coeff = NUM_(coeff_value);
         
+        node_t *x_minus_x0 = SUB_(VAR_(indep_var), CopyNode(x0));
+        node_t *power_term = POW_(x_minus_x0, NUM_((double)n));
         node_t *new_term = MUL_(coeff, power_term);
         
         node_t *old_sum = series_sum;
         series_sum = ADD_(old_sum, new_term);
-    }
         
+        FreeNodes(derivative_at_point);
+        
+        if (n < order)
+        {
+            // SimplifyTree(current_derivative);
+            node_t *next_derivative = DerivativeNode(current_derivative, hash_indep_var);
+            FreeNodes(current_derivative);
+            current_derivative = next_derivative;
+        }        
+    }
+    FreeNodes(current_derivative);
+    FreeNodes(x0);
+    
     set_parents(series_sum, NULL);
     SimplifyTree(series_sum);
-
-    TreeToLatex(series_sum);
-
-    // GenGraphs(taylor_tree, __func__);
+    
+    GenGraphs(series_sum, __func__);
+    // TreeToLatex(series_sum);
+    
+    FreeNodes(series_sum);
 }
 
 

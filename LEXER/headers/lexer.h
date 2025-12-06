@@ -1,29 +1,32 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "wolfram.h"
+#include "token.h"
 
 
-node_t *GetGeneral(const char **lex_pos);
-node_t *GetExpress(const char **lex_pos);
-node_t *GetTerm(const char **lex_pos);
-node_t *GetPow(const char **lex_pos);
-node_t *GetFunc(const char **lex_pos);
-node_t *GetName(const char **lex_pos);
-node_t *GetParen(const char **lex_pos);
-node_t *GetNum(const char **lex_pos);
-bool isValidName(const char* name);
+enum lexerErr_t
+{
+    LEX_SUCCESS = 0,
+    LEX_ERROR   = 1
+};
 
+struct lexer_t
+{
+    char**      lines;
+    int         line_count;
+    int         cur_line;
+    int         cur_col;
+    const char* cur_pos;
+    const char* file_name;
+};
 
-#define IS_USED_VARS(name)  do { \
-                                hash_t name_hash = HashStr(name); \
-                                for (int i = 0; i < MAX_NUM_VAR; ++i) \
-                                { \
-                                    if (name_hash == variables[i].hash) \
-                                    { \
-                                        variables[i].is_used = true; \
-                                        return node_name; \
-                                    } \
-                                } \
-                            } while(0)
+lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name);
+token_t *NewToken(type_t type, const char* start, int length, int line, int col);
+
+lexerErr_t SkipSpaces(lexer_t* lexer);
+token_t *NextToken(lexer_t* lexer);
+token_t *PeekToken(lexer_t* lexer);
+
+#define IS_END(lexer) (lexer->cur_line >= lexer->line_count)
+
 #endif

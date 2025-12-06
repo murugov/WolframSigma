@@ -65,9 +65,13 @@ WolfErr_t GenHTML()
 }
 
 
-WolfErr_t GenGraphs(tree_t *tree, const char *func)
+WolfErr_t GenGraphs(node_t *node, const char *func)
 {
-    ON_DEBUG( if (IS_BAD_PTR(tree)) return WOLF_ERROR; )
+    ON_DEBUG( if (IS_BAD_PTR(node)) return WOLF_ERROR; )
+
+    tree_t *tree = NULL;
+    WolfCtor(&tree);
+    tree->root = node;
 
     char folder[64] = {0};
     snprintf(folder, sizeof(folder), "mkdir -p WOLFRAM_SIGMA/ReportFiles/graphs/graph%zu", number_graph);
@@ -88,6 +92,7 @@ WolfErr_t GenGraphs(tree_t *tree, const char *func)
     system(dot_cmd);
 
     number_graph++;
+
     return WOLF_SUCCESS;
 }
 

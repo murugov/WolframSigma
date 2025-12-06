@@ -18,4 +18,6 @@
 
 bool IsBadPtr(void* ptr);
 
+#define IS_BAD_PTR(ptr) IsBadPtr((void*)ptr)
+
 #endif

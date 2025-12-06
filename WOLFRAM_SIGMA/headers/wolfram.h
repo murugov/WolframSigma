@@ -10,17 +10,26 @@
 
 #include "WolfOp.h"
 
-extern FILE *file_latex;
-
 #define MAX_NUM_VAR 4
 
 struct var_t
 {
     hash_t hash;
-    char   name[8];
+    char   name[8];  // это прям bad, зачем мне тоскать и перекопировать эти 8 байт
     double value;
     bool   is_used;
 };
+
+
+struct op_t
+{
+	hash_t hash;
+	char   name[8];  // это прям bad, зачем мне тоскать и перекопировать эти 8 байт
+	int    num_args;
+	calc_t calc;
+	diff_t diff;
+};
+
 
 extern var_t variables[MAX_NUM_VAR];
 
@@ -37,7 +46,6 @@ WolfErr_t WolfDtor(tree_t *tree);
 
 void EnterVar();
 node_t *DerivativeNode(node_t *node, hash_t hash_indep_var);
-void set_parents(node_t *node, node_t *parent);
 node_t *CopyNode(node_t *node);
 
 node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count);
@@ -56,7 +64,7 @@ double CalcExpression(node_t *node);
 WolfErr_t DataReader(const char *src, tree_t *tree);
 
 WolfErr_t GenHTML();
-WolfErr_t GenGraphs(tree_t *tree, const char *func);
+WolfErr_t GenGraphs(node_t *node, const char *func);
 WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 
 WolfErr_t LatexFileOpener(const char* path);
@@ -68,14 +76,10 @@ void NodeToLatex(node_t *node);
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
 
-#define OP_(op)   NewNode(ARG_OP, valVAR(op), NULL, NULL)
-#define VAR_(var) NewNode(ARG_VAR, valVAR(var), NULL, NULL)
-#define NUM_(num) NewNode(ARG_NUM, num, NULL, NULL)
-
-#define LATEX(node) do{ \
-                        fprintf(file_latex, "\\[\n"); \
-                        NodeToLatex(node); \
-                        fprintf(file_latex, "\n\\]\n\n"); \
-                    } while(0)
+// #define LATEX(node) do{ \
+//                         fprintf(file_latex, "\\[\n"); \
+//                         NodeToLatex(node); \
+//                         fprintf(file_latex, "\n\\]\n\n"); \
+//                     } while(0)
 
 #endif
