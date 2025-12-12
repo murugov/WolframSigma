@@ -1,16 +1,15 @@
-#ifndef STACK_H
-#define STACK_H
+#ifndef STACK_HPP
+#define STACK_HPP
+
+#include "CONFIG.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "IsBadPtr.h"
-#include "FormatSpecifier.h"
-#include "logger.h"
-#include "CONFIG.h"
-#include "DEBUG_MOD.h"
-#include "ERR_FIND_MOD.h"
+#include "IsBadPtr.hpp"
+#include "FormatSpecifier.hpp"
+#include "logger.hpp"
 
 #define MIN_STK_LEN 16
 #define STK_POISON  0

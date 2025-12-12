@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "stack.hpp"
 
 #ifndef STACK_FUNC_HPP
 #define STACK_FUNC_HPP

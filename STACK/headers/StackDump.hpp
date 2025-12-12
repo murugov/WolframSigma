@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "stack.hpp"
 
 #ifndef STACK_DUMP_HPP
 #define STACK_DUMP_HPP

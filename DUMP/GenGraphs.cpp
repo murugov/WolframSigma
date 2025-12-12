@@ -1,17 +1,17 @@
-#include "wolfram.h"
+#include "dump.hpp"
 
 
-static size_t number_graph = 0;
+static size_t number_trees = 0;
 
-WolfErr_t GenHTML()
+genErr_t GenHTML(const char* title)
 {
-    FILE *GraphsHTML = fopen("WOLFRAM_SIGMA/reports/GraphsHTML.html", "w");
-    if (IS_BAD_PTR(GraphsHTML)) return WOLF_ERROR;
+    FILE *GraphsHTML = fopen(PATH_TO_HTML, "w");
+    if (IS_BAD_PTR(GraphsHTML)) return GEN_ERROR;
 
     fprintf(GraphsHTML, "<!DOCTYPE html>\n"
                         "<html>\n"
                         "<head>\n"
-                        "\t<title>WolfDump</title>\n"
+                        "\t<title>%s</title>\n"
                         "\t<style>\n"
                         "\t\tbody {\n"
                         "\t\t\tfont-family: Arial;\n"
@@ -22,7 +22,7 @@ WolfErr_t GenHTML()
                         "\t\t\tbackground-color: #f5f5f5;\n"
                         "\t\t}\n"
                         "\n"
-                        "\t\t.graph-container {\n"
+                        "\t\t.tree-container {\n"
                         "\t\t\tmargin-top: 20px;\n"
                         "\t\t\tbackground: white;\n"
                         "\t\t\tpadding: 20px;\n"
@@ -31,27 +31,27 @@ WolfErr_t GenHTML()
                         "\t\t\tmax-width: auto;\n"
                         "\t\t}\n"
                         "\n"
-                        "\t\t.graph-container img {\n"
+                        "\t\t.tree-container img {\n"
                         "\t\t\tmax-width: 100%%;\n"
                         "\t\t\theight: auto;\n"
                         "\t\t\tborder-radius: 4px;\n"
                         "\t\t}\n"
                         "\n"
-                        "\t\t.graph-row {\n"
+                        "\t\t.tree-row {\n"
                         "\t\t\talign-items: center;\n"
                         "\t\t\tgap: 10px;\n"
                         "\t\t}\n"
                         "\t</style>\n"
                         "</head>\n"
                         "<body>\n"
-                        "\t<h1 text-align: center;>WolfDump</h1>\n");
+                        "\t<h1 text-align: center;>%s</h1>\n", title, title);
 
-    for (size_t i = 0; i < number_graph; ++i)
+    for (size_t i = 0; i < number_trees; ++i)
     {
-        fprintf(GraphsHTML, "\t<div class=\"graph-container\" id=\"graph%zu\">\n", i);
-        fprintf(GraphsHTML, "\t\t<div class=\"graph-row\">\n");
-        fprintf(GraphsHTML, "\t\t\t<h4>graph%zu/wolf.dot.png:</h4>\n", i);
-        fprintf(GraphsHTML, "\t\t\t<img src=\"graphs/graph%zu/wolf.dot.png\">\n", i);
+        fprintf(GraphsHTML, "\t<div class=\"tree-container\" id=\"tree%zu\">\n", i);
+        fprintf(GraphsHTML, "\t\t<div class=\"tree-row\">\n");
+        fprintf(GraphsHTML, "\t\t\t<h4>tree%zu/tree.dot.png:</h4>\n", i);
+        fprintf(GraphsHTML, "\t\t\t<img src=\"trees/tree%zu/tree.dot.png\">\n", i);
         fprintf(GraphsHTML, "\t\t</div>\n");
         fprintf(GraphsHTML, "\t</div>\n");
     }
@@ -60,30 +60,32 @@ WolfErr_t GenHTML()
                         "</html>");
 
     fclose(GraphsHTML);
-
-    return WOLF_SUCCESS;
+    return GEN_SUCCESS;
 }
 
 
-WolfErr_t GenGraphs(node_t *node, const char *func)
+genErr_t GenTrees(node_t *node, const char *func)
 {
-    ON_DEBUG( if (IS_BAD_PTR(node)) return WOLF_ERROR; )
+    ON_DEBUG( if (IS_BAD_PTR(node)) return GEN_ERROR; )
 
-    tree_t *tree = NULL;
-    WolfCtor(&tree);
-    tree->root = node;
+    tree_t *tree = (tree_t*)calloc(1, sizeof(tree_t));
+    if (IS_BAD_PTR(tree)) return GEN_ERROR;
+
+    tree->root     = node;
+    tree->size     = 0;
+    tree->capacity = 0;
 
     char folder[64] = {0};
-    snprintf(folder, sizeof(folder), "mkdir -p WOLFRAM_SIGMA/reports/graphs/graph%zu", number_graph);
+    snprintf(folder, sizeof(folder), "mkdir -p %s/tree%zu", PATH_TO_TREES_FOLDER, number_trees);
     system(folder);
 
     char file_path[64] = {0};
-    snprintf(file_path, sizeof(file_path), "WOLFRAM_SIGMA/reports/graphs/graph%zu/wolf.dot", number_graph);
+    snprintf(file_path, sizeof(file_path), "%s/tree%zu/tree.dot", PATH_TO_TREES_FOLDER, number_trees);
 
     FILE *graph = fopen(file_path, "w");
-    if (IS_BAD_PTR(graph)) return WOLF_ERROR;
+    if (IS_BAD_PTR(graph)) return GEN_ERROR;
 
-    if (GenDot(graph, tree, func))  return WOLF_ERROR;
+    if (GenDot(graph, tree, func))  return GEN_ERROR;
     
     fclose(graph);
     
@@ -91,9 +93,8 @@ WolfErr_t GenGraphs(node_t *node, const char *func)
     snprintf(dot_cmd, sizeof(dot_cmd), "dot -Tpng %s -o %s.png", file_path, file_path);
     system(dot_cmd);
 
-    number_graph++;
-
-    return WOLF_SUCCESS;
+    number_trees++;
+    return GEN_SUCCESS;
 }
 
 //Надо вставить в код, будет классно работать
@@ -111,15 +112,12 @@ WolfErr_t GenGraphs(node_t *node, const char *func)
 // }
 
 
-WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
+genErr_t GenDot(FILE *src, tree_t *tree, const char *func)
 {
-    ON_DEBUG(
-        if (IS_BAD_PTR(src))  return WOLF_ERROR;
-        if (IS_BAD_PTR(tree)) return WOLF_ERROR;
-    )
+    ON_DEBUG( if (IS_BAD_PTR(src) || IS_BAD_PTR(tree))  return GEN_ERROR; )
 
     fprintf(src,"digraph G {\n"
-                "\tlabel=<<B>WolfTree from %s()</B>>;\n"
+                "\tlabel=<<B>Tree from %s()</B>>;\n"
                 "\tfontcolor=\"%s\";\n"
                 "\tfontname=\"Arial\";\n"
                 "\tlabelloc=\"top\";\n"
@@ -132,7 +130,7 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
                 "\tnode[fontsize=9, shape=box, width=0.7, height=0.4, style=\"filled, rounded\", fontname=\"Arial\"];\n"
                 "\n", func, (tree->error == 0) ? "#008000" : "#B22222");
 
-    if (tree->root == NULL) { fprintf(src, "}"); return WOLF_SUCCESS; }
+    if (tree->root == NULL) { fprintf(src, "}"); return GEN_SUCCESS; }
 
     stk_t<node_t*> stk_ret = {};
     STACK_CTOR(&stk_ret, tree->size + 1);
@@ -216,5 +214,5 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func)
     STACK_DTOR(&stk_ids);
 
     fprintf(src, "}");
-    return WOLF_SUCCESS;
+    return GEN_SUCCESS;
 }

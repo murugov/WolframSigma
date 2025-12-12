@@ -1,17 +1,6 @@
 #include "parser.hpp"
-#include "wolfram.h"
+#include "wolfram.hpp"
 #include "OpInstrSet.cpp"
-
-
-void FreeLines(char **lines, int count_lines)         // maybe it needs to be moved to another file 
-{
-    ON_DEBUG( if (IS_BAD_PTR(lines)) return;)
-
-    for (int i = 0; i < count_lines; ++i)
-        free(lines[i]);
-
-    free(lines);
-}
 
 
 // void AdvanceToken(lexer_t* lexer)

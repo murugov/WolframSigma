@@ -1,12 +1,13 @@
-#include "wolfram.h"
+#include "dump.hpp"
 
 #define INSERT_TO_LATEX(str) fprintf(file_latex, "%s", str)
 
-WolfErr_t LatexFileOpener(const char* path)
-{
-    if (IS_BAD_PTR(path)) return WOLF_ERROR;
 
-    file_latex = fopen(path, "w");
+genErr_t LatexFileOpener(const char* path)
+{
+    if (IS_BAD_PTR(path)) return GEN_ERROR;
+
+    FILE *file_latex = fopen(path, "w");
     if (IS_BAD_PTR(file_latex))
     { 
         printf(ANSI_COLOR_RED "Error: Cannot open file %s\n" ANSI_COLOR_RESET, path); 

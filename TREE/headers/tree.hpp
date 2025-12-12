@@ -1,21 +1,18 @@
-#ifndef TREE_H
-#define TREE_H
+#ifndef TREE_HPP
+#define TREE_HPP
 
-#include <stdio.h>
+#include "CONFIG.hpp"
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#include "IsBadPtr.h"
-#include "HashStr.h"
-#include "logger.h"
-#include "CONFIG.h"
-#include "DEBUG_MOD.h"
-#include "ERR_FIND_MOD.h"
-#include "stack.h"
+#include "IsBadPtr.hpp"
+#include "HashStr.hpp"
+#include "logger.hpp"
+#include "stack.hpp"
 
-#define TREE_POISON -1
-
+#define TREE_POISON -1       // improve
 
 typedef int    arg_t;
 typedef size_t tree_canary_t;

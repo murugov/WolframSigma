@@ -1,7 +1,11 @@
-#ifndef IS_BAD_PTR_H
-#define IS_BAD_PTR_H
+#ifndef IS_BAD_PTR_HPP
+#define IS_BAD_PTR_HPP
 
+#include <stdio.h>
 #include <stdbool.h>
+#include <mach/mach.h>
+#include <mach/mach_vm.h>
+#include <mach/vm_map.h>
 
 #ifdef __APPLE__
     #include <mach/mach.h>

@@ -1,18 +1,20 @@
-#ifndef WOLF_GEN_H
-#define WOLF_GEN_H
+#ifndef WOLF_GEN_HPP
+#define WOLF_GEN_HPP
+
+#include "CONFIG.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "IsBadPtr.h"
-#include "TXTreader.h"
-#include "HashStr.h"
-#include "colors.h"
+#include "IsBadPtr.hpp"
+#include "TXTreader.hpp"
+#include "HashStr.hpp"
+#include "colors.hpp"
 
 #define PATH_TO_SRC_FUNC_FILE "GENERATOR/src/func.txt"
 #define PATH_TO_SRC_KEY_FILE  "GENERATOR/src/keywords.txt"
-#define PATH_TO_WOLF_OP_H     "GENERATOR/reports/WolfOp.h"
+#define PATH_TO_WOLF_OP_H     "GENERATOR/reports/WolfOp.hpp"
 #define PATH_TO_OP_INSTR_SET  "GENERATOR/reports/OpInstrSet.cpp"
 #define PATH_TO_KEYWORD_SET   "GENERATOR/reports/KeywordSet.cpp"
 

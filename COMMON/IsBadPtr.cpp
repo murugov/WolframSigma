@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <mach/mach.h>
-#include <mach/mach_vm.h>
-#include <mach/vm_map.h>
+#include "IsBadPtr.hpp"
 
 
 bool IsBadPtr(void* ptr)

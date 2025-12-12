@@ -1,4 +1,4 @@
-#include "LineCounter.h"
+#include "LineCounter.hpp"
 
 
 int LineCounter(char* buffer)

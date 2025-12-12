@@ -1,5 +1,5 @@
-#ifndef MATH_FUNC_H
-#define MATH_FUNC_H
+#ifndef MATH_FUNC_HPP
+#define MATH_FUNC_HPP
 
 #include <math.h>
 

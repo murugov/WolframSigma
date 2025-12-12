@@ -1,5 +1,5 @@
-#ifndef FACTORIAL_H
-#define FACTORIAL_H
+#ifndef FACTORIAL_HPP
+#define FACTORIAL_HPP
 
 #include <stdio.h>
 #include <limits.h>

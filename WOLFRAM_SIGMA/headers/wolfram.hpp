@@ -1,14 +1,14 @@
-#ifndef WOLFRAM_H
-#define WOLFRAM_H
+#ifndef WOLFRAM_HPP
+#define WOLFRAM_HPP
 
-#include "math_func.h"
-#include "tree.h"
-#include "is_zero.h"
-#include "Factorial.h"
-#include "colors.h"
-#include "DSL.h"
+#include "tree.hpp"
+#include "math_func.hpp"
+#include "is_zero.hpp"
+#include "Factorial.hpp"
+#include "colors.hpp"
+#include "DSL.hpp"
 
-#include "WolfOp.h"
+#include "WolfOp.hpp"
 
 #define MAX_NUM_VAR 4
 
@@ -65,23 +65,6 @@ double CalcExpression(node_t *node);
 
 WolfErr_t DataReader(FILE *data, tree_t *tree);
 
-WolfErr_t GenHTML();
-WolfErr_t GenGraphs(node_t *node, const char *func);
-WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
-
-WolfErr_t LatexFileOpener(const char* path);
-WolfErr_t LatexFileCloser();
-
-// void TreeToLatex(node_t *node);
-// void NodeToLatex(node_t *node);
-
-
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
-
-// #define LATEX(node) do{ \
-//                         fprintf(file_latex, "\\[\n"); \
-//                         NodeToLatex(node); \
-//                         fprintf(file_latex, "\n\\]\n\n"); \
-//                     } while(0)
 
 #endif

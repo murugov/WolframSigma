@@ -1,8 +1,8 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef LEXER_HPP
+#define LEXER_HPP
 
 #include "token.hpp"
-
+#include "HashStr.hpp"
 
 enum lexerErr_t
 {

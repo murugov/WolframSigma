@@ -1,82 +1,82 @@
-[2025-12-12 13:31:01] DEBUG Created id for stack "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] INFO  Stack "tokens" created
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001d50 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001db0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001de0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001e10 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001e40 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001ea0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001ed0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001f00 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001f30 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001f90 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000001fc0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002020 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002050 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002080 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000020b0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000020e0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] INFO  Stack "tokens" reallocated
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002110 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002140 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002170 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000021d0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002200 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002230 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002260 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002290 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000022f0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002320 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002380 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000023b0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000023e0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002410 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002440 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002470 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] INFO  Stack "tokens" reallocated
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000024a0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x6030000024d0 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
-[2025-12-12 13:31:01] DEBUG PUSH 0x603000002500 in "tokens"
-[2025-12-12 13:31:01] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG Created id for stack "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] INFO  Stack "tokens" created
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001d50 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001db0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001de0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001e10 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001e40 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001ea0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001ed0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001f00 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001f30 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001f90 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000001fc0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002020 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002050 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002080 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000020b0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000020e0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] INFO  Stack "tokens" reallocated
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002110 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002140 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002170 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000021d0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002200 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002230 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002260 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002290 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000022f0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002320 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002380 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000023b0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000023e0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002410 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002440 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002470 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] INFO  Stack "tokens" reallocated
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000024a0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x6030000024d0 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
+[2025-12-12 15:00:02] DEBUG PUSH 0x603000002500 in "tokens"
+[2025-12-12 15:00:02] INFO  Hash updated
 ---------------------------------------------------------------------------------------------------------------------------
-DUMP stack "tokens" [0x608000000120] from main() at LEXER/main_lex.cpp:55:
+DUMP stack "tokens" [0x608000000120] from main() at LEXER/main_lex.cpp:41:
 
 STK_POISON = 0
 
@@ -156,5 +156,5 @@ tokens {
 	canary_2 = 222; (STK_CANARY_2)
 }
 ---------------------------------------------------------------------------------------------------------------------------
-[2025-12-12 13:31:01] INFO  Stack "tokens" destroed
-[2025-12-12 13:31:01] INFO  Lexer is destructured
+[2025-12-12 15:00:02] INFO  Stack "tokens" destroed
+[2025-12-12 15:00:02] INFO  Lexer is destructured

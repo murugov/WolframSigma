@@ -5,14 +5,15 @@ CONFIG_INCLUDES 	= -I./CONFIG
 STK_INCLUDES		= -I./STACK/headers
 GEN_INCLUDES		= -I./GENERATOR/headers -I./GENERATOR/src -I./GENERATOR/reports
 TREE_INCLUDES		= -I./TREE/headers
-# DUMP_INCLUDES		= -I./DUMP
+DUMP_INCLUDES		= -I./DUMP/headers
 LEX_INCLUDES		= -I./LEXER/headers
 WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
 COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
-LEX_FILES	  = LEXER/lexer.cpp LEXER/token.cpp LEXER/parser.cpp
-WOLFRAM_FILES = WOLFRAM_SIGMA/VerifyInstrSet.cpp WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/LatexDump.cpp
+# DUMP_FILES	  = DUMP/ WOLFRAM_SIGMA/GenGraphs.cpp WOLFRAM_SIGMA/LatexDump.cpp
+LEX_FILES	  = LEXER/lexer.cpp LEXER/token.cpp
+WOLFRAM_FILES = WOLFRAM_SIGMA/VerifyInstrSet.cpp WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp
 
 DEFAULT_SRC   ?=  src/data.txt
 DEFAULT_LATEX ?=  reports/LatexDump.tex

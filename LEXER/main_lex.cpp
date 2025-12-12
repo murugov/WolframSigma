@@ -38,6 +38,8 @@ int main()
     printf("file_name:  [%p]\n", lexer->file_name);
     printf("----------------\n");
 
+    StackDump(lexer->tokens, __FILE__, __func__, __LINE__);
+
     // node_t* ast = ParseGeneral(lexer);
     
     // if (ast)
@@ -48,11 +50,7 @@ int main()
     //     FreeNodes(ast);
     // }
     // else
-    //     printf(ANSI_COLOR_RED "Parsing failed\n" ANSI_COLOR_RESET);
-    
-    // parserDtor(parser);
-    
-    StackDump(lexer->tokens, __FILE__, __func__, __LINE__);
+    //     printf(ANSI_COLOR_RED "Parsing failed\n" ANSI_COLOR_RESET);    
     
     LexerDtor(lexer);
     FreeLines(lines, count_lines);

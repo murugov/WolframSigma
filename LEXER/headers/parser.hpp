@@ -1,13 +1,12 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
-#include "tree.h"
+#include "tree.hpp"
 #include "token.hpp"
 #include "lexer.hpp"
-#include "DSL.h"
+#include "colors.hpp"
+// #include "DSL.hpp"
 
-
-void FreeLines(char **arr_ptr, int count_lines);
 
 node_t* ParseGeneral(lexer_t* lexer);
 node_t* ParseExpression(lexer_t* lexer);

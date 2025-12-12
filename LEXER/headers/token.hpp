@@ -1,20 +1,8 @@
-#ifndef TOKEN_H
-#define TOKEN_H
+#ifndef TOKEN_HPP
+#define TOKEN_HPP
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "stack.h"
-#include "colors.h"
-#include "CONFIG.h"
-#include "DEBUG_MOD.h"
-#include "ERR_FIND_MOD.h"
-#include "IsBadPtr.h"
-#include "logger.h"
-#include "TXTreader.h"
-#include "HashStr.h"
-
+#include "stack.hpp"
+#include "TXTreader.hpp"
 
 enum tokenErr_t
 {

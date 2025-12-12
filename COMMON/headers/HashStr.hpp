@@ -1,5 +1,5 @@
-#ifndef HASH_STR_H
-#define HASH_STR_H
+#ifndef HASH_STR_HPP
+#define HASH_STR_HPP
 
 #include <stdio.h>
 

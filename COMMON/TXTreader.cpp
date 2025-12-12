@@ -1,4 +1,4 @@
-#include "TXTreader.h"
+#include "TXTreader.hpp"
 
 
 int no_change(int c) { return c; }
@@ -71,4 +71,15 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, int *count_
     
     free(buffer);
     return lines;
+}
+
+
+void FreeLines(char **lines, int count_lines)
+{
+    if (IS_BAD_PTR(lines)) return;
+
+    for (int i = 0; i < count_lines; ++i)
+        free(lines[i]);
+
+    free(lines);
 }

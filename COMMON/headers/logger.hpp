@@ -1,9 +1,9 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LOGGER_HPP
+#define LOGGER_HPP
 
 #include <stdio.h>
 #include <time.h>
-#include "IsBadPtr.h"
+#include "IsBadPtr.hpp"
 
 extern FILE *LogFile;
 extern const char* verdict_strings[];

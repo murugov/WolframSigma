@@ -1,5 +1,5 @@
-#ifndef IS_ZERO_H
-#define IS_ZERO_H
+#ifndef IS_ZERO_HPP
+#define IS_ZERO_HPP
 
 #include <math.h>
 

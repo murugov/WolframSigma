@@ -1,4 +1,4 @@
-#include "wolfram.h"
+#include "wolfram.hpp"
 #include "OpInstrSet.cpp"
 
 
@@ -173,7 +173,7 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
     set_parents(series_sum, NULL);
     SimplifyTree(series_sum);
     
-    GenGraphs(series_sum, __func__);
+    // GenGraphs(series_sum, __func__);
     // TreeToLatex(series_sum);
     
     FreeNodes(series_sum);

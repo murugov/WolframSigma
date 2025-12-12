@@ -1,4 +1,4 @@
-#include "WolfGen.h"
+#include "WolfGen.hpp"
 
 hash_t bad_hash[] = {  
                         HashStr("("), HashStr(")"),
@@ -109,8 +109,8 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
         }
     }
 
-    fprintf(WolfOpFile, "#ifndef WOLF_OP_H\n"
-                        "#define WOLF_OP_H\n\n\n");
+    fprintf(WolfOpFile, "#ifndef WOLF_OP_HPP\n"
+                        "#define WOLF_OP_HPP\n\n\n");
 
     fprintf(WolfOpFile, "enum HashOp\n");
     fprintf(WolfOpFile, "{\n");

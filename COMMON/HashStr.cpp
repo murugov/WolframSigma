@@ -1,4 +1,4 @@
-#include "HashStr.h"
+#include "HashStr.hpp"
 
 
 hash_t HashStr(const char *line)

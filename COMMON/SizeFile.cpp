@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <sys/stat.h>
+#include "SizeFile.hpp"
+
 
 ssize_t SizeFile(FILE* stream)
 {

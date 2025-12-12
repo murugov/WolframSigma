@@ -1,4 +1,4 @@
-#include "wolfram.h"
+#include "wolfram.hpp"
 #include "OpInstrSet.cpp"
 
 static int global_number_changes = 0;
@@ -174,7 +174,7 @@ node_t *SwapParentAndChild(node_t *parent, node_t *child)
 {
     ON_DEBUG( if (IS_BAD_PTR(parent) || IS_BAD_PTR(child)) return NULL; )
 
-    node_t *new_node = CopyNode(child);
+    node_t *new_node = CopyNode(child);         //improve recursion
     ReplaceNode(parent, new_node);
     return new_node;
 }

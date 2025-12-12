@@ -1,7 +1,7 @@
-#include "stack.h"
+#include "stack.hpp"
 
-#ifndef STACK_VERIF_HPP
-#define STACK_VERIF_HPP
+#ifndef STACK_VERIFY_HPP
+#define STACK_VERIFY_HPP
 
 
 template <typename stackElem_T>

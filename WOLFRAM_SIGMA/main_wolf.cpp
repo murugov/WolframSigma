@@ -1,4 +1,4 @@
-#include "wolfram.h"
+#include "wolfram.hpp"
 
 
 int main(int argc, char *argv[])

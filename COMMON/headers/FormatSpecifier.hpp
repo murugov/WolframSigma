@@ -1,5 +1,5 @@
-#ifndef FORMAT_SPECIFIER_H
-#define FORMAT_SPECIFIER_H
+#ifndef FORMAT_SPECIFIER_HPP
+#define FORMAT_SPECIFIER_HPP
 
 #define FORMAT_SPECIFIER(value) _Generic((value), \
     int: "%d", \

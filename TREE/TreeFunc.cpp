@@ -1,4 +1,5 @@
-#include "wolfram.h"
+#include "tree.hpp"
+#include "wolfram.hpp"
 #include "OpInstrSet.cpp"
 
 TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line)
@@ -30,7 +31,7 @@ TreeErr_t TreeCtor(tree_t *tree)
 }
 
 
-ArgTypes DetType(char* str)
+ArgTypes DetType(char* str)                 // needs to be moved to WOLFRAM_SIGMA
 {
     hash_t hash = HashStr(str);
     for (int i = 0; i < MAX_NUM_VAR; ++i)

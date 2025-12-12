@@ -1,5 +1,6 @@
-#include "math_func.h"
-#include "is_zero.h"
+#include "math_func.hpp"
+#include "is_zero.hpp"
+
 
 double acot(double x)
 {

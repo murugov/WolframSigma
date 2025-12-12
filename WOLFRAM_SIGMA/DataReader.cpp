@@ -1,6 +1,6 @@
-#include "wolfram.h"
-#include "SizeFile.h"
-#include "LineCounter.h"
+#include "wolfram.hpp"
+#include "SizeFile.hpp"
+#include "LineCounter.hpp"
 #include "lexer.hpp"
 
 
