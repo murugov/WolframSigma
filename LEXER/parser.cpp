@@ -3,18 +3,29 @@
 #include "OpInstrSet.cpp"
 
 
-void FreeLines(char **arr_ptr, int count_lines)         // maybe it needs to be moved to another file 
+void FreeLines(char **lines, int count_lines)         // maybe it needs to be moved to another file 
 {
-    ON_DEBUG( if (IS_BAD_PTR(arr_ptr)) return;)
+    ON_DEBUG( if (IS_BAD_PTR(lines)) return;)
 
     for (int i = 0; i < count_lines; ++i)
-        free(arr_ptr[i]);
+        free(lines[i]);
+
+    free(lines);
 }
+
+
+// void AdvanceToken(lexer_t* lexer)
+// {
+//     ON_DEBUG( if (IS_BAD_PTR(lexer)) return; )
+
+//     StackPush(lexer->tokens, NextToken(lexer));
+//     lexer->cur_token++;                                         // maybe does't need
+// }
 
 
 int MatchToken(lexer_t* lexer, type_t type)
 {
-    if (CheckType(lexer, type)) { AdvanceToken(lexer); return 1; }
+    // if (CheckType(lexer, type)) { AdvanceToken(lexer); return 1; }
     return 0;
 }
 
@@ -35,7 +46,7 @@ token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg)
     if (CheckType(lexer, type))
     {
         token_t* token = lexer->tokens->data[lexer->cur_token];
-        AdvanceToken(lexer);
+        // AdvanceToken(lexer);
         return token;
     }
 

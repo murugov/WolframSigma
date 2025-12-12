@@ -26,8 +26,8 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, int *count_
     *count_line = LineCounter(buffer);
     if (*count_line == 0) return NULL;
 
-    char **arr_ptr = (char**)calloc((size_t)(*count_line + 1), sizeof(char*));
-    if (IsBadPtr((void*)arr_ptr)) return NULL;
+    char **lines = (char**)calloc((size_t)(*count_line + 1), sizeof(char*));
+    if (IS_BAD_PTR(lines)) return NULL;
     
     size_t line_number = 0;
     char* line_start = buffer;
@@ -42,7 +42,7 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, int *count_
             if (!isspace((unsigned char)*ptr))
             {
                 has_content = 1;
-                arr_ptr[line_number] = ptr;
+                lines[line_number] = ptr;
                 break;
             }
         }
@@ -60,11 +60,15 @@ char** TXTreader(FILE *SourceFile, char* buffer, size_t *len_buffer, int *count_
         {
             if (!isspace((unsigned char)*ptr)) 
             {
-                arr_ptr[line_number++] = ptr;
+                lines[line_number++] = ptr;
                 break;
             }
         }
     }
 
-    return arr_ptr;
+    for (int i = 0; i < *count_line; ++i)
+        lines[i] = strdup(lines[i]);
+    
+    free(buffer);
+    return lines;
 }

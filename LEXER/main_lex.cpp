@@ -12,14 +12,14 @@ int main()
     
     char *buffer = NULL;
     int count_lines = 0;
-    char **arr_ptr = DataReader(SourceFile, buffer, &count_lines);
+    char **lines = DataReader(SourceFile, buffer, &count_lines);
     fclose(SourceFile);
     
-    if (IS_BAD_PTR(arr_ptr)) { printf("Error: Failed to read file\n"); return EXIT_FAILURE; }
+    if (IS_BAD_PTR(lines)) { printf("Error: Failed to read file\n"); return EXIT_FAILURE; }
     
-    RemoveComments(arr_ptr, &count_lines);
+    RemoveComments(lines, &count_lines);
 
-    lexer_t *lexer = LexerCtor(arr_ptr, count_lines, __FILE__);
+    lexer_t *lexer = LexerCtor(lines, count_lines, __FILE__);
     if (IS_BAD_PTR(lexer))
     {
         printf("Error: Failed to initialize lexer\n");
@@ -38,7 +38,7 @@ int main()
     printf("file_name:  [%p]\n", lexer->file_name);
     printf("----------------\n");
 
-    // node_t* ast = ParseGeneral(&lexer);
+    // node_t* ast = ParseGeneral(lexer);
     
     // if (ast)
     // {
@@ -51,12 +51,11 @@ int main()
     //     printf(ANSI_COLOR_RED "Parsing failed\n" ANSI_COLOR_RESET);
     
     // parserDtor(parser);
-    // FreeLines(arr_ptr, count_lines);
-
+    
     StackDump(lexer->tokens, __FILE__, __func__, __LINE__);
-
-
+    
     LexerDtor(lexer);
+    FreeLines(lines, count_lines);
     LogFileCloser();
     return 0;
 }

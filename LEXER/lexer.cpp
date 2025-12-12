@@ -1,7 +1,7 @@
 #include "lexer.hpp" 
 #include "KeywordSet.cpp"
 
-#define IS_END(lexer) (lexer->cur_line >= lexer->line_count)
+#define IS_END(lexer) (lexer->cur_line > lexer->line_count - 1)
 
 static token_t *ReadNum(lexer_t *lexer);
 static token_t *ReadName(lexer_t *lexer);
@@ -83,15 +83,34 @@ lexerErr_t LexerDtor(lexer_t* lexer)
 }
 
 
+token_t *PeekToken(lexer_t* lexer)                      // maybe void
+{
+    if (IS_BAD_PTR(lexer->peeked_token))
+    {
+        const char* saved_pos = lexer->cur_pos;
+        // int saved_line        = lexer->cur_line;
+        int saved_col         = lexer->cur_col;
+        
+        lexer->peeked_token = NextToken(lexer);
+        
+        lexer->cur_pos  = saved_pos;
+        // lexer->cur_line = saved_line;
+        lexer->cur_col  = saved_col;
+    }
+
+    return lexer->peeked_token;
+}
+
+
 lexerErr_t AdvanceToken(lexer_t* lexer)
 {
-    ON_DEBUG(if (IS_BAD_PTR(lexer)) { LOG(ERROR, "Token didn't advance"); return LEX_ERROR; })
-    ON_DEBUG( if (IS_BAD_PTR(lexer->peeked_token)) return LEX_ERROR; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) { LOG(ERROR, "Token didn't advance"); return LEX_ERROR; } )
     
-    if (StackPush(lexer->tokens, lexer->peeked_token) != STK_SUCCESS) return LEX_ERROR;
+    token_t *next_token = NextToken(lexer);
+    if (StackPush(lexer->tokens, next_token) != STK_SUCCESS) return LEX_ERROR;
     
-    lexer->cur_pos = lexer->peeked_token->start + lexer->peeked_token->length;
-    lexer->cur_col += lexer->peeked_token->length;
+    lexer->cur_pos = next_token->start + next_token->length;
+    lexer->cur_col += next_token->length;
     
     lexer->peeked_token = NULL;
     lexer->cur_token++;
@@ -128,6 +147,9 @@ lexerErr_t SkipSpaces(lexer_t* lexer)
 
 token_t *NextToken(lexer_t* lexer)
 {
+    if (!IS_BAD_PTR(lexer->peeked_token))
+        return lexer->peeked_token;
+
     SkipSpaces(lexer);
     if (IS_END(lexer)) return NewToken(TOKEN_EOF, "", 0, lexer->cur_line + 1, lexer->cur_col);
     
@@ -155,24 +177,6 @@ token_t *NextToken(lexer_t* lexer)
     return NewToken(TOKEN_UNDEF, start, 1, lexer->cur_line, lexer->cur_col);
 }
 
-
-token_t *PeekToken(lexer_t* lexer)
-{
-    if (!lexer->peeked_token)
-    {
-        const char* saved_pos = lexer->cur_pos;
-        int saved_line        = lexer->cur_line;
-        int saved_col         = lexer->cur_col;
-        
-        lexer->peeked_token = NextToken(lexer);
-        
-        lexer->cur_pos  = saved_pos;
-        lexer->cur_line = saved_line;
-        lexer->cur_col  = saved_col;
-    }
-
-    return lexer->peeked_token;
-}
 
 
 static token_t *ReadNum(lexer_t *lexer)

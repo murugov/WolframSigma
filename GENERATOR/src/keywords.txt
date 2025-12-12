@@ -4,6 +4,7 @@ ELSE:   "else";
 FOR:    "for";
 WHILE:  "while";
 RETURN: "return";
+DEF:    "def";
 # operators
 ADD:  "+";
 SUB:  "-";

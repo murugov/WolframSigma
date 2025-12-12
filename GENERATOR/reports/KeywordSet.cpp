@@ -2,7 +2,7 @@
 
 const keyword_t keyword_set[] =
 {
-	{TOKEN_LPAREN   , "(",	1 ,	0x0},
+	{TOKEN_LPAREN   , "(",	1 ,	0x28},
 	{TOKEN_RPAREN   , ")",	1 ,	0x29},
 	{TOKEN_MUL      , "*",	1 ,	0x2A},
 	{TOKEN_ADD      , "+",	1 ,	0x2B},
@@ -19,6 +19,7 @@ const keyword_t keyword_set[] =
 	{TOKEN_RBRACE   , "}",	1 ,	0x7D},
 	{TOKEN_EQEQ     , "==",	2 ,	0x7A0},
 	{TOKEN_IF       , "if",	2 ,	0xD1D},
+	{TOKEN_DEF      , "def",	3 ,	0x18405},
 	{TOKEN_FOR      , "for",	3 ,	0x18CC9},
 	{TOKEN_ELSE     , "else",	4 ,	0x2F8D39},
 	{TOKEN_WHILE    , "while",	5 ,	0x6BDCB31},

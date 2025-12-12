@@ -294,8 +294,11 @@ GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
             if (name_len > max_name_len) max_name_len = name_len;
             if (key_len > max_key_len) max_key_len = key_len;
             
-            func_infos[actual_count].hash = HashStr(func_infos[actual_count].key);
-            
+            if (key_len == 1)
+                func_infos[actual_count].hash = (hash_t)(*func_infos[actual_count].key);
+            else
+                func_infos[actual_count].hash = HashStr(func_infos[actual_count].key);
+
             actual_count++;
         }
     }
