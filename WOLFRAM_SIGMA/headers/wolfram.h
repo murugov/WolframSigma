@@ -12,6 +12,13 @@
 
 #define MAX_NUM_VAR 4
 
+
+enum WolfErr_t
+{
+    WOLF_SUCCESS = 0,
+    WOLF_ERROR   = 1
+};
+
 struct var_t
 {
     hash_t hash;
@@ -34,12 +41,7 @@ struct op_t
 extern var_t variables[MAX_NUM_VAR];
 
 
-enum WolfErr_t
-{
-    WOLF_SUCCESS = 0,
-    WOLF_ERROR   = 1
-};
-
+WolfErr_t VerifyOpInstrSetSort();
 
 WolfErr_t WolfCtor(tree_t **tree);
 WolfErr_t WolfDtor(tree_t *tree);
@@ -61,7 +63,7 @@ node_t *SwapParentAndChild(node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
-WolfErr_t DataReader(const char *src, tree_t *tree);
+WolfErr_t DataReader(FILE *data, tree_t *tree);
 
 WolfErr_t GenHTML();
 WolfErr_t GenGraphs(node_t *node, const char *func);
@@ -70,8 +72,8 @@ WolfErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 WolfErr_t LatexFileOpener(const char* path);
 WolfErr_t LatexFileCloser();
 
-void TreeToLatex(node_t *node);
-void NodeToLatex(node_t *node);
+// void TreeToLatex(node_t *node);
+// void NodeToLatex(node_t *node);
 
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++

@@ -9,7 +9,7 @@ StackErr_t StackInit(stk_t<stackElem_T> *stk, const char *name, const char *file
 {
     ON_DEBUG( if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; } )
     
-    (*stk).id.name = name + 1;
+    (*stk).id.name = name;
     (*stk).id.file = file;
     (*stk).id.func = func;
     (*stk).id.line = line;

@@ -4,7 +4,7 @@
 FILE *LogFile = NULL;
 const char* verdict_strings[] = {"INFO", "DEBUG", "WARN", "ERROR"};
 
-int LogFileOpener(const char* path)
+int LogFileOpener(const char* path)     // make it possible to create multiple logfiles
 {
     LogFile = fopen(path, "w");
     if (IsBadPtr((void*)LogFile))

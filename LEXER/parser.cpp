@@ -1,96 +1,59 @@
-#include "parser.h"
+#include "parser.hpp"
 #include "wolfram.h"
 #include "OpInstrSet.cpp"
 
 
-parser_t *parserCtor(lexer_t* lexer)
-{
-    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
-
-    parser_t* parser = (parser_t*)calloc(1, sizeof(parser_t));
-    if (IS_BAD_PTR(parser)) return NULL;
-    
-    parser->lexer      = lexer;
-    parser->cur_token  = NULL;
-    parser->prev_token = NULL;
-
-    AdvanceToken(parser);
-    
-    return parser;
-}
-
-
-void parserDtor(parser_t* parser)
-{
-    if (!IS_BAD_PTR(parser))
-    {
-        if (parser->cur_token)
-            free(parser->cur_token);
-        if (parser->prev_token)
-            free(parser->prev_token);
-        free(parser);
-    }
-}
-
-
-void FreeLines(char **arr_ptr, int count_lines)
+void FreeLines(char **arr_ptr, int count_lines)         // maybe it needs to be moved to another file 
 {
     ON_DEBUG( if (IS_BAD_PTR(arr_ptr)) return;)
-    
+
     for (int i = 0; i < count_lines; ++i)
-        free(arr_ptr[count_lines]);
+        free(arr_ptr[i]);
 }
 
 
-void AdvanceToken(parser_t* parser)
+int MatchToken(lexer_t* lexer, type_t type)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return; )
-
-    parser->prev_token = parser->cur_token;
-    parser->cur_token = NextToken(parser->lexer);
-}
-
-
-int MatchToken(parser_t* parser, type_t type)
-{
-    if (CheckType(parser, type)) { AdvanceToken(parser); return 1; }
+    if (CheckType(lexer, type)) { AdvanceToken(lexer); return 1; }
     return 0;
 }
 
 
-int CheckType(parser_t* parser, type_t type)
+int CheckType(lexer_t* lexer, type_t type)
 {
-    if (parser->cur_token->type == TOKEN_EOF) return 0;
-    return parser->cur_token->type == type;
+    type_t token_type = (lexer->tokens->data)[lexer->tokens->size]->type;
+
+    if (token_type == TOKEN_EOF) return 0;
+    return token_type == type;
 }
 
 
-token_t* ConsumeToken(parser_t* parser, type_t type, const char* error_msg)
+token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    if (CheckType(parser, type))
+    if (CheckType(lexer, type))
     {
-        token_t* token = parser->cur_token;
-        AdvanceToken(parser);
+        token_t* token = lexer->tokens->data[lexer->cur_token];
+        AdvanceToken(lexer);
         return token;
     }
 
-    PrintError(parser, parser->cur_token, error_msg);
+    // PrintError(parser, parser->cur_token, error_msg);
     return NULL;
 }
 
 
-node_t* ParseGeneral(parser_t* parser)
+node_t* ParseGeneral(lexer_t* lexer)                        // rename ParseAst
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    node_t* node = ParseExpression(parser);
+    node_t* node = ParseExpression(lexer);
     if (IS_BAD_PTR(node)) return NULL;
     
-    if (!MatchToken(parser, TOKEN_DOLLAR))
+    if (!MatchToken(lexer, TOKEN_DOLLAR))
     {
-        PrintError(parser, parser->cur_token, "Expected '$' at end of expression");
+        // PrintError(parser, parser->cur_token, "Expected '$' at end of expression");
         FreeNodes(node);
         return NULL;
     }
@@ -100,18 +63,18 @@ node_t* ParseGeneral(parser_t* parser)
 }
 
 
-node_t* ParseExpression(parser_t* parser)
+node_t* ParseExpression(lexer_t* lexer)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    node_t* node = ParseTerm(parser);
+    node_t* node = ParseTerm(lexer);
     if (IS_BAD_PTR(node)) return NULL;
     
-    while (MatchToken(parser, TOKEN_ADD) || MatchToken(parser, TOKEN_SUB))
+    while (MatchToken(lexer, TOKEN_ADD) || MatchToken(lexer, TOKEN_SUB))
     {
-        type_t op_type = parser->prev_token->type;
+        type_t op_type = (lexer->tokens->data)[lexer->tokens->size - 1]->type;  // -1?
         
-        node_t* right = ParseTerm(parser);
+        node_t* right = ParseTerm(lexer);
         if (IS_BAD_PTR(right)) { FreeNodes(node); return NULL; }
         
         if (op_type == TOKEN_ADD)
@@ -124,18 +87,18 @@ node_t* ParseExpression(parser_t* parser)
 }
 
 
-node_t* ParseTerm(parser_t* parser)
+node_t* ParseTerm(lexer_t* lexer)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    node_t* node = ParseFactor(parser);
+    node_t* node = ParseFactor(lexer);
     if (IS_BAD_PTR(node)) return NULL;
     
-    while (MatchToken(parser, TOKEN_MUL) || MatchToken(parser, TOKEN_DIV))
+    while (MatchToken(lexer, TOKEN_MUL) || MatchToken(lexer, TOKEN_DIV))
     {
-        type_t op_type = parser->prev_token->type;
+        type_t op_type = (lexer->tokens->data)[lexer->tokens->size - 1]->type;
         
-        node_t* right = ParseFactor(parser);
+        node_t* right = ParseFactor(lexer);
         if (IS_BAD_PTR(right)) { FreeNodes(node); return NULL; }
         
         if (op_type == TOKEN_MUL)
@@ -148,7 +111,7 @@ node_t* ParseTerm(parser_t* parser)
 }
 
 
-node_t* ParseFactor(parser_t* parser)
+node_t* ParseFactor(lexer_t* parser)
 {
     ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
 
@@ -167,11 +130,8 @@ node_t* ParseFactor(parser_t* parser)
 }
 
 
-node_t* ParsePrimary(parser_t* parser)
-{
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
-    // printf("ParsePrimary begin: %d\n", parser->cur_token->type);
-
+node_t* ParsePrimary(lexer_t* parser)
+{    
     if (MatchToken(parser, TOKEN_NUM))
         return ParseNumber(parser);
     
@@ -179,7 +139,7 @@ node_t* ParsePrimary(parser_t* parser)
         return ParseVariable(parser);
     
     if (CheckType(parser, TOKEN_FUNC))
-        return ParseFunctionCall(parser);
+        return ParseFunc(parser);
     
     if (MatchToken(parser, TOKEN_LPAREN))
     {
@@ -195,15 +155,15 @@ node_t* ParsePrimary(parser_t* parser)
         return node_expression;
     }
     
-    PrintError(parser, parser->cur_token, "Expected expression");
+    // PrintError(parser, parser->cur_token, "Expected expression");
     return NULL;
 }
 
-node_t* ParseFunctionCall(parser_t* parser)
+node_t* ParseFunc(lexer_t* lexer)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    token_t* func_token = ConsumeToken(parser, TOKEN_FUNC, "Expected function name");
+    token_t* func_token = ConsumeToken(lexer, TOKEN_FUNC, "Expected function name");
     if (IS_BAD_PTR(func_token)) return NULL;
     
     char func_name[256];
@@ -215,18 +175,18 @@ node_t* ParseFunctionCall(parser_t* parser)
     
     if (HashSearch(hash_item, &index) != TREE_SUCCESS)
     {
-        PrintError(parser, func_token, "Unknown function");
+        PrintError(lexer, func_token, "Unknown function");
         return NULL;
     }
     
-    if (!ConsumeToken(parser, TOKEN_LPAREN, "Expected '(' after function name")) return NULL;
+    if (!ConsumeToken(lexer, TOKEN_LPAREN, "Expected '(' after function name")) return NULL;
     
-    node_t* arg1 = ParseExpression(parser);
+    node_t* arg1 = ParseExpression(lexer);
     if (IS_BAD_PTR(arg1)) return NULL;
     
     if (op_instr_set[index].num_args == 1)
     {
-        if (!ConsumeToken(parser, TOKEN_RPAREN, "Expected ')' after argument"))
+        if (!ConsumeToken(lexer, TOKEN_RPAREN, "Expected ')' after argument"))
         {
             FreeNodes(arg1);
             return NULL;
@@ -242,16 +202,16 @@ node_t* ParseFunctionCall(parser_t* parser)
     }
     else if (op_instr_set[index].num_args == 2)
     {
-        if (!ConsumeToken(parser, TOKEN_COMMA, "Expected ',' for second argument"))
+        if (!ConsumeToken(lexer, TOKEN_COMMA, "Expected ',' for second argument"))
         {
             FreeNodes(arg1);
             return NULL;
         }
         
-        node_t* arg2 = ParseExpression(parser);
+        node_t* arg2 = ParseExpression(lexer);
         if (IS_BAD_PTR(arg2)) { FreeNodes(arg1); return NULL; }
         
-        if (!ConsumeToken(parser, TOKEN_RPAREN, "Expected ')' after second argument"))
+        if (!ConsumeToken(lexer, TOKEN_RPAREN, "Expected ')' after second argument"))
         {
             FreeNodes(arg1);
             FreeNodes(arg2);
@@ -268,17 +228,17 @@ node_t* ParseFunctionCall(parser_t* parser)
         
     }
 
-    PrintError(parser, func_token, "Function has invalid number of arguments");
+    PrintError(lexer, func_token, "Function has invalid number of arguments");
     FreeNodes(arg1);
     return NULL;
 }
 
 
-node_t* ParseVariable(parser_t* parser)
+node_t* ParseVariable(lexer_t* lexer)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    token_t* var_token = parser->prev_token;
+    token_t* var_token = (lexer->tokens->data)[lexer->tokens->size - 1];
     
     char var_name[256];                                                     // DEFINE
     strncpy(var_name, var_token->start, (size_t)var_token->length);
@@ -289,7 +249,7 @@ node_t* ParseVariable(parser_t* parser)
     
     if (IS_BAD_PTR(var_node))
     {
-        PrintError(parser, var_token, "Failed to create variable node");
+        PrintError(lexer, var_token, "Failed to create variable node");
         return NULL;
     }
     
@@ -297,11 +257,11 @@ node_t* ParseVariable(parser_t* parser)
 }
 
 
-node_t* ParseNumber(parser_t* parser)
+node_t* ParseNumber(lexer_t* lexer)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer)) return NULL; )
 
-    token_t* num_token = parser->prev_token;
+    token_t* num_token = (lexer->tokens->data)[lexer->tokens->size - 1];
     
     node_t *num_node = NUM_(0);
     if (IS_BAD_PTR(num_node)) return NULL;
@@ -313,10 +273,10 @@ node_t* ParseNumber(parser_t* parser)
 }
 
 
-void PrintError(parser_t* parser, token_t* token, const char* message)
+void PrintError(lexer_t* lexer, token_t* token, const char* message)
 {
-    ON_DEBUG( if (IS_BAD_PTR(parser) || IS_BAD_PTR(token) || IS_BAD_PTR(message)) return; )
-    if (parser->prev_token && parser->prev_token->type == TOKEN_EOF)
+    ON_DEBUG( if (IS_BAD_PTR(lexer) || IS_BAD_PTR(token) || IS_BAD_PTR(message)) return; )
+    if (lexer->tokens->data[lexer->cur_token - 1] && (lexer->tokens->data[lexer->cur_token - 1])->type== TOKEN_EOF)
         printf(ANSI_COLOR_RED "Error at end: %s\n" ANSI_COLOR_RESET, message);
     else if (token)
         printf(ANSI_COLOR_RED "Error at %d:%d: %s\n" ANSI_COLOR_RESET, token->line, token->col, message);

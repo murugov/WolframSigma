@@ -6,7 +6,7 @@
 
 enum HashOp
 {
-	HASH_L_PAREN    = 0x28,
+	HASH_L_PAREN    = 0x0,
 	HASH_R_PAREN    = 0x29,
 	HASH_L_BRACKET  = 0x5B,
 	HASH_R_BRACKET  = 0x5D,
@@ -15,6 +15,7 @@ enum HashOp
 	HASH_EQUAL      = 0x3D,
 	HASH_COMMA      = 0x2C,
 	HASH_SEMICOLON  = 0x3B,
+	HASH_DEF        = 0x18405,
 	HASH_DERIVATIVE = 0x44,
 	HASH_PLOT       = 0x348CE1,
 	HASH_ADD        = 0x2B,

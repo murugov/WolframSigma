@@ -1,36 +1,101 @@
-#include "lexer.h" 
+#include "lexer.hpp" 
+#include "KeywordSet.cpp"
 
-static token_t* peeked_token = NULL;
+#define IS_END(lexer) (lexer->cur_line >= lexer->line_count)
+
 static token_t *ReadNum(lexer_t *lexer);
 static token_t *ReadName(lexer_t *lexer);
 
 
 lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name)
 {
-    ON_DEBUG( if (IS_BAD_PTR(lines) || IS_BAD_PTR(file_name)) return LEX_ERROR; )
+    stk_t<token_t*>* tokens = (stk_t<token_t*>*)calloc(1, sizeof(stk_t<token_t*>));
+    if (IS_BAD_PTR(tokens)) return LEX_ERROR;
+    
+    STACK_CTOR(tokens, MIN_STK_LEN);
 
-    lexer->lines = lines;
-    lexer->line_count = line_count;
-    lexer->cur_line = 0;
-    lexer->cur_col = 1;
-    lexer->cur_pos = lines[0]; 
-    lexer->file_name = strdup(file_name);
+    lexer->tokens       = tokens;
+    lexer->cur_token    = 0;
+    lexer->peeked_token = NULL;
+    lexer->lines        = lines;
+    lexer->line_count   = line_count;
+    lexer->cur_line     = 0;
+    lexer->cur_col      = 1;
+    lexer->cur_pos      = lines[0]; 
+    lexer->file_name    = file_name;
 
     return LEX_SUCCESS;
 }
 
 
-token_t *NewToken(type_t type, const char* start, int length, int line, int col)
+lexer_t *LexerCtor(char** lines, int line_count, const char* file_name)
 {
-    token_t *new_token = (token_t*)calloc(1, sizeof(token_t));
+    ON_DEBUG( if (IS_BAD_PTR(lines) || IS_BAD_PTR(file_name)) return NULL; )
 
-    new_token->type   = type;
-    new_token->start  = start;
-    new_token->length = length;
-    new_token->line   = line;
-    new_token->col    = col;
+    lexer_t *lexer = (lexer_t*)calloc(1, sizeof(lexer_t));
+    if (IS_BAD_PTR(lexer)) return NULL;
 
-    return new_token;
+    LexerInit(lexer, lines, line_count, file_name);
+
+    PeekToken(lexer);
+    while (!IS_BAD_PTR(lexer->peeked_token) && lexer->peeked_token->type != TOKEN_EOF)
+    {
+        printf("cur_pos: [%c];   token->type: [%d];\n", *lexer->peeked_token->start, lexer->peeked_token->type);
+        if (AdvanceToken(lexer) == LEX_ERROR) return NULL;
+        
+        PeekToken(lexer);
+    }
+    
+    return lexer;
+}
+
+
+lexerErr_t LexerDtor(lexer_t* lexer)
+{
+    ON_DEBUG(if (IS_BAD_PTR(lexer)) return LEX_ERROR;)
+    
+    if (IS_BAD_PTR(lexer->tokens))
+        LOG(ERROR, "Bad pointer of tokens");
+    else
+    {
+        for (ssize_t i = 0; i < lexer->tokens->size; ++i)
+        {
+            if (lexer->tokens->data[i])
+                free(lexer->tokens->data[i]);
+        }
+        
+        STACK_DTOR(lexer->tokens);
+        free(lexer->tokens);
+        lexer->tokens = NULL;
+    }
+    
+    lexer->cur_token    = 0;
+    lexer->peeked_token = NULL;
+    lexer->lines        = NULL;
+    lexer->line_count   = 0;
+    lexer->cur_line     = 0;
+    lexer->cur_col      = 0;
+    lexer->cur_pos      = NULL;
+    lexer->file_name    = NULL;
+    
+    LOG(INFO, "Lexer is destructured");
+    return LEX_SUCCESS;
+}
+
+
+lexerErr_t AdvanceToken(lexer_t* lexer)
+{
+    ON_DEBUG(if (IS_BAD_PTR(lexer)) { LOG(ERROR, "Token didn't advance"); return LEX_ERROR; })
+    ON_DEBUG( if (IS_BAD_PTR(lexer->peeked_token)) return LEX_ERROR; )
+    
+    if (StackPush(lexer->tokens, lexer->peeked_token) != STK_SUCCESS) return LEX_ERROR;
+    
+    lexer->cur_pos = lexer->peeked_token->start + lexer->peeked_token->length;
+    lexer->cur_col += lexer->peeked_token->length;
+    
+    lexer->peeked_token = NULL;
+    lexer->cur_token++;
+    return LEX_SUCCESS;
 }
 
 
@@ -63,107 +128,50 @@ lexerErr_t SkipSpaces(lexer_t* lexer)
 
 token_t *NextToken(lexer_t* lexer)
 {
-    if (peeked_token)
-    {
-        token_t* token = peeked_token;
-        peeked_token = NULL;
-        return token;
-    }
-
     SkipSpaces(lexer);
     if (IS_END(lexer)) return NewToken(TOKEN_EOF, "", 0, lexer->cur_line + 1, lexer->cur_col);
     
-    char cur_sym = *lexer->cur_pos;
     const char* start = lexer->cur_pos;
-    int line = lexer->cur_line + 1;
-    int col  = lexer->cur_col;
-    
-    switch (cur_sym)
-    {
-        case '(':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_LPAREN, start, 1, line, col);
-
-        case ')':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_RPAREN, start, 1, line, col);
-
-        case ',':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_COMMA, start, 1, line, col);
-
-        case '+':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_ADD, start, 1, line, col);
-
-        case '-':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_SUB, start, 1, line, col);
-
-        case '*':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_MUL, start, 1, line, col);
-
-        case '/':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_DIV, start, 1, line, col);
-
-        case '^':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_POW, start, 1, line, col);
-
-        case '=':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_EQ, start, 1, line, col);
-
-        case '$':
-            lexer->cur_pos++;
-            lexer->cur_col++;
-            return NewToken(TOKEN_DOLLAR, start, 1, line, col);
-
-        default:
-            break;
-    }
+    lexer->cur_col++;
     
     int num_digits = 0;
     sscanf(lexer->cur_pos, "%*g%n", &num_digits);
     if (num_digits)
         return ReadNum(lexer);
+
+    hash_t id_hash = HashStr(lexer->cur_pos);
+    keyword_t *key = (keyword_t*)bsearch(&id_hash, keyword_set, LEN_KEYWORD_SET, sizeof(keyword_t), CmpHashForBinSearch);
+    if (key != NULL)
+    {
+        if (strncmp(lexer->cur_pos, key->name, (size_t)(key->len)) == 0)
+            return NewToken(key->type, start, key->len, lexer->cur_line, lexer->cur_col);
+    }
     
-    if (isalpha(cur_sym))
+    if (isalpha(*lexer->cur_pos))
         return ReadName(lexer);
     
     lexer->cur_pos++;
     lexer->cur_col++;
-    return NewToken(TOKEN_UNDEF, start, 1, line, col);
+    return NewToken(TOKEN_UNDEF, start, 1, lexer->cur_line, lexer->cur_col);
 }
 
 
 token_t *PeekToken(lexer_t* lexer)
 {
-    if (!peeked_token)
+    if (!lexer->peeked_token)
     {
         const char* saved_pos = lexer->cur_pos;
         int saved_line        = lexer->cur_line;
         int saved_col         = lexer->cur_col;
         
-        peeked_token = NextToken(lexer);
+        lexer->peeked_token = NextToken(lexer);
         
         lexer->cur_pos  = saved_pos;
         lexer->cur_line = saved_line;
         lexer->cur_col  = saved_col;
     }
 
-    return peeked_token;
+    return lexer->peeked_token;
 }
 
 
@@ -188,13 +196,9 @@ static token_t *ReadName(lexer_t *lexer)
     int line = lexer->cur_line + 1;
     int col = lexer->cur_col;
     
-    while (isalnum(*lexer->cur_pos) || *lexer->cur_pos == '_')
-    {
-        lexer->cur_pos++;
-        lexer->cur_col++;
-    }
+    while (isalnum(*lexer->cur_pos) || *lexer->cur_pos == '_') { lexer->cur_pos++; lexer->cur_col++; }
     
-    int length = (int)(lexer->cur_pos - start);
+    int length = (int)((size_t)lexer->cur_pos - (size_t)start);
     
     const char* saved_pos = lexer->cur_pos;
     int saved_col = lexer->cur_col;
@@ -205,9 +209,22 @@ static token_t *ReadName(lexer_t *lexer)
     lexer->cur_pos = saved_pos;
     lexer->cur_col = saved_col;
     lexer->cur_line = saved_line;
-    
-    if (next_token && next_token->type == TOKEN_LPAREN)
+
+    if (!IS_BAD_PTR(next_token) && next_token->type == TOKEN_LPAREN)
         return NewToken(TOKEN_FUNC, start, length, line, col);
     else
         return NewToken(TOKEN_VAR, start, length, line, col);
+}
+
+
+int CmpHashForBinSearch(const void *a, const void *b)
+{
+    const hash_t    *hash_a    = (const hash_t*)a;
+    const keyword_t *keyword_b = (const keyword_t*)b;
+    
+    if (*hash_a > keyword_b->hash)
+        return 1;
+    if (*hash_a < keyword_b->hash)
+        return -1;
+    return 0;
 }

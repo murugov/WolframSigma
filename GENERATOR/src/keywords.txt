@@ -1,0 +1,24 @@
+# keywords
+IF:     "if";
+ELSE:   "else";
+FOR:    "for";
+WHILE:  "while";
+RETURN: "return";
+# operators
+ADD:  "+";
+SUB:  "-";
+MUL:  "*";
+DIV:  "/";
+POW:  "^";
+EQ:   "=";
+EQEQ: "==";
+# brackets and separators
+LPAREN:    "(";
+RPAREN:    ")";
+LBRACKET:  "[";
+RBRACKET:  "]";
+LBRACE:    "{";
+RBRACE:    "}";
+COMMA:     ",";
+SEMICOLON: ";";
+COLON:     ":";

@@ -5,7 +5,7 @@ static size_t number_graph = 0;
 
 WolfErr_t GenHTML()
 {
-    FILE *GraphsHTML = fopen("WOLFRAM_SIGMA/ReportFiles/GraphsHTML.html", "w");
+    FILE *GraphsHTML = fopen("WOLFRAM_SIGMA/reports/GraphsHTML.html", "w");
     if (IS_BAD_PTR(GraphsHTML)) return WOLF_ERROR;
 
     fprintf(GraphsHTML, "<!DOCTYPE html>\n"
@@ -74,11 +74,11 @@ WolfErr_t GenGraphs(node_t *node, const char *func)
     tree->root = node;
 
     char folder[64] = {0};
-    snprintf(folder, sizeof(folder), "mkdir -p WOLFRAM_SIGMA/ReportFiles/graphs/graph%zu", number_graph);
+    snprintf(folder, sizeof(folder), "mkdir -p WOLFRAM_SIGMA/reports/graphs/graph%zu", number_graph);
     system(folder);
 
     char file_path[64] = {0};
-    snprintf(file_path, sizeof(file_path), "WOLFRAM_SIGMA/ReportFiles/graphs/graph%zu/wolf.dot", number_graph);
+    snprintf(file_path, sizeof(file_path), "WOLFRAM_SIGMA/reports/graphs/graph%zu/wolf.dot", number_graph);
 
     FILE *graph = fopen(file_path, "w");
     if (IS_BAD_PTR(graph)) return WOLF_ERROR;

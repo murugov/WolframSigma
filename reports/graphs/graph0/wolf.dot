@@ -1,0 +1,17 @@
+digraph G {
+	label=<<B>WolfTree from main()</B>>;
+	fontcolor="#008000";
+	fontname="Arial";
+	labelloc="top";
+	labeljust="center";
+	fontsize=20;
+	rankdir=TB;
+	center=true;
+	nodesep=0.5;
+	ranksep=0.5;
+	node[fontsize=9, shape=box, width=0.7, height=0.4, style="filled, rounded", fontname="Arial"];
+
+	n0 [shape=record, label="{ptr = 0x604000000450 | parent = 0x0 | type = 0 | data = sin | {<left> left = 0x0 | <right> right = 0x604000000410}}", fillcolor="#87CEEB", color="black"]
+	n1 [shape=record, label="{ptr = 0x604000000410 | parent = 0x604000000450 | type = 1 | data = x | {<left> left = 0x0 | <right> right = 0x0}}", fillcolor="#87CEEB", color="black"]
+	n0:right -> n1
+}

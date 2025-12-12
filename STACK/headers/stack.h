@@ -12,7 +12,7 @@
 #include "DEBUG_MOD.h"
 #include "ERR_FIND_MOD.h"
 
-#define MIN_STK_LEN 8
+#define MIN_STK_LEN 16
 #define STK_POISON  0
 
 

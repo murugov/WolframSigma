@@ -1,5 +1,7 @@
-#include "parser.h"
-#include "wolfram.h"
+#include "parser.hpp"
+
+
+#define PATH_TO_DATA "src/data.txt"   // first version, after I will use argc/argv
 
 int main()
 {
@@ -16,39 +18,45 @@ int main()
     if (IS_BAD_PTR(arr_ptr)) { printf("Error: Failed to read file\n"); return EXIT_FAILURE; }
     
     RemoveComments(arr_ptr, &count_lines);
-    
-    lexer_t *lexer = (lexer_t*)calloc(1, sizeof(lexer_t));
-    if (IS_BAD_PTR(lexer)) return LEX_ERROR;
 
-    if (LexerInit(lexer, arr_ptr, count_lines, PATH_TO_DATA) != LEX_SUCCESS)
+    lexer_t *lexer = LexerCtor(arr_ptr, count_lines, __FILE__);
+    if (IS_BAD_PTR(lexer))
     {
         printf("Error: Failed to initialize lexer\n");
         return EXIT_FAILURE;
     }
 
-    parser_t* parser = parserCtor(lexer);
-    if (IS_BAD_PTR(parser))
-    {
-        printf("Error: Failed to create parser\n");
-        return EXIT_FAILURE;
-    }
+    printf("\nlexer:    [%p]\n", lexer);
+    printf("----------------\n");
+    printf("tokens:     [%p]\n", lexer->tokens);
+    printf("cur_token:  [%d]\n", lexer->cur_token);
+    printf("lines:      [%p]\n", lexer->lines);
+    printf("line_count: [%d]\n", lexer->line_count);
+    printf("cur_line:   [%d]\n", lexer->cur_line);
+    printf("cur_col:    [%d]\n", lexer->cur_col);
+    printf("cur_pos:    [%p]\n", lexer->cur_pos);
+    printf("file_name:  [%p]\n", lexer->file_name);
+    printf("----------------\n");
 
-    printf("=== Parsing ===\n");
-    node_t* ast = ParseGeneral(parser);
+    // node_t* ast = ParseGeneral(&lexer);
     
-    if (ast)
-    {
-        printf(ANSI_COLOR_GREEN "Successfully parsed!\n" ANSI_COLOR_RESET);
+    // if (ast)
+    // {
+    //     printf(ANSI_COLOR_GREEN "Successfully parsed!\n" ANSI_COLOR_RESET);
         
-        GenGraphs(ast, __func__);
-        FreeNodes(ast);
-    }
-    else
-        printf(ANSI_COLOR_RED "Parsing failed\n" ANSI_COLOR_RESET);
+    //     GenGraphs(ast, __func__);
+    //     FreeNodes(ast);
+    // }
+    // else
+    //     printf(ANSI_COLOR_RED "Parsing failed\n" ANSI_COLOR_RESET);
     
-    parserDtor(parser);
-    FreeLines(arr_ptr, count_lines);
-    
+    // parserDtor(parser);
+    // FreeLines(arr_ptr, count_lines);
+
+    StackDump(lexer->tokens, __FILE__, __func__, __LINE__);
+
+
+    LexerDtor(lexer);
     LogFileCloser();
-    return EXIT_SUCCESS;
+    return 0;
 }

@@ -5,7 +5,7 @@ hash_t bad_hash[] = {
                         HashStr("["), HashStr("]"),
                         HashStr("{"), HashStr("}"),
                         HashStr(","), HashStr(";"),
-                        HashStr("="),
+                        HashStr("="), HashStr("def"),
                         HashStr("D"), HashStr("plot")
                     };
 static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);
@@ -13,8 +13,8 @@ static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);
 
 int main()
 {
-    FILE *SourceFile     = fopen(PATH_TO_SRC_FILE, "r");
-    if (IS_BAD_PTR(SourceFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FILE); return EXIT_FAILURE; }
+    FILE *SourceFuncFile = fopen(PATH_TO_SRC_FUNC_FILE, "r");
+    if (IS_BAD_PTR(SourceFuncFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FUNC_FILE); return EXIT_FAILURE; }
     
     FILE *WolfOpFile     = fopen(PATH_TO_WOLF_OP_H, "w");
     if (IS_BAD_PTR(WolfOpFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_WOLF_OP_H); return EXIT_FAILURE; }
@@ -25,9 +25,9 @@ int main()
 
     char* buffer = NULL;
     size_t len_buffer = 0;
-    size_t count_line = 0;
-    char **arr_ptr = TXTreader(SourceFile, buffer, &len_buffer, &count_line);
-    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FILE);
+    int count_line = 0;
+    char **arr_ptr = TXTreader(SourceFuncFile, buffer, &len_buffer, &count_line, NULL);
+    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FUNC_FILE);
 
     RemoveComments(arr_ptr, &count_line);
 
@@ -42,15 +42,41 @@ int main()
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
 
     free(arr_ptr);
-    fclose(SourceFile);
+
+
+    FILE *SourceKeyFile  = fopen(PATH_TO_SRC_KEY_FILE, "r");
+    if (IS_BAD_PTR(SourceKeyFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE); return EXIT_FAILURE; }
+
+    FILE *KeywordSetFile = fopen(PATH_TO_KEYWORD_SET, "w");
+    if (IS_BAD_PTR(KeywordSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET); return EXIT_FAILURE; }
+
+
+    buffer = NULL;
+    len_buffer = 0;
+    count_line = 0;
+    arr_ptr = TXTreader(SourceKeyFile, buffer, &len_buffer, &count_line, NULL);
+    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE);
+
+    RemoveComments(arr_ptr, &count_line);
+
+    if (GenKeywordSet(KeywordSetFile, arr_ptr, count_line))
+        printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET);
+    else
+        printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+
+
+    free(arr_ptr);
+    fclose(SourceFuncFile);
+    fclose(SourceKeyFile);
     fclose(WolfOpFile);
     fclose(OpInstrSetFile);
-    
+    fclose(KeywordSetFile);
+
     return 0;
 }
 
 
-GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
+GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
 {
     if (IS_BAD_PTR(WolfOpFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
         
@@ -58,13 +84,13 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
     
     qsort(bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash);
 
-    funcInfo *func_infos = (funcInfo*)calloc(count_line, sizeof(funcInfo));
+    funcInfo *func_infos = (funcInfo*)calloc((size_t)count_line, sizeof(funcInfo));
     if (IS_BAD_PTR(func_infos)) return GEN_ERROR;
 
-    size_t actual_count = 0;
+    int actual_count = 0;
     int max_name_len = 0;
 
-    for (size_t line = 0; line < count_line; ++line)
+    for (int line = 0; line < count_line; ++line)
     {
         if (*arr_ptr[line] == '\0') continue;
         
@@ -77,7 +103,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
         }
         else
         {
-            printf(ANSI_COLOR_RED "Error parsing line %zu: '%s'\n" ANSI_COLOR_RESET, line, arr_ptr[line]);
+            printf(ANSI_COLOR_RED "Error parsing line %d: '%s'\n" ANSI_COLOR_RESET, line, arr_ptr[line]);
             free(func_infos);
             return GEN_ERROR;
         }
@@ -89,7 +115,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
     fprintf(WolfOpFile, "enum HashOp\n");
     fprintf(WolfOpFile, "{\n");
 
-    for (size_t i = 0; i < actual_count - 1; ++i)
+    for (int i = 0; i < actual_count - 1; ++i)
         fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX,\n", max_name_len, func_infos[i].name, HashStr(func_infos[i].op));
     
     if (actual_count > 0)
@@ -111,7 +137,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
     fprintf(WolfOpFile, "    hash_t hash_indep_var;\n");
     fprintf(WolfOpFile, "};\n\n\n");
     
-    for (size_t i = 0; i < actual_count; ++i)
+    for (int i = 0; i < actual_count; ++i)
     {
         hash_t target_hash = HashStr(func_infos[i].op);
         if (!bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash))
@@ -133,10 +159,9 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line)
 }
 
 
-GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line)
+GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line)
 {
-    if (IS_BAD_PTR(OpInstrSetFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) 
-        return GEN_ERROR;
+    if (IS_BAD_PTR(OpInstrSetFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
         
     fprintf(OpInstrSetFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n");
     
@@ -152,16 +177,15 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line)
     static const hash_t HASH_DIV   = HashStr("/");
     static const hash_t HASH_POW   = HashStr("^");
     
-    op_instr_t *func_infos = (op_instr_t*)calloc(count_line, sizeof(op_instr_t));
-    if (IS_BAD_PTR(func_infos)) 
-        return GEN_ERROR;
+    op_instr_t *func_infos = (op_instr_t*)calloc((size_t)count_line, sizeof(op_instr_t));
+    if (IS_BAD_PTR(func_infos)) return GEN_ERROR;
 
-    size_t actual_count = 0;
+    int actual_count = 0;
     size_t max_name_len = 0;
     size_t max_op_len = 0;
     int max_num_width = 0;
 
-    for (size_t line = 0; line < count_line; ++line)
+    for (int line = 0; line < count_line; ++line)
     {
         if (*arr_ptr[line] == '\0') 
             continue;
@@ -170,16 +194,11 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line)
                    func_infos[actual_count].name, 
                    func_infos[actual_count].op) == 2)
         {
-            // Проверяем, не является ли операция "плохой" (как в GenWolfOp)
             hash_t target_hash = HashStr(func_infos[actual_count].op);
-            if (bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash))
-            {
-                // Пропускаем "плохие" операции
-                continue;
-            }
+            if (bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash)) continue;
             
             size_t name_len = strlen(func_infos[actual_count].name);
-            size_t op_len = strlen(func_infos[actual_count].op);
+            size_t op_len   = strlen(func_infos[actual_count].op);
             
             if (name_len > max_name_len) max_name_len = name_len;
             if (op_len > max_op_len) max_op_len = op_len;
@@ -207,9 +226,9 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line)
         }
     }
     
-    qsort(func_infos, actual_count, sizeof(op_instr_t), CmpOpInstrSetByHash);
+    qsort(func_infos, (size_t)actual_count, sizeof(op_instr_t), CmpOpInstrSetByHash);
 
-    for (size_t i = 0; i < actual_count - 1; ++i)
+    for (int i = 0; i < actual_count - 1; ++i)
     {
         fprintf(OpInstrSetFile, 
                 "\t{HASH_%-*s, \"%s\",%*d, calc%s, diff%s},\n",
@@ -242,6 +261,76 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line)
 }
 
 
+GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
+{
+    if (IS_BAD_PTR(KeywordSetFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
+        
+    fprintf(KeywordSetFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n");
+    
+    qsort(bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash);
+
+    fprintf(KeywordSetFile, "const keyword_t keyword_set[] =\n");
+    fprintf(KeywordSetFile, "{\n");
+    
+    keyword_set_t *func_infos = (keyword_set_t*)calloc((size_t)count_line, sizeof(keyword_set_t));
+    if (IS_BAD_PTR(func_infos)) return GEN_ERROR;
+
+    int actual_count    = 0;
+    size_t max_name_len = 0;
+    size_t max_key_len  = 0;
+
+    for (int line = 0; line < count_line; ++line)
+    {
+        if (*arr_ptr[line] == '\0') 
+            continue;
+        
+        if (sscanf(arr_ptr[line], "%15[^:]: \"%15[^\"]\";", 
+                   func_infos[actual_count].name, 
+                   func_infos[actual_count].key) == 2)
+        {
+            size_t name_len = strlen(func_infos[actual_count].name);
+            size_t key_len  = strlen(func_infos[actual_count].key);
+            
+            if (name_len > max_name_len) max_name_len = name_len;
+            if (key_len > max_key_len) max_key_len = key_len;
+            
+            func_infos[actual_count].hash = HashStr(func_infos[actual_count].key);
+            
+            actual_count++;
+        }
+    }
+    
+    qsort(func_infos, (size_t)actual_count, sizeof(keyword_set_t), CmpKeywordSetByHash);
+
+    for (int i = 0; i < actual_count - 1; ++i)
+    {
+        fprintf(KeywordSetFile, 
+                "\t{TOKEN_%-*s, \"%s\",\t%zu ,\t0x%zX},\n",
+                (int)max_name_len, func_infos[i].name, 
+                func_infos[i].key,
+                strlen(func_infos[i].key),
+                func_infos[i].hash);
+    }
+    
+    if (actual_count > 0)
+    {
+        fprintf(KeywordSetFile, 
+                "\t{TOKEN_%-*s, \"%s\",\t%zu ,\t0x%zX}\n",
+                (int)max_name_len, func_infos[actual_count - 1].name, 
+                func_infos[actual_count - 1].key,
+                strlen(func_infos[actual_count - 1].key),
+                func_infos[actual_count - 1].hash);
+    }
+
+    fprintf(KeywordSetFile, "};\n\n");
+    
+    fprintf(KeywordSetFile, "#define LEN_KEYWORD_SET sizeof(keyword_set) / sizeof(*keyword_set)\n");
+
+    free(func_infos);
+    return GEN_SUCCESS;
+}
+
+
 int CmpOpInstrSetByHash(const void *a, const void *b)
 {
     const op_instr_t *op_instr_a = (const op_instr_t*)a;
@@ -250,6 +339,19 @@ int CmpOpInstrSetByHash(const void *a, const void *b)
     if (op_instr_a->hash > op_instr_b->hash)
         return 1;
     if (op_instr_a->hash == op_instr_b->hash)
+        return 0;
+    return -1;
+}
+
+
+int CmpKeywordSetByHash(const void *a, const void *b)
+{
+    const keyword_set_t *keyword_a = (const keyword_set_t*)a;
+    const keyword_set_t *keyword_b = (const keyword_set_t*)b;
+
+    if (keyword_a->hash > keyword_b->hash)
+        return 1;
+    if (keyword_a->hash == keyword_b->hash)
         return 0;
     return -1;
 }
@@ -268,9 +370,9 @@ int CmpByHash(const void *a, const void *b)
 }
 
 
-void RemoveComments(char** arr_ptr, size_t *count_line)
+void RemoveComments(char** arr_ptr, int *count_line)
 {
-    for (size_t i = 0; i < *count_line; ++i)
+    for (int i = 0; i < *count_line; ++i)
     {
         char* colon = strchr(arr_ptr[i], '#');
 

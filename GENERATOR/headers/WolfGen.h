@@ -10,9 +10,11 @@
 #include "HashStr.h"
 #include "colors.h"
 
-#define PATH_TO_SRC_FILE     "GENERATOR/src/func.txt"
-#define PATH_TO_WOLF_OP_H    "GENERATOR/ReportFiles/WolfOp.h"
-#define PATH_TO_OP_INSTR_SET "GENERATOR/ReportFiles/OpInstrSet.cpp"
+#define PATH_TO_SRC_FUNC_FILE "GENERATOR/src/func.txt"
+#define PATH_TO_SRC_KEY_FILE  "GENERATOR/src/keywords.txt"
+#define PATH_TO_WOLF_OP_H     "GENERATOR/reports/WolfOp.h"
+#define PATH_TO_OP_INSTR_SET  "GENERATOR/reports/OpInstrSet.cpp"
+#define PATH_TO_KEYWORD_SET   "GENERATOR/reports/KeywordSet.cpp"
 
 #define MAX_LEN_NAME_FUNC 16
 
@@ -36,12 +38,21 @@ struct op_instr_t
     int num_args; 
 };
 
-void RemoveComments(char** arr_cmd, size_t *count_line);
+struct keyword_set_t
+{
+    char name[32];
+    char key[8];
+    hash_t hash;
+};
 
-GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, size_t count_line);
-GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, size_t count_line);
+void RemoveComments(char** arr_cmd, int *count_line);
+
+GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line);
+GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line);
+GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line);
 
 int CmpOpInstrSetByHash(const void *a, const void *b);
+int CmpKeywordSetByHash(const void *a, const void *b);
 int CmpByHash(const void *a, const void *b);
 
 #endif
