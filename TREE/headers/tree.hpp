@@ -12,7 +12,7 @@
 #include "logger.hpp"
 #include "stack.hpp"
 
-#define TREE_POISON -1       // improve
+#define TREE_POISON 0       // improve
 
 typedef int    arg_t;
 typedef size_t tree_canary_t;
@@ -110,22 +110,18 @@ struct tree_t
 };
 
 
-TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line);
-TreeErr_t TreeCtor (tree_t *tree);
+TreeErr_t TreeInit(tree_t *tree, const char *name, const char *file, const char *func, size_t line);
+TreeErr_t TreeCtor(tree_t **tree);
 
 node_t *NewNode(ArgTypes type, val item, node_t *left, node_t *right);
 void set_parents(node_t *node, node_t *parent);
 
 TreeErr_t FreeNodes(node_t *node);
-TreeErr_t TreeDtor (tree_t *tree);
-
-ArgTypes DetType(char* str);
-
-TreeErr_t HashSearch(hash_t hash, size_t *index);
-int CmpForBinSearch(const void *a, const void *b);
+TreeErr_t TreeDtor(tree_t *tree);
 
 
-#define TREE_INIT(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(tree)
+#define TREE_CTOR(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(&(tree))
+#define TREE_DTOR(tree) TreeDtor(tree)
 
 #define OP_(op)   NewNode(ARG_OP, valVAR(op), NULL, NULL)
 #define VAR_(var) NewNode(ARG_VAR, valVAR(var), NULL, NULL)

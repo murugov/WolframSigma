@@ -1,12 +1,11 @@
 #include "tree.hpp"
-#include "wolfram.hpp"
-#include "OpInstrSet.cpp"
 
-TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char *func, size_t line)
+
+TreeErr_t TreeInit(tree_t *tree, const char *name, const char *file, const char *func, size_t line)
 {
     ON_DEBUG( if (IS_BAD_PTR(tree)) { LOG(ERROR, ERR_MSG_FORMAT("TREE_BAD_TREE_PTR"), ERR_MSG_PARAMS); return TREE_ERROR; } )
     
-    (*tree).id.name = name + 1;
+    (*tree).id.name = name;
     (*tree).id.file = file;
     (*tree).id.func = func;
     (*tree).id.line = line;
@@ -16,63 +15,21 @@ TreeErr_t TreeInit (tree_t *tree, const char *name, const char *file, const char
 }
 
 
-TreeErr_t TreeCtor(tree_t *tree)
+TreeErr_t TreeCtor(tree_t **tree)
 {
     ON_DEBUG( if (IS_BAD_PTR(tree)) { LOG(ERROR, ERR_MSG_FORMAT("TREE_BAD_TREE_PTR"), ERR_MSG_PARAMS); return TREE_ERROR; } )
 
-    tree->canary_1 = TREE_CANARY_1;
-    tree->root     = NULL;
-    tree->size     = 0;
-    tree->capacity = 0;
-    tree->error    = TREE_NO_ERRORS;
-    tree->canary_2 = TREE_CANARY_2;
+    *tree = (tree_t*)calloc(1, sizeof(tree_t));
+    if (IS_BAD_PTR(tree)) return TREE_ERROR;
+
+    (*tree)->canary_1 = TREE_CANARY_1;
+    (*tree)->root     = NULL;
+    (*tree)->size     = 0;
+    (*tree)->capacity = 0;
+    (*tree)->error    = TREE_NO_ERRORS;
+    (*tree)->canary_2 = TREE_CANARY_2;
 
     return TREE_SUCCESS;
-}
-
-
-ArgTypes DetType(char* str)                 // needs to be moved to WOLFRAM_SIGMA
-{
-    hash_t hash = HashStr(str);
-    for (int i = 0; i < MAX_NUM_VAR; ++i)
-    {
-        if (variables[i].hash == hash)
-        {
-            variables[i].is_used = true;
-            return ARG_VAR; 
-        }
-    }
-
-    size_t index = 0;
-    if (HashSearch(hash, &index) == TREE_SUCCESS) return ARG_OP;
-
-    return ARG_NUM;
-}
-
-
-TreeErr_t HashSearch(hash_t hash, size_t *index)
-{
-    ON_DEBUG( if (IS_BAD_PTR(index)) return TREE_ERROR; )
-
-    op_t *found = (op_t*)bsearch(&hash, op_instr_set, LEN_INSTR_SET, sizeof(op_instr_set[0]), CmpForBinSearch);
-    if (found == NULL)
-        return TREE_ERROR;
-    
-    *index = (size_t)(found - op_instr_set);
-    return TREE_SUCCESS;
-}
-
-
-int CmpForBinSearch(const void *a, const void *b)
-{
-    const hash_t *hash_a = (const hash_t*)a;
-    const op_t   *op_b   = (const op_t*)b;
-    
-    if (*hash_a > op_b->hash)
-        return 1;
-    if (*hash_a < op_b->hash)
-        return -1;
-    return 0;
 }
 
 
@@ -121,10 +78,7 @@ void set_parents(node_t *node, node_t *parent)
 
 TreeErr_t TreeDtor(tree_t *tree)
 {
-    ON_DEBUG(
-        if (IS_BAD_PTR(tree))       return TREE_ERROR;
-        if (IS_BAD_PTR(tree->root)) return TREE_ERROR;
-    )
+    ON_DEBUG( if (IS_BAD_PTR(tree) || IS_BAD_PTR(tree->root)) return TREE_ERROR; )
     
     FreeNodes(tree->root);
     return TREE_SUCCESS;

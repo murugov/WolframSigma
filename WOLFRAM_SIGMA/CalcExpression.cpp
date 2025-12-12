@@ -13,7 +13,7 @@ double CalcExpression(node_t *node)
             hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
 
-            if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
             {
                 double left_val = NAN, right_val = NAN;
                 

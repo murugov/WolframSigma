@@ -11,30 +11,6 @@ var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно
 };
 
 
-WolfErr_t WolfCtor(tree_t **tree)
-{
-    *tree = (tree_t*)calloc(1, sizeof(tree_t));
-    if (IS_BAD_PTR(tree)) return WOLF_ERROR;
-
-    (*tree)->root = NULL;
-    (*tree)->size = 0;
-    (*tree)->capacity = 0;
-
-    TREE_INIT((*tree));
-
-    return WOLF_SUCCESS;
-}
-
-
-WolfErr_t WolfDtor(tree_t *tree)
-{
-    ON_DEBUG( if (IS_BAD_PTR(tree)) {LOG(ERROR, "AKIN_BAD_TREE_PTR"); return WOLF_ERROR; } )
-
-    FreeNodes(tree->root);
-    return WOLF_SUCCESS;
-}
-
-
 void EnterVar()
 {
     for (int i = 0; i < MAX_NUM_VAR; ++i)
@@ -61,7 +37,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
             hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
 
-            if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
             {
                 diff_context context = {node->left, node->right, hash_indep_var};
                 tmp = op_instr_set[index].diff(&context);
@@ -194,4 +170,30 @@ node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
     new_node->right = Substitute_x0(node->right, var_hash, value);
 
     return new_node;
+}
+
+
+WolfErr_t HashSearch(hash_t hash, size_t *index)
+{
+    ON_DEBUG( if (IS_BAD_PTR(index)) return WOLF_ERROR; )
+
+    op_t *found = (op_t*)bsearch(&hash, op_instr_set, LEN_INSTR_SET, sizeof(op_instr_set[0]), CmpForBinSearch);
+    if (found == NULL)
+        return WOLF_ERROR;
+    
+    *index = (size_t)(found - op_instr_set);
+    return WOLF_SUCCESS;
+}
+
+
+int CmpForBinSearch(const void *a, const void *b)
+{
+    const hash_t *hash_a = (const hash_t*)a;
+    const op_t   *op_b   = (const op_t*)b;
+    
+    if (*hash_a > op_b->hash)
+        return 1;
+    if (*hash_a < op_b->hash)
+        return -1;
+    return 0;
 }

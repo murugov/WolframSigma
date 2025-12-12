@@ -35,16 +35,16 @@ int main(int argc, char *argv[])
         // LatexFileOpener(PATH_TO_LATEX);
 
         tree_t *wolf_tree = NULL;
-        WolfCtor(&wolf_tree);
+        TREE_CTOR(wolf_tree);
 
         DataReader(SourceFile, wolf_tree);
 
-        GenGraphs(wolf_tree->root, __func__);
+        GenTrees(wolf_tree->root, __func__);
 
         TaylorSeries(wolf_tree, "x", 0.0, 7);
 
-        WolfDtor(wolf_tree);    
-        GenHTML();
+        TREE_DTOR(wolf_tree);    
+        GenHTML("WolfDump");
 
         // LatexFileCloser();
 

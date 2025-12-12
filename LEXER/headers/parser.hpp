@@ -5,7 +5,8 @@
 #include "token.hpp"
 #include "lexer.hpp"
 #include "colors.hpp"
-// #include "DSL.hpp"
+#include "dump.hpp"
+#include "DSL.hpp"
 
 
 node_t* ParseGeneral(lexer_t* lexer);
@@ -17,7 +18,7 @@ node_t* ParseFunc(lexer_t* lexer);
 node_t* ParseVariable(lexer_t* lexer);
 node_t* ParseNumber(lexer_t* lexer);
 
-int MatchToken(lexer_t* lexer, type_t type);
+bool MatchToken(lexer_t* lexer, type_t type);
 int CheckType(lexer_t* lexer, type_t type);
 token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg);
 void PrintError(lexer_t* lexer, token_t* token, const char* message);

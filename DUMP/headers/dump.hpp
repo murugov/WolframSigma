@@ -14,8 +14,7 @@ genErr_t GenHTML(const char* title);
 genErr_t GenTrees(node_t *node, const char *func);
 genErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 
-
-
+// LATEX dump
 // WolfErr_t LatexFileOpener(const char* path);
 // WolfErr_t LatexFileCloser();
 

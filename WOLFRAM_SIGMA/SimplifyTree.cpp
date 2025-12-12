@@ -38,7 +38,7 @@ double ConstFold(node_t *node)
             
             if ((op_instr_set[index].num_args == 2 && isnan(left_val)) || isnan(right_val)) return NAN;
             
-            if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
             {
                 calc_context context = {left_val, right_val};
                 double result = op_instr_set[index].calc(&context);

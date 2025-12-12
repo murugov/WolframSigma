@@ -6,6 +6,7 @@
 #include "is_zero.hpp"
 #include "Factorial.hpp"
 #include "colors.hpp"
+#include "dump.hpp"
 #include "DSL.hpp"
 
 #include "WolfOp.hpp"
@@ -43,9 +44,6 @@ extern var_t variables[MAX_NUM_VAR];
 
 WolfErr_t VerifyOpInstrSetSort();
 
-WolfErr_t WolfCtor(tree_t **tree);
-WolfErr_t WolfDtor(tree_t *tree);
-
 void EnterVar();
 node_t *DerivativeNode(node_t *node, hash_t hash_indep_var);
 node_t *CopyNode(node_t *node);
@@ -64,6 +62,9 @@ node_t *SwapParentAndChild(node_t *parent, node_t *child);
 double CalcExpression(node_t *node);
 
 WolfErr_t DataReader(FILE *data, tree_t *tree);
+
+WolfErr_t HashSearch(hash_t hash, size_t *index);
+int CmpForBinSearch(const void *a, const void *b);
 
 #define SKIP_SPACES(ptr) while (isspace((int)*ptr)) ptr++
 

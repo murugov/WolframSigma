@@ -31,6 +31,8 @@ struct keyword_t
     hash_t      hash;
 };
 
+char **DataReader(FILE *SourceFile, char *buffer, int *count_line);
+
 lexer_t *LexerCtor(char** lines, int line_count, const char* file_name);
 lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name);
 lexerErr_t LexerDtor(lexer_t* lexer);

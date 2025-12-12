@@ -65,17 +65,17 @@ typedef size_t stk_hash_t;
 
 struct stack_id
 {
-    const char *name;
-    const char *file;
-    const char *func;
-    int        line;
+    const char* name;
+    const char* file;
+    const char* func;
+    int         line;
 };
 
-template <typename T>
+template <typename stackElem_T>
 struct stk_t
 {
     stk_canary_t canary_1;
-    T            *data;
+    stackElem_T* data;
     ssize_t      size;
     ssize_t      capacity;
     stk_err_t    error;
@@ -121,10 +121,9 @@ template <typename stackElem_T>
 
 #define ERR_DETECT(stk, IncomingFunc) ErrDetect(stk, IncomingFunc, __FILE__, __func__, __LINE__)
 #define ERR_CHECK(err_code) ((stk->error) & err_code) == err_code
+
 #define STACK_CTOR(stk, capacity) StackInit(stk, #stk, __FILE__, __func__, __LINE__); StackCtor(stk, capacity)
 #define STACK_DTOR(stk) StackDtor(stk)
-#define IS_BAD_PTR(ptr) IsBadPtr((void*)ptr)
-#define DUMP(stk) StackDump(stk, __FILE__, __func__, __LINE__);
 
 #include "StackFunc.hpp"
 #include "StackDump.hpp"

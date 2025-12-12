@@ -3,19 +3,10 @@
 #include "OpInstrSet.cpp"
 
 
-// void AdvanceToken(lexer_t* lexer)
-// {
-//     ON_DEBUG( if (IS_BAD_PTR(lexer)) return; )
-
-//     StackPush(lexer->tokens, NextToken(lexer));
-//     lexer->cur_token++;                                         // maybe does't need
-// }
-
-
-int MatchToken(lexer_t* lexer, type_t type)
+bool MatchToken(lexer_t* lexer, type_t type)
 {
-    // if (CheckType(lexer, type)) { AdvanceToken(lexer); return 1; }
-    return 0;
+    if (CheckType(lexer, type)) { AdvanceToken(lexer); return true; }
+    return false;
 }
 
 
@@ -35,7 +26,7 @@ token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg)
     if (CheckType(lexer, type))
     {
         token_t* token = lexer->tokens->data[lexer->cur_token];
-        // AdvanceToken(lexer);
+        AdvanceToken(lexer);
         return token;
     }
 
@@ -51,9 +42,9 @@ node_t* ParseGeneral(lexer_t* lexer)                        // rename ParseAst
     node_t* node = ParseExpression(lexer);
     if (IS_BAD_PTR(node)) return NULL;
     
-    if (!MatchToken(lexer, TOKEN_DOLLAR))
+    if (!MatchToken(lexer, TOKEN_EOF))
     {
-        // PrintError(parser, parser->cur_token, "Expected '$' at end of expression");
+        // PrintError(lexer, parser->cur_token, "Expected '$' at end of expression");
         FreeNodes(node);
         return NULL;
     }

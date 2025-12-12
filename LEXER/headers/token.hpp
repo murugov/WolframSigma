@@ -67,7 +67,5 @@ struct token_t
 token_t *NewToken(type_t type, const char* start, int length, int line, int col);
 tokenErr_t FreeToken(token_t *token);
 
-char **DataReader(FILE *SourceFile, char *buffer, int *count_line);
-void RemoveComments(char **arr_ptr, int *count_line);
 
 #endif

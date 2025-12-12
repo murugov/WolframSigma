@@ -14,11 +14,8 @@ int main()
     int count_lines = 0;
     char **lines = DataReader(SourceFile, buffer, &count_lines);
     fclose(SourceFile);
-    
     if (IS_BAD_PTR(lines)) { printf("Error: Failed to read file\n"); return EXIT_FAILURE; }
     
-    RemoveComments(lines, &count_lines);
-
     lexer_t *lexer = LexerCtor(lines, count_lines, __FILE__);
     if (IS_BAD_PTR(lexer))
     {
@@ -46,7 +43,7 @@ int main()
     // {
     //     printf(ANSI_COLOR_GREEN "Successfully parsed!\n" ANSI_COLOR_RESET);
         
-    //     GenGraphs(ast, __func__);
+    //     GenTrees(ast, __func__);
     //     FreeNodes(ast);
     // }
     // else

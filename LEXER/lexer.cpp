@@ -7,6 +7,17 @@ static token_t *ReadNum(lexer_t *lexer);
 static token_t *ReadName(lexer_t *lexer);
 
 
+char **DataReader(FILE *SourceFile, char *buffer, int *count_line)
+{
+    ON_DEBUG( if (IS_BAD_PTR(SourceFile)) { LOG(ERROR, "TOKEN_ERROR"); return NULL; } )
+
+    size_t len_buffer = 0;
+    char **lines = TXTreader(SourceFile, buffer, &len_buffer, count_line, NULL);
+
+    return lines;
+}
+
+
 lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name)
 {
     stk_t<token_t*>* tokens = (stk_t<token_t*>*)calloc(1, sizeof(stk_t<token_t*>));
@@ -40,7 +51,7 @@ lexer_t *LexerCtor(char** lines, int line_count, const char* file_name)
     PeekToken(lexer);
     while (!IS_BAD_PTR(lexer->peeked_token) && lexer->peeked_token->type != TOKEN_EOF)
     {
-        printf("cur_pos: [%c];   token->type: [%d];\n", *lexer->peeked_token->start, lexer->peeked_token->type);
+        printf("cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
         if (AdvanceToken(lexer) == LEX_ERROR) return NULL;
         
         PeekToken(lexer);
@@ -88,14 +99,8 @@ token_t *PeekToken(lexer_t* lexer)                      // maybe void
     if (IS_BAD_PTR(lexer->peeked_token))
     {
         const char* saved_pos = lexer->cur_pos;
-        // int saved_line        = lexer->cur_line;
-        int saved_col         = lexer->cur_col;
-        
         lexer->peeked_token = NextToken(lexer);
-        
         lexer->cur_pos  = saved_pos;
-        // lexer->cur_line = saved_line;
-        lexer->cur_col  = saved_col;
     }
 
     return lexer->peeked_token;
@@ -126,7 +131,7 @@ lexerErr_t SkipSpaces(lexer_t* lexer)
     {
         while (*lexer->cur_pos == ' ' || *lexer->cur_pos == '\t') { lexer->cur_pos++; lexer->cur_col++; }
         
-        if (*lexer->cur_pos == '\0')
+        if (*lexer->cur_pos == '\0' || *lexer->cur_pos == '#')
         {
             lexer->cur_line++;
             if (lexer->cur_line < lexer->line_count)
