@@ -19,11 +19,11 @@ typedef size_t tree_canary_t;
 typedef size_t tree_err_t;
 typedef size_t hash_t;
 
-enum ArgTypes
+enum ArgTypes                   // depends on tokenTypes - is very bad
 {
-    ARG_OP  = 0x00,
-    ARG_VAR = 0x01,
-    ARG_NUM = 0x02
+    ARG_OP  = 0x05,
+    ARG_VAR = 0x02,
+    ARG_NUM = 0x01
 };
 
 enum TreeErr_t
@@ -75,7 +75,7 @@ struct tree_id
     size_t     line;
 };
 
-union val
+union val                   // num and not_num?
 {
     double num;
     char*  op;

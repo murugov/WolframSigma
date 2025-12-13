@@ -1,82 +1,19 @@
-[2025-12-12 21:59:15] DEBUG Created id for stack "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] INFO  Stack "tokens" created
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001d50 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001db0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001de0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001e10 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001e40 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001ea0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001ed0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001f00 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001f30 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001f90 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000001fc0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002020 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002050 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002080 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000020b0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000020e0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] INFO  Stack "tokens" reallocated
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002110 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002140 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002170 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000021d0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002200 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002230 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002260 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002290 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000022f0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002320 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002380 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000023b0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000023e0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002410 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002440 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002470 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] INFO  Stack "tokens" reallocated
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000024a0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x6030000024d0 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
-[2025-12-12 21:59:15] DEBUG PUSH 0x603000002500 in "tokens"
-[2025-12-12 21:59:15] INFO  Hash updated
+[2025-12-13 02:00:12] ERROR TREE/TreeFunc.cpp:6: TREE_BAD_TREE_PTR in TREE/TreeFunc.cpp:6: from TreeInit
+[2025-12-13 02:00:12] DEBUG Created id for stack "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Stack "tokens" created
+[2025-12-13 02:00:12] DEBUG PUSH 0x603000001d80 in "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0x603000001db0 in "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0x603000001e10 in "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0x603000001e40 in "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0x603000001e70 in "tokens"
+[2025-12-13 02:00:12] INFO  Hash updated
 ---------------------------------------------------------------------------------------------------------------------------
-DUMP stack "tokens" [0x608000000120] from main() at LEXER/main_lex.cpp:38:
+DUMP stack "tokens" [0x6080000001a0] from parseWolfTree() at WOLFRAM_SIGMA/parseWolfTree.cpp:22:
 
 STK_POISON = 0
 
@@ -85,76 +22,76 @@ STK_CANARY_2 = 222
 tokens {
 	canary_1 = 111; (STK_CANARY_1)
 	data = {
-		[0] = 0x603000001d50, 
+		[0] = 0x603000001d80, 
 		[1] = 0x603000001db0, 
-		[2] = 0x603000001de0, 
-		[3] = 0x603000001e10, 
-		[4] = 0x603000001e40, 
-		[5] = 0x603000001ea0, 
-		[6] = 0x603000001ed0, 
-		[7] = 0x603000001f00, 
-		[8] = 0x603000001f30, 
-		[9] = 0x603000001f90, 
-		[10] = 0x603000001fc0, 
-		[11] = 0x603000002020, 
-		[12] = 0x603000002050, 
-		[13] = 0x603000002080, 
-		[14] = 0x6030000020b0, 
-		[15] = 0x6030000020e0, 
-		[16] = 0x603000002110, 
-		[17] = 0x603000002140, 
-		[18] = 0x603000002170, 
-		[19] = 0x6030000021d0, 
-		[20] = 0x603000002200, 
-		[21] = 0x603000002230, 
-		[22] = 0x603000002260, 
-		[23] = 0x603000002290, 
-		[24] = 0x6030000022f0, 
-		[25] = 0x603000002320, 
-		[26] = 0x603000002380, 
-		[27] = 0x6030000023b0, 
-		[28] = 0x6030000023e0, 
-		[29] = 0x603000002410, 
-		[30] = 0x603000002440, 
-		[31] = 0x603000002470, 
-		[32] = 0x6030000024a0, 
-		[33] = 0x6030000024d0, 
-		[34] = 0x603000002500, 
-		[35] = 0x0, (STK_POISON)
-		[36] = 0x0, (STK_POISON)
-		[37] = 0x0, (STK_POISON)
-		[38] = 0x0, (STK_POISON)
-		[39] = 0x0, (STK_POISON)
-		[40] = 0x0, (STK_POISON)
-		[41] = 0x0, (STK_POISON)
-		[42] = 0x0, (STK_POISON)
-		[43] = 0x0, (STK_POISON)
-		[44] = 0x0, (STK_POISON)
-		[45] = 0x0, (STK_POISON)
-		[46] = 0x0, (STK_POISON)
-		[47] = 0x0, (STK_POISON)
-		[48] = 0x0, (STK_POISON)
-		[49] = 0x0, (STK_POISON)
-		[50] = 0x0, (STK_POISON)
-		[51] = 0x0, (STK_POISON)
-		[52] = 0x0, (STK_POISON)
-		[53] = 0x0, (STK_POISON)
-		[54] = 0x0, (STK_POISON)
-		[55] = 0x0, (STK_POISON)
-		[56] = 0x0, (STK_POISON)
-		[57] = 0x0, (STK_POISON)
-		[58] = 0x0, (STK_POISON)
-		[59] = 0x0, (STK_POISON)
-		[60] = 0x0, (STK_POISON)
-		[61] = 0x0, (STK_POISON)
-		[62] = 0x0, (STK_POISON)
-		[63] = 0x0, (STK_POISON)
+		[2] = 0x603000001e10, 
+		[3] = 0x603000001e40, 
+		[4] = 0x603000001e70, 
+		[5] = 0x0, (STK_POISON)
+		[6] = 0x0, (STK_POISON)
+		[7] = 0x0, (STK_POISON)
+		[8] = 0x0, (STK_POISON)
+		[9] = 0x0, (STK_POISON)
+		[10] = 0x0, (STK_POISON)
+		[11] = 0x0, (STK_POISON)
+		[12] = 0x0, (STK_POISON)
+		[13] = 0x0, (STK_POISON)
+		[14] = 0x0, (STK_POISON)
+		[15] = 0x0, (STK_POISON)
 		};
-	size = 35;
-	capacity = 64;
-	hash = 7e5d98abb6305b9d;
+	size = 5;
+	capacity = 16;
+	hash = 5e2a4af7af92569b;
 	canary_2 = 222; (STK_CANARY_2)
 }
 ---------------------------------------------------------------------------------------------------------------------------
-[2025-12-12 21:59:15] INFO  Stack "tokens" destroed
-[2025-12-12 21:59:15] INFO  Lexer is destructured
+[2025-12-13 02:00:12] DEBUG Created id for stack "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Stack "&stk_ret" created
+[2025-12-13 02:00:12] DEBUG Created id for stack "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Stack "&stk_ids" created
+[2025-12-13 02:00:12] DEBUG PUSH 0x604000000650 in "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0 in "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0x604000000650 from "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0 from "&stk_ids"
+[2025-12-13 02:00:12] DEBUG PUSH 0x604000000610 in "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 1 in "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0x604000000610 from "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 1 from "&stk_ids"
+[2025-12-13 02:00:12] INFO  Stack "&stk_ret" destroed
+[2025-12-13 02:00:12] INFO  Stack "&stk_ids" destroed
+[2025-12-13 02:00:12] INFO  Stack "tokens" destroed
+[2025-12-13 02:00:12] INFO  Lexer is destructured
+[2025-12-13 02:00:12] DEBUG Created id for stack "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Stack "&stk_ret" created
+[2025-12-13 02:00:12] DEBUG Created id for stack "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Stack "&stk_ids" created
+[2025-12-13 02:00:12] DEBUG PUSH 0x604000000650 in "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 0 in "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0x604000000650 from "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0 from "&stk_ids"
+[2025-12-13 02:00:12] DEBUG PUSH 0x604000000610 in "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG PUSH 1 in "&stk_ids"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 0x604000000610 from "&stk_ret"
+[2025-12-13 02:00:12] INFO  Hash updated
+[2025-12-13 02:00:12] DEBUG POP 1 from "&stk_ids"
+[2025-12-13 02:00:12] INFO  Stack "&stk_ret" destroed
+[2025-12-13 02:00:12] INFO  Stack "&stk_ids" destroed

@@ -28,8 +28,9 @@ enum GenErr_t
 
 struct funcInfo
 {
-    char name[MAX_LEN_NAME_FUNC];
-    char op[MAX_LEN_NAME_FUNC];
+    char   name[MAX_LEN_NAME_FUNC];
+    char   op[MAX_LEN_NAME_FUNC];
+    hash_t hash;
 };
 
 struct op_instr_t

@@ -18,7 +18,7 @@ node_t* ParseFunc(lexer_t* lexer);
 node_t* ParseVariable(lexer_t* lexer);
 node_t* ParseNumber(lexer_t* lexer);
 
-bool MatchToken(lexer_t* lexer, type_t type);
+int MatchToken(lexer_t* lexer, type_t type);
 int CheckType(lexer_t* lexer, type_t type);
 token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg);
 void PrintError(lexer_t* lexer, token_t* token, const char* message);

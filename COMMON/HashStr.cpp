@@ -3,7 +3,7 @@
 
 hash_t HashStr(const char *line)
 {    
-    if (!line || !*line) return 0;
+    if (IS_BAD_PTR(line)) return 0;
     
     hash_t new_hash = 0;
     const char* ptr = line;
@@ -14,5 +14,5 @@ hash_t HashStr(const char *line)
         ptr++;
     }
 
-    return new_hash;
+    return (*ptr == '(' && new_hash == 0) ? (hash_t)('(') : new_hash;
 }

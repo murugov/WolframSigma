@@ -51,12 +51,14 @@ lexer_t *LexerCtor(char** lines, int line_count, const char* file_name)
     PeekToken(lexer);
     while (!IS_BAD_PTR(lexer->peeked_token) && lexer->peeked_token->type != TOKEN_EOF)
     {
-        printf("cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
+        printf("type: [%d];   cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
         if (AdvanceToken(lexer) == LEX_ERROR) return NULL;
         
         PeekToken(lexer);
     }
+    if (StackPush(lexer->tokens, lexer->peeked_token) != STK_SUCCESS) return NULL;
     
+    lexer->cur_token = 0;
     return lexer;
 }
 
@@ -168,6 +170,14 @@ token_t *NextToken(lexer_t* lexer)
 
     hash_t id_hash = HashStr(lexer->cur_pos);
     keyword_t *key = (keyword_t*)bsearch(&id_hash, keyword_set, LEN_KEYWORD_SET, sizeof(keyword_t), CmpHashForBinSearch);
+    if (key != NULL)
+    {
+        if (strncmp(lexer->cur_pos, key->name, (size_t)(key->len)) == 0)
+            return NewToken(key->type, start, key->len, lexer->cur_line, lexer->cur_col);
+    }
+
+    id_hash = (hash_t)(*lexer->cur_pos);
+    key = (keyword_t*)bsearch(&id_hash, keyword_set, LEN_KEYWORD_SET, sizeof(keyword_t), CmpHashForBinSearch);
     if (key != NULL)
     {
         if (strncmp(lexer->cur_pos, key->name, (size_t)(key->len)) == 0)

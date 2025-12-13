@@ -36,12 +36,14 @@ int main(int argc, char *argv[])
 
         tree_t *wolf_tree = NULL;
         TREE_CTOR(wolf_tree);
+        
+        parseWolfTree(argv[1], wolf_tree);
 
-        DataReader(SourceFile, wolf_tree);
 
         GenTrees(wolf_tree->root, __func__);
 
-        TaylorSeries(wolf_tree, "x", 0.0, 7);
+
+        // TaylorSeries(wolf_tree, "x", 0.0, 7);
 
         TREE_DTOR(wolf_tree);    
         GenHTML("WolfDump");

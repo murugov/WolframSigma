@@ -6,6 +6,7 @@
 #include "is_zero.hpp"
 #include "Factorial.hpp"
 #include "colors.hpp"
+#include "parser.hpp"
 #include "dump.hpp"
 #include "DSL.hpp"
 
@@ -61,7 +62,7 @@ node_t *SwapParentAndChild(node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
 
-WolfErr_t DataReader(FILE *data, tree_t *tree);
+lexerErr_t parseWolfTree(const char* src, tree_t *tree);
 
 WolfErr_t HashSearch(hash_t hash, size_t *index);
 int CmpForBinSearch(const void *a, const void *b);

@@ -3,18 +3,18 @@
 #include "OpInstrSet.cpp"
 
 
-bool MatchToken(lexer_t* lexer, type_t type)
+int MatchToken(lexer_t* lexer, type_t type)
 {
-    if (CheckType(lexer, type)) { AdvanceToken(lexer); return true; }
-    return false;
+    if (CheckType(lexer, type)) { lexer->cur_token++; return 1; }
+    return 0;
 }
 
 
 int CheckType(lexer_t* lexer, type_t type)
 {
-    type_t token_type = (lexer->tokens->data)[lexer->tokens->size]->type;
+    if (lexer->cur_token >= lexer->tokens->size) return 0;
+    type_t token_type = (lexer->tokens->data)[lexer->cur_token]->type;
 
-    if (token_type == TOKEN_EOF) return 0;
     return token_type == type;
 }
 
@@ -26,11 +26,11 @@ token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg)
     if (CheckType(lexer, type))
     {
         token_t* token = lexer->tokens->data[lexer->cur_token];
-        AdvanceToken(lexer);
+        lexer->cur_token++;
         return token;
     }
 
-    // PrintError(parser, parser->cur_token, error_msg);
+    PrintError(lexer, lexer->tokens->data[lexer->cur_token], error_msg);
     return NULL;
 }
 
@@ -44,7 +44,7 @@ node_t* ParseGeneral(lexer_t* lexer)                        // rename ParseAst
     
     if (!MatchToken(lexer, TOKEN_EOF))
     {
-        // PrintError(lexer, parser->cur_token, "Expected '$' at end of expression");
+        PrintError(lexer, lexer->tokens->data[lexer->cur_token], "Expected TOKEN_EOF at end of expression");
         FreeNodes(node);
         return NULL;
     }
@@ -90,6 +90,7 @@ node_t* ParseTerm(lexer_t* lexer)
         type_t op_type = (lexer->tokens->data)[lexer->tokens->size - 1]->type;
         
         node_t* right = ParseFactor(lexer);
+
         if (IS_BAD_PTR(right)) { FreeNodes(node); return NULL; }
         
         if (op_type == TOKEN_MUL)
@@ -121,23 +122,23 @@ node_t* ParseFactor(lexer_t* parser)
 }
 
 
-node_t* ParsePrimary(lexer_t* parser)
+node_t* ParsePrimary(lexer_t* lexer)
 {    
-    if (MatchToken(parser, TOKEN_NUM))
-        return ParseNumber(parser);
+    if (MatchToken(lexer, TOKEN_NUM))
+        return ParseNumber(lexer);
     
-    if (MatchToken(parser, TOKEN_VAR))
-        return ParseVariable(parser);
+    if (MatchToken(lexer, TOKEN_VAR))
+        return ParseVariable(lexer);
     
-    if (CheckType(parser, TOKEN_FUNC))
-        return ParseFunc(parser);
+    if (CheckType(lexer, TOKEN_FUNC))
+        return ParseFunc(lexer);
     
-    if (MatchToken(parser, TOKEN_LPAREN))
+    if (MatchToken(lexer, TOKEN_LPAREN))
     {
-        node_t* node_expression = ParseExpression(parser);
+        node_t* node_expression = ParseExpression(lexer);
         if (IS_BAD_PTR(node_expression)) return NULL;
         
-        if (!ConsumeToken(parser, TOKEN_RPAREN, "Expected ')' after expression"))
+        if (!ConsumeToken(lexer, TOKEN_RPAREN, "Expected ')' after expression"))
         {
             FreeNodes(node_expression);
             return NULL;
@@ -145,8 +146,7 @@ node_t* ParsePrimary(lexer_t* parser)
         
         return node_expression;
     }
-    
-    // PrintError(parser, parser->cur_token, "Expected expression");
+    PrintError(lexer, lexer->tokens->data[lexer->cur_token], "Expected expression");
     return NULL;
 }
 
@@ -164,7 +164,7 @@ node_t* ParseFunc(lexer_t* lexer)
     hash_t hash_item = HashStr(func_name);
     size_t index = 0;
     
-    if (HashSearch(hash_item, &index) != TREE_SUCCESS)
+    if (HashSearch(hash_item, &index) != WOLF_SUCCESS)
     {
         PrintError(lexer, func_token, "Unknown function");
         return NULL;

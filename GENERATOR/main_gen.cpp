@@ -97,6 +97,11 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
         int name_len = 0;
         if (sscanf(arr_ptr[line], "%15[^:]%n: \"%15[^\"]\";", func_infos[actual_count].name, &name_len, func_infos[actual_count].op) == 2)
         {
+            if (strlen(func_infos[actual_count].op) == 1)
+                func_infos[actual_count].hash = (hash_t)*func_infos[actual_count].op;
+            else
+                func_infos[actual_count].hash = HashStr(func_infos[actual_count].op);
+
             if (name_len > max_name_len)
                 max_name_len = name_len;
             actual_count++;
@@ -116,10 +121,10 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
     fprintf(WolfOpFile, "{\n");
 
     for (int i = 0; i < actual_count - 1; ++i)
-        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX,\n", max_name_len, func_infos[i].name, HashStr(func_infos[i].op));
+        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX,\n", max_name_len, func_infos[i].name, func_infos[i].hash);
     
     if (actual_count > 0)
-        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX\n", max_name_len, func_infos[actual_count - 1].name, HashStr(func_infos[actual_count - 1].op));
+        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX\n", max_name_len, func_infos[actual_count - 1].name, func_infos[actual_count - 1].hash);
     
 
     fprintf(WolfOpFile, "};\n\n");

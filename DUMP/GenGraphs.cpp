@@ -66,7 +66,7 @@ genErr_t GenHTML(const char* title)
 
 genErr_t GenTrees(node_t *node, const char *func)
 {
-    ON_DEBUG( if (IS_BAD_PTR(node)) return GEN_ERROR; )
+    ON_DEBUG( if (IS_BAD_PTR(node) || IS_BAD_PTR(func)) return GEN_ERROR; )
 
     tree_t *tree = (tree_t*)calloc(1, sizeof(tree_t));
     if (IS_BAD_PTR(tree)) return GEN_ERROR;

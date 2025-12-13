@@ -58,6 +58,7 @@ typedef tokenTypes type_t;
 struct token_t
 {
     type_t      type;
+    // hash_t      hash;
     const char* start;
     int         length;
     int         line;

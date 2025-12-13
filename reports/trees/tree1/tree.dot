@@ -1,5 +1,5 @@
 digraph G {
-	label=<<B>Tree from parseWolfTree()</B>>;
+	label=<<B>Tree from main()</B>>;
 	fontcolor="#008000";
 	fontname="Arial";
 	labelloc="top";

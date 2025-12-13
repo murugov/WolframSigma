@@ -6,7 +6,7 @@
 
 enum HashOp
 {
-	HASH_L_PAREN    = 0x0,
+	HASH_L_PAREN    = 0x28,
 	HASH_R_PAREN    = 0x29,
 	HASH_L_BRACKET  = 0x5B,
 	HASH_R_BRACKET  = 0x5D,
