@@ -2,15 +2,17 @@ FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-compat -W
 
 COMMON_INCLUDES		= -I./COMMON/headers
 CONFIG_INCLUDES 	= -I./CONFIG
-STK_INCLUDES		= -I./STACK/headers
+STK_INCLUDES		= -I./STACK
 GEN_INCLUDES		= -I./GENERATOR/headers -I./GENERATOR/src -I./GENERATOR/reports
 TREE_INCLUDES		= -I./TREE/headers
+HT_INCLUDES			= -I./HASH_TABLE/headers
 DUMP_INCLUDES		= -I./DUMP/headers
 LEX_INCLUDES		= -I./LEXER/headers
 WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
-COMMON_FILES  = COMMON/HAshStr.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
+COMMON_FILES  = COMMON/GetHash.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
+HT_FILES	  = HASH_TABLE/HashTableFunc.cpp
 DUMP_FILES	  = DUMP/GenGraphs.cpp 
 LEX_FILES	  = LEXER/lexer.cpp LEXER/token.cpp LEXER/parser.cpp
 WOLFRAM_FILES = WOLFRAM_SIGMA/VerifyInstrSet.cpp WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp WOLFRAM_SIGMA/parseWolfTree.cpp
@@ -21,9 +23,11 @@ DEFAULT_LATEX ?=  reports/LatexDump.tex
 
 all: help
 
-wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(DUMP_FILES) $(WOLFRAM_FILES)
+wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
-	g++ -o wolf_program $(FLAGS) WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(GEN_INCLUDES) $(STK_INCLUDES) $(TREE_INCLUDES) $(DUMP_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) $(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(DUMP_FILES) $(WOLFRAM_FILES)
+	g++ -o wolf_program $(FLAGS) WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(GEN_INCLUDES) \
+	$(STK_INCLUDES) $(TREE_INCLUDES) $(HT_INCLUDES) $(DUMP_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) \
+	$(COMMON_FILES) $(LEX_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 gen: GENERATOR/main_gen.cpp $(COMMON_FILES)
@@ -31,9 +35,11 @@ gen: GENERATOR/main_gen.cpp $(COMMON_FILES)
 	g++ -o gen_program $(FLAGS) GENERATOR/main_gen.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(GEN_INCLUDES) $(COMMON_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
-lex: LEXER/main_lex.cpp $(COMMON_FILES) $(TREE_FILES) $(DUMP_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
+lex: LEXER/main_lex.cpp $(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(LEX_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
-	g++ -o lex_program $(FLAGS) LEXER/main_lex.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(TREE_INCLUDES) $(DUMP_INCLUDES) $(GEN_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) $(COMMON_FILES) $(TREE_FILES) $(DUMP_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
+	g++ -o lex_program $(FLAGS) LEXER/main_lex.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) \
+	$(STK_INCLUDES) $(TREE_INCLUDES) $(HT_INCLUDES) $(DUMP_INCLUDES) $(GEN_INCLUDES) $(LEX_INCLUDES) \
+	$(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(LEX_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 

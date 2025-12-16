@@ -10,8 +10,10 @@
 #include "IsBadPtr.hpp"
 #include "FormatSpecifier.hpp"
 #include "logger.hpp"
+#include "DEBUG_MOD.hpp"
+#include "ERR_FIND_MOD.hpp"
 
-#define MIN_STK_LEN 16
+#define MIN_STK_LEN 8
 #define STK_POISON  0
 
 
@@ -65,23 +67,25 @@ typedef size_t stk_hash_t;
 
 struct stack_id
 {
-    const char* name;
-    const char* file;
-    const char* func;
-    int         line;
+    const char *name;
+    const char *file;
+    const char *func;
+    int        line;
 };
 
 template <typename stackElem_T>
 struct stk_t
 {
     stk_canary_t canary_1;
+    stack_id     id;
     stackElem_T* data;
     ssize_t      size;
     ssize_t      capacity;
-    stk_err_t    error;
-    stack_id     id;
-    stk_hash_t   hash;
     stk_canary_t canary_2;
+    ON_DEBUG(
+    stk_err_t    error;
+    stk_hash_t   hash;
+    )
 };
 
 
@@ -110,20 +114,21 @@ template <typename stackElem_T>
 StackErr_t StackRevRealloc(stk_t<stackElem_T> *stk);
 
 template <typename stackElem_T>
-StackErr_t StackVerify(stk_t<stackElem_T> *stk, StackFunc IncomingFunc = STK_DEFUALT);
+StackErr_t StackVerify(stk_t<stackElem_T> *ON_DEBUG(stk), StackFunc ON_DEBUG(IncomingFunc));
 
 template <typename stackElem_T>
-StackErr_t StackDump(stk_t<stackElem_T> *stk, const char *file, const char *func, int line);
+StackErr_t StackDump(stk_t<stackElem_T>* ON_DEBUG(stk), const char* ON_DEBUG(file), const char* ON_DEBUG(func), int ON_DEBUG(line));
 
 template <typename stackElem_T>
-    stk_hash_t HashFunc(stk_t<stackElem_T> *stk);
+stk_hash_t StkHashFunc(stk_t<stackElem_T> *stk);
 
 
 #define ERR_DETECT(stk, IncomingFunc) ErrDetect(stk, IncomingFunc, __FILE__, __func__, __LINE__)
 #define ERR_CHECK(err_code) ((stk->error) & err_code) == err_code
-
 #define STACK_CTOR(stk, capacity) StackInit(stk, #stk, __FILE__, __func__, __LINE__); StackCtor(stk, capacity)
 #define STACK_DTOR(stk) StackDtor(stk)
+
+#define STK_DUMP(stk) StackDump(stk, __FILE__, __func__, __LINE__);
 
 #include "StackFunc.hpp"
 #include "StackDump.hpp"

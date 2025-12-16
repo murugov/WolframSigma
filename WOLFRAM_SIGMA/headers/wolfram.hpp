@@ -10,9 +10,7 @@
 #include "dump.hpp"
 #include "DSL.hpp"
 
-#include "WolfOp.hpp"
-
-#define MAX_NUM_VAR 4
+#include "HashOp.hpp"
 
 
 enum WolfErr_t
@@ -40,7 +38,7 @@ struct op_t
 };
 
 
-extern var_t variables[MAX_NUM_VAR];
+// extern var_t variables[MAX_NUM_VAR];
 
 
 WolfErr_t VerifyOpInstrSetSort();

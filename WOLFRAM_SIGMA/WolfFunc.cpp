@@ -2,13 +2,13 @@
 #include "OpInstrSet.cpp"
 
 
-var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
-{
-    {119, "w", 0, false},
-    {120, "x", 0, false},
-    {121, "y", 0, false},
-    {122, "z", 0, false}
-};
+// var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
+// {
+//     {119, "w", 0, false},
+//     {120, "x", 0, false},
+//     {121, "y", 0, false},
+//     {122, "z", 0, false}
+// };
 
 
 void EnterVar()
@@ -34,7 +34,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
     {
         case ARG_OP:
         {   
-            hash_t op_hash = HashStr(node->item.op);
+            hash_t op_hash = GetHash(node->item.op);
             size_t index   = 0;
 
             if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
@@ -53,7 +53,7 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
         }
         case ARG_VAR:
         {
-            hash_t hash_var = HashStr(node->item.var);
+            hash_t hash_var = GetHash(node->item.var);
             
             if (hash_var == hash_indep_var)
                 return NUM_(1.0);
@@ -112,7 +112,7 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
     ON_DEBUG( if (IS_BAD_PTR(tree)) return; )
     
     node_t *series_sum = NUM_(0.0);
-    hash_t hash_indep_var = HashStr(indep_var);
+    hash_t hash_indep_var = GetHash(indep_var);
     node_t *x0 = NUM_(point);
 
     node_t *current_derivative = CopyNode(tree->root);
@@ -160,7 +160,7 @@ node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value)
 {
     if (!node) return NULL;
     
-    if (node->type == ARG_VAR && HashStr(node->item.var) == var_hash)
+    if (node->type == ARG_VAR && GetHash(node->item.var) == var_hash)
     {
         return CopyNode(value);
     }

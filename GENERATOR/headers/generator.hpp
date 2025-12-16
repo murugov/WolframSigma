@@ -9,12 +9,11 @@
 #include <ctype.h>
 #include "IsBadPtr.hpp"
 #include "TXTreader.hpp"
-#include "HashStr.hpp"
+#include "GetHash.hpp"
 #include "colors.hpp"
 
-#define PATH_TO_SRC_FUNC_FILE "GENERATOR/src/func.txt"
 #define PATH_TO_SRC_KEY_FILE  "GENERATOR/src/keywords.txt"
-#define PATH_TO_WOLF_OP_H     "GENERATOR/reports/WolfOp.hpp"
+#define PATH_TO_WOLF_OP_H     "GENERATOR/reports/HashOp.hpp"
 #define PATH_TO_OP_INSTR_SET  "GENERATOR/reports/OpInstrSet.cpp"
 #define PATH_TO_KEYWORD_SET   "GENERATOR/reports/KeywordSet.cpp"
 
@@ -50,7 +49,7 @@ struct keyword_set_t
 
 void RemoveComments(char** arr_cmd, int *count_line);
 
-GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line);
+GenErr_t GenHashOp(FILE *WolfOpFile, char **arr_ptr, int count_line);
 GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line);
 GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line);
 

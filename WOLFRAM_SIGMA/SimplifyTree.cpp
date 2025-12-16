@@ -33,7 +33,7 @@ double ConstFold(node_t *node)
             double left_val  = ConstFold(node->left);
             double right_val = ConstFold(node->right);
 
-            hash_t op_hash = HashStr(node->item.op);
+            hash_t op_hash = GetHash(node->item.op);
             size_t index   = 0;
             
             if ((op_instr_set[index].num_args == 2 && isnan(left_val)) || isnan(right_val)) return NAN;
@@ -70,7 +70,7 @@ node_t *RemoveNeutralElem(node_t *node)
     
     if (node->type != ARG_OP) return node;
     
-    hash_t op_hash = HashStr(node->item.op);
+    hash_t op_hash = GetHash(node->item.op);
     
     int left_is_num  = (node->left  != NULL && node->left->type  == ARG_NUM);
     int right_is_num = (node->right != NULL && node->right->type == ARG_NUM);

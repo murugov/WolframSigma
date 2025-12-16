@@ -8,7 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "IsBadPtr.hpp"
-#include "HashStr.hpp"
+#include "GetHash.hpp"
 #include "logger.hpp"
 #include "stack.hpp"
 
@@ -19,12 +19,15 @@ typedef size_t tree_canary_t;
 typedef size_t tree_err_t;
 typedef size_t hash_t;
 
-enum ArgTypes                   // depends on tokenTypes - is very bad
+enum ArgTypes
 {
-    ARG_OP  = 0x05,
-    ARG_VAR = 0x02,
-    ARG_NUM = 0x01
+    ARG_NUM  = 0x00,
+    ARG_OP   = 0x01,
+    ARG_VAR  = 0x02,
+    ARG_FUNC = 0x03
 };
+
+typedef ArgTypes type_t;
 
 enum TreeErr_t
 {
@@ -75,19 +78,20 @@ struct tree_id
     size_t     line;
 };
 
-union val                   // num and not_num?
+union val
 {
     double num;
-    char*  op;
+    hash_t op;
     char*  var;
+    char*  func;
 
     val() : num(0) {}
     val(double n) : num(n) {}
+    val(hash_t n) : op(n) {}
 };
 
-val valOP(const char* s);
 val valVAR(const char* s);
-
+val valFUNC(const char* s);
 
 struct node_t
 {
@@ -111,9 +115,9 @@ struct tree_t
 
 
 TreeErr_t TreeInit(tree_t *tree, const char *name, const char *file, const char *func, size_t line);
-TreeErr_t TreeCtor(tree_t **tree);
+TreeErr_t TreeCtor(tree_t *tree);
 
-node_t *NewNode(ArgTypes type, val item, node_t *left, node_t *right);
+node_t *NewNode(type_t type, val item, node_t *left, node_t *right);
 void set_parents(node_t *node, node_t *parent);
 
 TreeErr_t FreeNodes(node_t *node);
@@ -123,8 +127,10 @@ TreeErr_t TreeDtor(tree_t *tree);
 #define TREE_CTOR(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(&(tree))
 #define TREE_DTOR(tree) TreeDtor(tree)
 
-#define OP_(op)   NewNode(ARG_OP, valVAR(op), NULL, NULL)
-#define VAR_(var) NewNode(ARG_VAR, valVAR(var), NULL, NULL)
-#define NUM_(num) NewNode(ARG_NUM, num, NULL, NULL)
+#define NUM_(num)   NewNode(ARG_NUM, (val)(num), NULL, NULL)
+#define OP_(op)     NewNode(ARG_OP, (val)((hash_t)op), NULL, NULL)
+#define VAR_(var)   NewNode(ARG_VAR, valVAR(var), NULL, NULL)
+#define FUNC_(func) NewNode(ARG_FUNC, valFUNC(func), NULL, NULL)
+
 
 #endif

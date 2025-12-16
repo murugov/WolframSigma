@@ -4,35 +4,53 @@
 #include "tree.hpp"
 #include "token.hpp"
 #include "lexer.hpp"
+#include "./hash_table.hpp"
 #include "colors.hpp"
 #include "dump.hpp"
-#include "DSL.hpp"
 
 
-node_t* ParseGeneral(lexer_t* lexer);
-node_t* ParseExpression(lexer_t* lexer);
-node_t* ParseTerm(lexer_t* lexer);
-node_t* ParseFactor(lexer_t* lexer);
-node_t* ParsePrimary(lexer_t* lexer);
-node_t* ParseFunc(lexer_t* lexer);
-node_t* ParseVariable(lexer_t* lexer);
-node_t* ParseNumber(lexer_t* lexer);
+struct parser_t
+{
+    lexer_t*      lexer;
+    stk_t<ht_t*>* name_tables;
+    int           cur_name_table;
+};
 
-int MatchToken(lexer_t* lexer, type_t type);
-int CheckType(lexer_t* lexer, type_t type);
-token_t* ConsumeToken(lexer_t* lexer, type_t type, const char* error_msg);
-void PrintError(lexer_t* lexer, token_t* token, const char* message);
+lexerErr_t parserCtor(parser_t *parser);
+lexerErr_t parserDtor(parser_t *parser);
 
-#define IS_USED_VARS(name, node)  do { \
-                                hash_t name_hash = HashStr(name); \
-                                for (int i = 0; i < MAX_NUM_VAR; ++i) \
-                                { \
-                                    if (name_hash == variables[i].hash) \
-                                    { \
-                                        variables[i].is_used = true; \
-                                        return node; \
-                                    } \
-                                } \
-                            } while(0)
+int MatchToken(parser_t* parser, hash_t hash);
+int CheckToken(parser_t* parser, hash_t hash);
+token_t* ConsumeToken(parser_t* parser, hash_t hash, const char* error_msg);
+void PrintError(parser_t* parser, token_t* token, const char* message);
+
+node_t* ParseAST(parser_t *parser);
+node_t* ParseFunc(parser_t* parser);
+node_t* ParseStatement(parser_t *parser);
+node_t* ParseExpression(parser_t* parser);
+node_t* ParseTerm(parser_t* parser);
+node_t* ParseFactor(parser_t* parser);
+node_t* ParsePrimary(parser_t* parser);
+node_t* ParseIf(parser_t* parser);
+node_t* ParseWhile(parser_t* parser);
+node_t* ParseVarDecl(parser_t* parser);
+node_t* ParseAssignment(parser_t* parser);
+node_t* ParseReturn(parser_t* parser);
+node_t* ParseFuncCall(parser_t* parser);
+node_t* ParseBlock(parser_t* parser);
+node_t* ParseVar(parser_t* parser);
+node_t* ParseNum(parser_t* parser);
+
+#define CUR_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token])
+#define CUR_TYPE  (CUR_TOKEN->type)
+#define CUR_HASH  (CUR_TOKEN->hash)
+#define CUR_START (CUR_TOKEN->start)
+
+#define PREV_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token - 1])
+#define PREV_TYPE  (PREV_TOKEN->type)
+#define PREV_HASH  (PREV_TOKEN->hash)
+#define PREV_START (PREV_TOKEN->start)
+
+#define CUR_NAME_TABLE (parser->name_tables->data[parser->cur_name_table])
 
 #endif

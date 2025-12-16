@@ -1,37 +1,44 @@
-#include "WolfGen.hpp"
+#include "generator.hpp"
 
 hash_t bad_hash[] = {  
-                        HashStr("("), HashStr(")"),
-                        HashStr("["), HashStr("]"),
-                        HashStr("{"), HashStr("}"),
-                        HashStr(","), HashStr(";"),
-                        HashStr("="), HashStr("def"),
-                        HashStr("D"), HashStr("plot")
+                        GetHash("("),      GetHash(")"),
+                        GetHash("["),      GetHash("]"),
+                        GetHash("{"),      GetHash("}"),
+                        GetHash(","),      GetHash(";"),
+                        GetHash("="),      GetHash("=="),
+                        GetHash("<"),      GetHash(">"),
+                        GetHash("def"),    GetHash("init"),
+                        GetHash("if"),     GetHash("else"),
+                        GetHash("while"),  GetHash("for"),
+                        GetHash("return"), GetHash("EOF"),
+                        GetHash("UNDEF"),  GetHash("$")
                     };
-static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);
 
+static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);
 
 int main()
 {
-    FILE *SourceFuncFile = fopen(PATH_TO_SRC_FUNC_FILE, "r");
-    if (IS_BAD_PTR(SourceFuncFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FUNC_FILE); return EXIT_FAILURE; }
-    
+    FILE *SourceKeyFile  = fopen(PATH_TO_SRC_KEY_FILE, "r");
+    if (IS_BAD_PTR(SourceKeyFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE); return EXIT_FAILURE; }
+
     FILE *WolfOpFile     = fopen(PATH_TO_WOLF_OP_H, "w");
     if (IS_BAD_PTR(WolfOpFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_WOLF_OP_H); return EXIT_FAILURE; }
     
     FILE *OpInstrSetFile = fopen(PATH_TO_OP_INSTR_SET, "w");
     if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_OP_INSTR_SET); return EXIT_FAILURE; }
 
+    FILE *KeywordSetFile = fopen(PATH_TO_KEYWORD_SET, "w");
+    if (IS_BAD_PTR(KeywordSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET); return EXIT_FAILURE; }
 
     char* buffer = NULL;
     size_t len_buffer = 0;
     int count_line = 0;
-    char **arr_ptr = TXTreader(SourceFuncFile, buffer, &len_buffer, &count_line, NULL);
-    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_FUNC_FILE);
+    char **arr_ptr = TXTreader(SourceKeyFile, buffer, &len_buffer, &count_line, NULL);
+    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE);
 
     RemoveComments(arr_ptr, &count_line);
 
-    if (GenWolfOp(WolfOpFile, arr_ptr, count_line))
+    if (GenHashOp(WolfOpFile, arr_ptr, count_line))
         printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_WOLF_OP_H);
     else
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
@@ -41,24 +48,6 @@ int main()
     else
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
 
-    free(arr_ptr);
-
-
-    FILE *SourceKeyFile  = fopen(PATH_TO_SRC_KEY_FILE, "r");
-    if (IS_BAD_PTR(SourceKeyFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE); return EXIT_FAILURE; }
-
-    FILE *KeywordSetFile = fopen(PATH_TO_KEYWORD_SET, "w");
-    if (IS_BAD_PTR(KeywordSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET); return EXIT_FAILURE; }
-
-
-    buffer = NULL;
-    len_buffer = 0;
-    count_line = 0;
-    arr_ptr = TXTreader(SourceKeyFile, buffer, &len_buffer, &count_line, NULL);
-    if (IS_BAD_PTR(arr_ptr)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE);
-
-    RemoveComments(arr_ptr, &count_line);
-
     if (GenKeywordSet(KeywordSetFile, arr_ptr, count_line))
         printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET);
     else
@@ -66,7 +55,6 @@ int main()
 
 
     free(arr_ptr);
-    fclose(SourceFuncFile);
     fclose(SourceKeyFile);
     fclose(WolfOpFile);
     fclose(OpInstrSetFile);
@@ -76,7 +64,7 @@ int main()
 }
 
 
-GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
+GenErr_t GenHashOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
 {
     if (IS_BAD_PTR(WolfOpFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
         
@@ -100,7 +88,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
             if (strlen(func_infos[actual_count].op) == 1)
                 func_infos[actual_count].hash = (hash_t)*func_infos[actual_count].op;
             else
-                func_infos[actual_count].hash = HashStr(func_infos[actual_count].op);
+                func_infos[actual_count].hash = GetHash(func_infos[actual_count].op);
 
             if (name_len > max_name_len)
                 max_name_len = name_len;
@@ -114,8 +102,8 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
         }
     }
 
-    fprintf(WolfOpFile, "#ifndef WOLF_OP_HPP\n"
-                        "#define WOLF_OP_HPP\n\n\n");
+    fprintf(WolfOpFile, "#ifndef HASH_OP_HPP\n"
+                        "#define HASH_OP_HPP\n\n\n");
 
     fprintf(WolfOpFile, "enum HashOp\n");
     fprintf(WolfOpFile, "{\n");
@@ -144,7 +132,7 @@ GenErr_t GenWolfOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
     
     for (int i = 0; i < actual_count; ++i)
     {
-        hash_t target_hash = HashStr(func_infos[i].op);
+        hash_t target_hash = GetHash(func_infos[i].op);
         if (!bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash))
         {
             fprintf(WolfOpFile, "double calc%s(calc_context *calc_params);\n", 
@@ -175,12 +163,12 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line)
     fprintf(OpInstrSetFile, "const op_t op_instr_set[] =\n");
     fprintf(OpInstrSetFile, "{\n");
 
-    static const hash_t HASH_LOG  = HashStr("LOG");
-    static const hash_t HASH_PLUS = HashStr("+");
-    static const hash_t HASH_MINUS = HashStr("-");
-    static const hash_t HASH_MUL   = HashStr("*");
-    static const hash_t HASH_DIV   = HashStr("/");
-    static const hash_t HASH_POW   = HashStr("^");
+    static const hash_t HASH_LOG  = GetHash("LOG");
+    static const hash_t HASH_PLUS = GetHash("+");
+    static const hash_t HASH_MINUS = GetHash("-");
+    static const hash_t HASH_MUL   = GetHash("*");
+    static const hash_t HASH_DIV   = GetHash("/");
+    static const hash_t HASH_POW   = GetHash("^");
     
     op_instr_t *func_infos = (op_instr_t*)calloc((size_t)count_line, sizeof(op_instr_t));
     if (IS_BAD_PTR(func_infos)) return GEN_ERROR;
@@ -199,7 +187,7 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line)
                    func_infos[actual_count].name, 
                    func_infos[actual_count].op) == 2)
         {
-            hash_t target_hash = HashStr(func_infos[actual_count].op);
+            hash_t target_hash = GetHash(func_infos[actual_count].op);
             if (bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash)) continue;
             
             size_t name_len = strlen(func_infos[actual_count].name);
@@ -211,7 +199,7 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line)
             func_infos[actual_count].hash = target_hash;
             
             hash_t op_hash = func_infos[actual_count].hash;
-            hash_t name_hash = HashStr(func_infos[actual_count].name);
+            hash_t name_hash = GetHash(func_infos[actual_count].name);
             
             if (name_hash == HASH_LOG || op_hash == HASH_PLUS || 
                 op_hash == HASH_MINUS || op_hash == HASH_MUL || 
@@ -302,7 +290,7 @@ GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
             if (key_len == 1)
                 func_infos[actual_count].hash = (hash_t)(*func_infos[actual_count].key);
             else
-                func_infos[actual_count].hash = HashStr(func_infos[actual_count].key);
+                func_infos[actual_count].hash = GetHash(func_infos[actual_count].key);
 
             actual_count++;
         }
@@ -313,8 +301,7 @@ GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
     for (int i = 0; i < actual_count - 1; ++i)
     {
         fprintf(KeywordSetFile, 
-                "\t{TOKEN_%-*s, \"%s\",\t%zu ,\t0x%zX},\n",
-                (int)max_name_len, func_infos[i].name, 
+                "\t{ARG_OP, \"%s\",\t%zu ,\t0x%zX},\n",
                 func_infos[i].key,
                 strlen(func_infos[i].key),
                 func_infos[i].hash);
@@ -323,8 +310,7 @@ GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
     if (actual_count > 0)
     {
         fprintf(KeywordSetFile, 
-                "\t{TOKEN_%-*s, \"%s\",\t%zu ,\t0x%zX}\n",
-                (int)max_name_len, func_infos[actual_count - 1].name, 
+                "\t{ARG_OP, \"%s\",\t%zu ,\t0x%zX}\n",
                 func_infos[actual_count - 1].key,
                 strlen(func_infos[actual_count - 1].key),
                 func_infos[actual_count - 1].hash);

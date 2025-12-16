@@ -12,7 +12,7 @@ lexerErr_t parseWolfTree(const char* src, tree_t *tree)
     fclose(SourceFile);
     if (IS_BAD_PTR(lines)) { printf("Error: Failed to read file\n"); return LEX_ERROR; }
 
-    lexer_t *lexer = LexerCtor(lines, count_lines, __FILE__);
+    lexer_t *lexer = LexerCtor(lines, 1, __FILE__);
     if (IS_BAD_PTR(lexer))
     {
         printf("Error: Failed to initialize lexer\n");

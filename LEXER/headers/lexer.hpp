@@ -2,7 +2,8 @@
 #define LEXER_HPP
 
 #include "token.hpp"
-#include "HashStr.hpp"
+#include "GetHash.hpp"
+#include "HashOp.hpp"
 
 enum lexerErr_t
 {
@@ -33,7 +34,7 @@ struct keyword_t
 
 char **DataReader(FILE *SourceFile, char *buffer, int *count_line);
 
-lexer_t *LexerCtor(char** lines, int line_count, const char* file_name);
+lexerErr_t LexerCtor(lexer_t *lexer, char **lines, int line_count, const char *file_name);
 lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* file_name);
 lexerErr_t LexerDtor(lexer_t* lexer);
 

@@ -9,7 +9,7 @@ static token_t *ReadName(lexer_t *lexer);
 
 char **DataReader(FILE *SourceFile, char *buffer, int *count_line)
 {
-    ON_DEBUG( if (IS_BAD_PTR(SourceFile)) { LOG(ERROR, "TOKEN_ERROR"); return NULL; } )
+    ON_DEBUG( if (IS_BAD_PTR(SourceFile)) { LOG(ERROR, "BAD_SRC_FILE_PTR"); return NULL; } )
 
     size_t len_buffer = 0;
     char **lines = TXTreader(SourceFile, buffer, &len_buffer, count_line, NULL);
@@ -22,44 +22,43 @@ lexerErr_t LexerInit(lexer_t* lexer, char** lines, int line_count, const char* f
 {
     stk_t<token_t*>* tokens = (stk_t<token_t*>*)calloc(1, sizeof(stk_t<token_t*>));
     if (IS_BAD_PTR(tokens)) return LEX_ERROR;
-    
+
     STACK_CTOR(tokens, MIN_STK_LEN);
 
-    lexer->tokens       = tokens;
-    lexer->cur_token    = 0;
-    lexer->peeked_token = NULL;
-    lexer->lines        = lines;
-    lexer->line_count   = line_count;
-    lexer->cur_line     = 0;
-    lexer->cur_col      = 1;
-    lexer->cur_pos      = lines[0]; 
-    lexer->file_name    = file_name;
+    lexer->tokens         = tokens;
+    lexer->cur_token      = 0; 
+    lexer->peeked_token   = NULL;
+    lexer->lines          = lines;
+    lexer->line_count     = line_count;
+    lexer->cur_line       = 0;
+    lexer->cur_col        = 1;
+    lexer->cur_pos        = lines[0]; 
+    lexer->file_name      = file_name;
 
     return LEX_SUCCESS;
 }
 
 
-lexer_t *LexerCtor(char** lines, int line_count, const char* file_name)
+lexerErr_t LexerCtor(lexer_t *lexer, char **lines, int line_count, const char *file_name)
 {
-    ON_DEBUG( if (IS_BAD_PTR(lines) || IS_BAD_PTR(file_name)) return NULL; )
+    ON_DEBUG( if (IS_BAD_PTR(lexer) || IS_BAD_PTR(lines) || IS_BAD_PTR(file_name)) return LEX_ERROR; )
 
-    lexer_t *lexer = (lexer_t*)calloc(1, sizeof(lexer_t));
-    if (IS_BAD_PTR(lexer)) return NULL;
-
-    LexerInit(lexer, lines, line_count, file_name);
+    if (LexerInit(lexer, lines, line_count, file_name) != LEX_SUCCESS) { free(lexer); return LEX_ERROR; }
 
     PeekToken(lexer);
-    while (!IS_BAD_PTR(lexer->peeked_token) && lexer->peeked_token->type != TOKEN_EOF)
+    while (!IS_BAD_PTR(lexer->peeked_token) && (lexer->peeked_token->type != ARG_OP || lexer->peeked_token->hash != HASH_EOF))
     {
         printf("type: [%d];   cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
-        if (AdvanceToken(lexer) == LEX_ERROR) return NULL;
+        if (AdvanceToken(lexer) == LEX_ERROR) return LEX_ERROR;
         
         PeekToken(lexer);
     }
-    if (StackPush(lexer->tokens, lexer->peeked_token) != STK_SUCCESS) return NULL;
+    if (StackPush(lexer->tokens, lexer->peeked_token) != STK_SUCCESS) return LEX_ERROR;
     
     lexer->cur_token = 0;
-    return lexer;
+
+    ON_DEBUG( LOG(INFO, "Lexer is created"); )
+    return LEX_SUCCESS;
 }
 
 
@@ -68,10 +67,12 @@ lexerErr_t LexerDtor(lexer_t* lexer)
     ON_DEBUG(if (IS_BAD_PTR(lexer)) return LEX_ERROR;)
     
     if (IS_BAD_PTR(lexer->tokens))
-        LOG(ERROR, "Bad pointer of tokens");
+    {
+        ON_DEBUG( LOG(ERROR, "Bad pointer of tokens"); )
+    }
     else
     {
-        for (ssize_t i = 0; i < lexer->tokens->size; ++i)
+        for (ssize_t i = 1; i < lexer->tokens->size - 1; ++i)
         {
             if (lexer->tokens->data[i])
                 free(lexer->tokens->data[i]);
@@ -91,7 +92,7 @@ lexerErr_t LexerDtor(lexer_t* lexer)
     lexer->cur_pos      = NULL;
     lexer->file_name    = NULL;
     
-    LOG(INFO, "Lexer is destructured");
+    ON_DEBUG( LOG(INFO, "Lexer is destroed"); )
     return LEX_SUCCESS;
 }
 
@@ -158,7 +159,7 @@ token_t *NextToken(lexer_t* lexer)
         return lexer->peeked_token;
 
     SkipSpaces(lexer);
-    if (IS_END(lexer)) return NewToken(TOKEN_EOF, "", 0, lexer->cur_line + 1, lexer->cur_col);
+    if (IS_END(lexer)) return NewToken(ARG_OP, HASH_EOF, "", 0, lexer->cur_line + 1, lexer->cur_col);
     
     const char* start = lexer->cur_pos;
     lexer->cur_col++;
@@ -168,12 +169,12 @@ token_t *NextToken(lexer_t* lexer)
     if (num_digits)
         return ReadNum(lexer);
 
-    hash_t id_hash = HashStr(lexer->cur_pos);
+    hash_t id_hash = GetHash(lexer->cur_pos);
     keyword_t *key = (keyword_t*)bsearch(&id_hash, keyword_set, LEN_KEYWORD_SET, sizeof(keyword_t), CmpHashForBinSearch);
     if (key != NULL)
     {
         if (strncmp(lexer->cur_pos, key->name, (size_t)(key->len)) == 0)
-            return NewToken(key->type, start, key->len, lexer->cur_line, lexer->cur_col);
+            return NewToken(key->type, id_hash, start, key->len, lexer->cur_line, lexer->cur_col);
     }
 
     id_hash = (hash_t)(*lexer->cur_pos);
@@ -181,7 +182,7 @@ token_t *NextToken(lexer_t* lexer)
     if (key != NULL)
     {
         if (strncmp(lexer->cur_pos, key->name, (size_t)(key->len)) == 0)
-            return NewToken(key->type, start, key->len, lexer->cur_line, lexer->cur_col);
+            return NewToken(key->type, id_hash, start, key->len, lexer->cur_line, lexer->cur_col);
     }
     
     if (isalpha(*lexer->cur_pos))
@@ -189,9 +190,8 @@ token_t *NextToken(lexer_t* lexer)
     
     lexer->cur_pos++;
     lexer->cur_col++;
-    return NewToken(TOKEN_UNDEF, start, 1, lexer->cur_line, lexer->cur_col);
+    return NewToken(ARG_OP, HASH_UNDEF, start, 1, lexer->cur_line, lexer->cur_col);
 }
-
 
 
 static token_t *ReadNum(lexer_t *lexer)
@@ -200,7 +200,7 @@ static token_t *ReadNum(lexer_t *lexer)
     int num_digits = 0;
     if (sscanf(lexer->cur_pos, "%lg%n", &tmp_num, &num_digits) != 1) return NULL;
 
-    token_t* token = NewToken(TOKEN_NUM, lexer->cur_pos, num_digits, lexer->cur_line + 1, lexer->cur_col);
+    token_t* token = NewToken(ARG_NUM, (size_t)tmp_num, lexer->cur_pos, num_digits, lexer->cur_line + 1, lexer->cur_col);
     
     lexer->cur_pos += num_digits;
     lexer->cur_col += num_digits;
@@ -229,10 +229,10 @@ static token_t *ReadName(lexer_t *lexer)
     lexer->cur_col = saved_col;
     lexer->cur_line = saved_line;
 
-    if (!IS_BAD_PTR(next_token) && next_token->type == TOKEN_LPAREN)
-        return NewToken(TOKEN_FUNC, start, length, line, col);
+    if (!IS_BAD_PTR(next_token) && next_token->type == ARG_OP && next_token->hash == HASH_LPAREN)
+        return NewToken(ARG_FUNC, GetHash(start), start, length, line, col);
     else
-        return NewToken(TOKEN_VAR, start, length, line, col);
+        return NewToken(ARG_VAR, GetHash(start), start, length, line, col);
 }
 
 
