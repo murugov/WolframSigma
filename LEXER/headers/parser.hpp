@@ -37,6 +37,7 @@ node_t* ParseVarDecl(parser_t* parser);
 node_t* ParseAssignment(parser_t* parser);
 node_t* ParseReturn(parser_t* parser);
 node_t* ParseFuncCall(parser_t* parser);
+node_t* ParseCondition(parser_t* parser);
 node_t* ParseBlock(parser_t* parser);
 node_t* ParseVar(parser_t* parser);
 node_t* ParseNum(parser_t* parser);
@@ -45,12 +46,15 @@ node_t* ParseNum(parser_t* parser);
 #define CUR_TYPE  (CUR_TOKEN->type)
 #define CUR_HASH  (CUR_TOKEN->hash)
 #define CUR_START (CUR_TOKEN->start)
+#define CUR_POS   (parser->lexer->cur_token)
 
 #define PREV_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token - 1])
 #define PREV_TYPE  (PREV_TOKEN->type)
 #define PREV_HASH  (PREV_TOKEN->hash)
 #define PREV_START (PREV_TOKEN->start)
+#define PREV_POS   (parser->lexer->cur_token - 1)
 
 #define CUR_NAME_TABLE (parser->name_tables->data[parser->cur_name_table])
+
 
 #endif

@@ -7,7 +7,6 @@ def sort(init a, init b)
         b = t;
     }
 }
-
 init x = 100;
 init y = 200;
 sort(x, y);

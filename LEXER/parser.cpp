@@ -42,7 +42,6 @@ lexerErr_t parserCtor(parser_t *parser)
     parser->name_tables    = name_tables;
     parser->cur_name_table = 0; 
 
-    FreeLines(lines, count_lines);
     return LEX_SUCCESS;
 }
 
@@ -97,8 +96,8 @@ token_t* ConsumeToken(parser_t* parser, hash_t hash, const char* error_msg)
 {
     if (CheckToken(parser, hash))
     {
-        token_t* token = parser->lexer->tokens->data[parser->lexer->cur_token];
-        parser->lexer->cur_token++;
+        token_t* token = CUR_TOKEN;
+        CUR_POS++;
         return token;
     }
 
@@ -113,12 +112,12 @@ void PrintError(parser_t* parser, token_t* token, const char* message)
     
     if (token)
     {
-        printf("Error at line %d, column %d: %s\n", token->line, token->col, message);
-        printf("Token: type=%d, hash=%lu\n", token->type, token->hash);
+        printf(ANSI_COLOR_RED "Error at line %d, column %d: %s\n" ANSI_COLOR_RESET, token->line, token->col, message);
+        printf(ANSI_COLOR_RED "Token: type=%d, hash=%zu\n" ANSI_COLOR_RESET, token->type, token->hash);
     }
     else 
     {
-        printf("Error: %s\n", message);
+        printf(ANSI_COLOR_RED "Error: %s\n" ANSI_COLOR_RESET, message);
     }
 }
 
@@ -127,13 +126,12 @@ node_t* ParseAST(parser_t *parser)
 {
     ON_DEBUG( if (IS_BAD_PTR(parser)) { return NULL; } )
 
-    hash_t program_hash = 0;                                    // improve
-    node_t* program = OP_(program_hash);
+    node_t* program = OP_(HASH_UNDEF);                                   // improve
     if (IS_BAD_PTR(program)) return NULL;
     
     node_t* last_stmt = NULL;
     
-    while (!MatchToken(parser, HASH_EOF))
+    while (!MatchToken(parser, HASH_EOF))                       // perhaps it can be replaced with CUR_HASH == HASH_EOF
     {
         node_t* stmt = NULL;
         
@@ -155,8 +153,8 @@ node_t* ParseAST(parser_t *parser)
         }
         else if (CUR_TYPE == ARG_VAR)
         {
-            if (parser->lexer->cur_token + 1 < parser->lexer->tokens->size &&
-                parser->lexer->tokens->data[parser->lexer->cur_token + 1]->hash == HASH_EQ)
+            if (CUR_POS + 1 < parser->lexer->tokens->size &&
+                parser->lexer->tokens->data[CUR_POS + 1]->hash == HASH_EQ)
             {
                 stmt = ParseAssignment(parser);
             } 
@@ -165,6 +163,11 @@ node_t* ParseAST(parser_t *parser)
                 stmt = ParseExpression(parser);
                 ConsumeToken(parser, HASH_SEMICOLON, "Expected ';' after expression");
             }
+        }
+        else if (CUR_TYPE == ARG_FUNC)
+        {
+            stmt = ParseFuncCall(parser);
+            ConsumeToken(parser, HASH_SEMICOLON, "Expected ';' after function call");
         }
         else
         {
@@ -208,17 +211,26 @@ node_t* ParseFunc(parser_t* parser)
     node_t* params     = NULL;
     node_t* last_param = NULL;
     
-    while (!MatchToken(parser, HASH_RPAREN) && !MatchToken(parser, HASH_EOF))
+    while (!CheckToken(parser, HASH_RPAREN) && !CheckToken(parser, HASH_EOF))
     {
+        if (!CheckToken(parser, HASH_INIT))
+        {
+            PrintError(parser, CUR_TOKEN, "Expected 'init' before parameter name");
+            if (params) free(params);
+            return NULL;
+        }
+        
+        MatchToken(parser, HASH_INIT);
+        
         if (CUR_TYPE != ARG_VAR)
         {
             PrintError(parser, CUR_TOKEN, "Expected parameter name");
-            free(params);
+            if (params) free(params);
             return NULL;
         }
         
         node_t* param = ParseVar(parser);
-        if (IS_BAD_PTR(param)) { free(params); return NULL; }
+        if (IS_BAD_PTR(param)) { if (params) free(params); return NULL; }
         
         if (IS_BAD_PTR(params))
         {
@@ -231,20 +243,49 @@ node_t* ParseFunc(parser_t* parser)
             last_param        = param;
         }
         
-        if (!MatchToken(parser, HASH_COMMA)) { break; }
+        if (CheckToken(parser, HASH_COMMA))
+        {
+            MatchToken(parser, HASH_COMMA);
+        }
+        else
+        {
+            break;
+        }
     }
     
-    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after parameters")) { free(params); return NULL; }
+    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after parameters")) 
+    { 
+        if (params) { free(params); } 
+        return NULL; 
+    }
     
-    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before function body")) { free(params); return NULL; }
+    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before function body")) 
+    { 
+        if (params) { free(params); } 
+        return NULL; 
+    }
     
     node_t* body = ParseBlock(parser);
-    if (IS_BAD_PTR(body)) { free(params); return NULL; }
+    if (IS_BAD_PTR(body)) 
+    { 
+        if (params) { free(params); } 
+        return NULL; 
+    }
     
-    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after function body")) { free(params); free(body); return NULL; }
+    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after function body")) 
+    { 
+        if (params) { free(params); }
+        if (body) { free(body); }
+        return NULL; 
+    }
     
     node_t* func_node = FUNC_(name_token->start);
-    if (IS_BAD_PTR(func_node)) { free(params); free(body); return NULL; }
+    if (IS_BAD_PTR(func_node)) 
+    { 
+        if (params) { free(params); }
+        if (body) { free(body); }
+        return NULL; 
+    }
     
     func_node->left  = params;
     func_node->right = body;
@@ -257,6 +298,11 @@ node_t* ParseFunc(parser_t* parser)
 
 node_t* ParseStatement(parser_t *parser)
 {
+    if (CheckToken(parser, HASH_INIT))
+    {
+        return ParseVarDecl(parser);
+    }
+
     if (CUR_TYPE == ARG_OP)
     {
         switch (CUR_HASH)
@@ -266,9 +312,18 @@ node_t* ParseStatement(parser_t *parser)
             case HASH_WHILE:
                 return ParseWhile(parser);
             case HASH_RETURN:
-                return ParseReturn(parser);        
+                return ParseReturn(parser);       
             default:
                 break;
+        }
+    }
+
+    if (CUR_TYPE == ARG_VAR)
+    {
+        if (parser->lexer->cur_token + 1 < parser->lexer->tokens->size &&
+            parser->lexer->tokens->data[parser->lexer->cur_token + 1]->hash == HASH_EQ)
+        {
+            return ParseAssignment(parser);
         }
     }
     
@@ -378,80 +433,6 @@ node_t* ParsePrimary(parser_t* parser)
 }
 
 
-node_t* ParseIf(parser_t* parser)
-{
-    MatchToken(parser, HASH_IF);
-    
-    if (!ConsumeToken(parser, HASH_LPAREN, "Expected '(' after 'if'")) { return NULL; }
-    
-    node_t* condition = ParseExpression(parser);
-    if (IS_BAD_PTR(condition)) return NULL;
-    
-    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after condition")) { free(condition); return NULL; }
-    
-    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before if body")) { free(condition); return NULL; }
-    
-    node_t* if_body = ParseBlock(parser);
-    if (IS_BAD_PTR(if_body)) { free(condition); return NULL; }
-    
-    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after if body")) { free(condition); free(if_body); return NULL; }
-    
-    node_t* else_body = NULL;
-    if (MatchToken(parser, HASH_ELSE))
-    {
-        if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before else body")) { free(condition); free(if_body); return NULL; }
-        
-        else_body = ParseBlock(parser);
-        if (IS_BAD_PTR(else_body)) { free(condition); free(if_body); return NULL; }
-        
-        if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after else body")) { free(condition); free(if_body); free(else_body); return NULL; }
-    }
-    
-    node_t* if_node = OP_(HASH_IF);
-    if (IS_BAD_PTR(if_node)) { free(condition); free(if_body); free(else_body); return NULL; }
-    
-    if_node->left = condition;
-    
-    node_t* branches = OP_(HASH_BLOCK);
-    if (IS_BAD_PTR(branches)) { free(if_node); free(condition); free(if_body); free(else_body); return NULL; }
-    
-    branches->left  = if_body;
-    branches->right = else_body;
-    
-    if_node->right = branches;
-    
-    return if_node;
-}
-
-
-node_t* ParseWhile(parser_t* parser)
-{
-    MatchToken(parser, HASH_WHILE);
-    
-    if (!ConsumeToken(parser, HASH_LPAREN, "Expected '(' after 'while'")) { return NULL; }
-    
-    node_t* condition = ParseExpression(parser);
-    if (IS_BAD_PTR(condition)) return NULL;
-    
-    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after condition")) { free(condition); return NULL; }
-    
-    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before while body")) { free(condition); return NULL; }
-    
-    node_t* body = ParseBlock(parser);
-    if (IS_BAD_PTR(body)) { free(condition); return NULL; }
-    
-    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after while body")) { free(condition); free(body); return NULL; }
-    
-    node_t* while_node = OP_(HASH_WHILE);
-    if (IS_BAD_PTR(while_node)) { free(condition); free(body); return NULL; }
-    
-    while_node->left  = condition;
-    while_node->right = body;
-    
-    return while_node;
-}
-
-
 node_t* ParseVarDecl(parser_t* parser)
 {
     if (!MatchToken(parser, HASH_INIT))
@@ -536,6 +517,87 @@ node_t* ParseAssignment(parser_t* parser)
 }
 
 
+node_t* ParseIf(parser_t* parser)
+{
+    MatchToken(parser, HASH_IF);
+    
+    if (!ConsumeToken(parser, HASH_LPAREN, "Expected '(' after 'if'")) { return NULL; }
+    
+    node_t* condition = ParseCondition(parser);
+    if (IS_BAD_PTR(condition)) return NULL;
+    
+    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after condition")) { free(condition); return NULL; }
+
+    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before if body")) { free(condition); return NULL; }
+    
+    node_t* if_body = ParseBlock(parser);
+    if (IS_BAD_PTR(if_body)) { free(condition); return NULL; }
+    
+    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after if body")) { free(condition); free(if_body); return NULL; }
+    
+    node_t* else_body = NULL;
+    if (MatchToken(parser, HASH_ELSE))
+    {
+        if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before else body")) { free(condition); free(if_body); return NULL; }
+        
+        else_body = ParseBlock(parser);
+        if (IS_BAD_PTR(else_body)) { free(condition); free(if_body); return NULL; }
+        
+        if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after else body")) { free(condition); free(if_body); free(else_body); return NULL; }
+    }
+    
+    node_t* if_node = OP_(HASH_IF);
+    if (IS_BAD_PTR(if_node)) { free(condition); free(if_body); free(else_body); return NULL; }
+    
+    if_node->left = condition;
+    
+    if (else_body)
+    {
+        node_t* else_node = OP_(HASH_ELSE);
+        if (IS_BAD_PTR(else_node)) { free(if_node); free(condition); free(if_body); free(else_body); return NULL; }
+        
+        else_node->left = if_body;
+        else_node->right = else_body;
+        
+        if_node->right = else_node;
+    }
+    else
+    {
+        if_node->right = if_body;
+    }
+    
+    return if_node;
+}
+
+
+node_t* ParseWhile(parser_t* parser)
+{
+    MatchToken(parser, HASH_WHILE);
+    
+    if (!ConsumeToken(parser, HASH_LPAREN, "Expected '(' after 'while'")) { return NULL; }
+    
+    node_t* condition = ParseCondition(parser);
+    if (IS_BAD_PTR(condition)) return NULL;
+    
+    if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after condition")) { free(condition); return NULL; }
+    
+    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{' before while body")) { free(condition); return NULL; }
+    
+    node_t* body = ParseBlock(parser);
+    if (IS_BAD_PTR(body)) { free(condition); return NULL; }
+    
+    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}' after while body")) { free(condition); free(body); return NULL; }
+    
+    node_t* while_node = OP_(HASH_WHILE);
+    if (IS_BAD_PTR(while_node)) { free(condition); free(body); return NULL; }
+    
+    while_node->left = condition;
+    while_node->right = body;
+    
+    return while_node;
+}
+
+
 node_t* ParseReturn(parser_t* parser)
 {
     MatchToken(parser, HASH_RETURN);
@@ -600,22 +662,56 @@ node_t* ParseFuncCall(parser_t* parser)
 }
 
 
+node_t* ParseCondition(parser_t* parser)
+{
+    node_t* left_node = ParseExpression(parser);
+    if (IS_BAD_PTR(left_node)) return NULL;
+    
+    if (CheckToken(parser, HASH_LT)   ||
+        CheckToken(parser, HASH_GT)   ||
+        CheckToken(parser, HASH_LE)   ||
+        CheckToken(parser, HASH_GE)   ||
+        CheckToken(parser, HASH_EQEQ) ||
+        CheckToken(parser, HASH_NE))
+    {
+        hash_t op_hash = CUR_HASH;
+        MatchToken(parser, op_hash);
+        
+        node_t* right_node = ParseExpression(parser);
+        if (IS_BAD_PTR(right_node)) { free(left_node); return NULL; }
+        
+        node_t* cmp_node = OP_(op_hash);
+        if (IS_BAD_PTR(cmp_node)) { free(left_node); free(right_node); return NULL; }
+        
+        cmp_node->left  = left_node;
+        cmp_node->right = right_node;
+        return cmp_node;
+    }
+    
+    return left_node;
+}
+
+
 node_t* ParseBlock(parser_t* parser)
 {    
-    node_t* block = OP_(HASH_BLOCK);
-    if (IS_BAD_PTR(block)) return NULL;
+    if (!ConsumeToken(parser, HASH_LBRACE, "Expected '{'")) return NULL;
     
-    node_t* last_stmt = NULL;
+    node_t* first_stmt = NULL;
+    node_t* last_stmt  = NULL;
     
-    while (!MatchToken(parser, HASH_RBRACE) && !MatchToken(parser, HASH_EOF))
+    while (!CheckToken(parser, HASH_RBRACE) && !CheckToken(parser, HASH_EOF))
     {
         node_t* stmt = ParseStatement(parser);
-        if (IS_BAD_PTR(stmt)) { free(block); return NULL; }
-        
-        if (IS_BAD_PTR(block->left))
+        if (IS_BAD_PTR(stmt)) 
         {
-            block->left = stmt;
-            last_stmt   = stmt;
+            if (first_stmt) { FreeNodes(first_stmt); }
+            return NULL;
+        }
+        
+        if (IS_BAD_PTR(first_stmt))
+        {
+            first_stmt = stmt;
+            last_stmt  = stmt;
         }
         else
         {
@@ -624,7 +720,13 @@ node_t* ParseBlock(parser_t* parser)
         }
     }
     
-    return block;
+    if (!ConsumeToken(parser, HASH_RBRACE, "Expected '}'"))
+    {
+        if (first_stmt) { FreeNodes(first_stmt); }
+        return NULL;
+    }
+    
+    return first_stmt;
 }
 
 

@@ -5,13 +5,15 @@ hash_t bad_hash[] = {
                         GetHash("["),      GetHash("]"),
                         GetHash("{"),      GetHash("}"),
                         GetHash(","),      GetHash(";"),
-                        GetHash("="),      GetHash("=="),
+                        GetHash(":"),      GetHash("="),
+                        GetHash("=="),     GetHash("!="),
                         GetHash("<"),      GetHash(">"),
+                        GetHash("<="),     GetHash(">="),
                         GetHash("def"),    GetHash("init"),
                         GetHash("if"),     GetHash("else"),
                         GetHash("while"),  GetHash("for"),
                         GetHash("return"), GetHash("EOF"),
-                        GetHash("UNDEF"),  GetHash("$")
+                        GetHash("UNDEF")
                     };
 
 static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);

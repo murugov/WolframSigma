@@ -24,28 +24,32 @@ StackErr_t StackCtor(stk_t<stackElem_T> *stk, ssize_t capacity)
 {   
     ON_DEBUG( if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; } )
 
-    if (capacity < 0) { ON_DEBUG( stk->error = STK_WRONG_CAPACITY; LOG(ERROR, "STK_WRONG_CAPACITY") ); return STK_ERROR; }
+    if (capacity < 0)
+    { 
+        ON_DEBUG( stk->error = STK_WRONG_CAPACITY; LOG(ERROR, "STK_WRONG_CAPACITY") ); 
+        return STK_ERROR; 
+    }
     
     stk->canary_1 = STK_CANARY_1;
-
-    stk->size     = (ssize_t)(sizeof(stk_canary_t) / sizeof(stackElem_T) * 2);
-    stk->capacity = capacity + (ssize_t)(sizeof(stk_canary_t) / sizeof(stackElem_T) * 2);
+    stk->size = 0;
+    stk->capacity = capacity;
 
     stk->data = (stackElem_T*)calloc((size_t)stk->capacity, sizeof(stackElem_T));
-    if (IS_BAD_PTR(stk->data)) { ON_DEBUG( stk->error |= STK_BAD_DATA_PTR; LOG(ERROR, "STK_BAD_DATA_PTR"); ) return STK_ERROR; }
+    if (IS_BAD_PTR(stk->data))
+    { 
+        ON_DEBUG( stk->error |= STK_BAD_DATA_PTR; LOG(ERROR, "STK_BAD_DATA_PTR"); ) 
+        return STK_ERROR; 
+    }
 
-    stk_canary_t start_canary = STK_CANARY_3;
-    memcpy((void*)(&stk->data[0]), (const void*)(&start_canary), sizeof(stk_canary_t)); // через выравнивание
-
-    for (size_t i = sizeof(stk_canary_t) / sizeof(stackElem_T); i < (size_t)stk->capacity - sizeof(stk_canary_t) / sizeof(stackElem_T); ++i)
-        stk->data[i] = STK_POISON;
-
-    stk_canary_t end_canary = STK_CANARY_4;
-    memcpy((void*)(&stk->data[(size_t)stk->capacity - sizeof(stk_canary_t) / sizeof(stackElem_T)]), (const void*)(&end_canary), sizeof(stk_canary_t));
+    for (ssize_t i = 0; i < stk->capacity; ++i) { stk->data[i] = STK_POISON; }
 
     ON_DEBUG(
         stk->hash = StkHashFunc(stk);
-        if(stk->hash == 0) { stk->error |= STK_WRONG_HASH; LOG(ERROR, "STK_WRONG_HASH"); return STK_ERROR; }
+        if(stk->hash == 0) { 
+            stk->error |= STK_WRONG_HASH; 
+            LOG(ERROR, "STK_WRONG_HASH"); 
+            return STK_ERROR; 
+        }
         LOG(INFO, "Hash updated");
     )
 
@@ -59,7 +63,7 @@ StackErr_t StackCtor(stk_t<stackElem_T> *stk, ssize_t capacity)
 template <typename stackElem_T>
 StackErr_t StackDtor(stk_t<stackElem_T> *stk)
 {
-    if (stk == NULL) return STK_SUCCESS;
+    if (stk == NULL) { return STK_SUCCESS; }
 
     ON_DEBUG( 
         if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; }
@@ -67,14 +71,18 @@ StackErr_t StackDtor(stk_t<stackElem_T> *stk)
     )
 
     free(stk->data);
+    stk->data = NULL;
     stk->size = -1;
     stk->capacity = -1;
+    
     ON_DEBUG(
         stk->error = STK_DESTROYED;
         stk->hash = 0;
+        stk->canary_1 = 0;
+        stk->canary_2 = 0;
     )
     
-    ON_DEBUG( LOG(INFO, "Stack \"%s\" is destroed", stk->id.name); )
+    ON_DEBUG( LOG(INFO, "Stack \"%s\" is destroyed", stk->id.name); )
     
     stk->id.name = NULL;
     stk->id.file = NULL;
@@ -89,9 +97,9 @@ template <typename stackElem_T>
 StackErr_t StackPush(stk_t<stackElem_T> *stk, const stackElem_T value)
 {
     ON_DEBUG( if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; } )
-    ON_ERR_FIND( if (ERR_DETECT(stk, STK_PUSH)) return STK_ERROR; )
+    ON_ERR_FIND( if (ERR_DETECT(stk, STK_PUSH)) { return STK_ERROR; } )
 
-    if ((size_t)stk->size + 1 > (size_t)stk->capacity)
+    if (stk->size >= stk->capacity)
     {
         if (StackRealloc(stk) == STK_ERROR)
         {
@@ -103,7 +111,7 @@ StackErr_t StackPush(stk_t<stackElem_T> *stk, const stackElem_T value)
         }
     }
 
-    stk->data[(size_t)stk->size - sizeof(stk_canary_t) / sizeof(stackElem_T)] = value;
+    stk->data[stk->size] = value;
     stk->size++;
 
     ON_DEBUG( 
@@ -114,21 +122,34 @@ StackErr_t StackPush(stk_t<stackElem_T> *stk, const stackElem_T value)
 
     ON_DEBUG(
         stk->hash = StkHashFunc(stk);
-        if(stk->hash == 0) { stk->error |= STK_WRONG_HASH; LOG(ERROR, "STK_WRONG_HASH"); return STK_ERROR; }
+        if(stk->hash == 0)
+        { 
+            stk->error |= STK_WRONG_HASH; 
+            LOG(ERROR, "STK_WRONG_HASH"); 
+            return STK_ERROR; 
+        }
         LOG(INFO, "Hash is updated");
     )
 
     return STK_SUCCESS;
 }
 
-
 template <typename stackElem_T>
 StackErr_t StackPop(stk_t<stackElem_T> *stk, stackElem_T *last_value)
 {
     ON_DEBUG( if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; } )
-    ON_ERR_FIND( if (ERR_DETECT(stk, STK_POP)) return STK_ERROR; )
+    ON_ERR_FIND( if (ERR_DETECT(stk, STK_POP)) { return STK_ERROR; } )
 
-    if ((size_t)stk->size - 1 < (size_t)stk->capacity / 2 && (size_t)stk->capacity / 2 > MIN_STK_LEN)
+    if (stk->size == 0)
+    {
+        ON_DEBUG(
+            stk->error |= STK_ACCESS_EMPTY_DATA;
+            LOG(ERROR, "STK_ACCESS_EMPTY_DATA");
+        )
+        return STK_ERROR;
+    }
+
+    if (stk->size - 1 < stk->capacity / 2 && stk->capacity / 2 > MIN_STK_LEN)
     {
         if (StackRevRealloc(stk) == STK_ERROR)
         {
@@ -141,12 +162,17 @@ StackErr_t StackPop(stk_t<stackElem_T> *stk, stackElem_T *last_value)
     }
 
     stk->size--;
-    *last_value = stk->data[(size_t)stk->size - sizeof(stk_canary_t) / sizeof(stackElem_T)];
-    stk->data[(size_t)stk->size - sizeof(stk_canary_t) / sizeof(stackElem_T)] = STK_POISON;
+    *last_value = stk->data[stk->size];
+    stk->data[stk->size] = STK_POISON;
 
     ON_DEBUG(
         stk->hash = StkHashFunc(stk);
-        if(stk->hash == 0) { stk->error |= STK_WRONG_HASH; LOG(ERROR, "STK_WRONG_HASH"); return STK_ERROR; }
+        if(stk->hash == 0)
+        { 
+            stk->error |= STK_WRONG_HASH; 
+            LOG(ERROR, "STK_WRONG_HASH"); 
+            return STK_ERROR; 
+        }
         LOG(INFO, "Hash is updated");
     )
 
@@ -159,36 +185,45 @@ StackErr_t StackPop(stk_t<stackElem_T> *stk, stackElem_T *last_value)
     return STK_SUCCESS;
 }
 
-
 template <typename stackElem_T>
 StackErr_t StackRealloc(stk_t<stackElem_T> *stk)
 {
     ON_DEBUG( if (IS_BAD_PTR(stk)) { LOG(ERROR, "STK_BAD_STK_PTR"); return STK_ERROR; } )
-    ON_ERR_FIND( if (ERR_DETECT(stk, STK_REALLOC)) { LOG(ERROR, "STK_WRONG_REALLOC"); return STK_ERROR; } )
+    ON_ERR_FIND( if (ERR_DETECT(stk, STK_REALLOC)) { LOG(ERROR, "STK_WRONG_REALLOC"); { return STK_ERROR; } } )
 
     ssize_t new_capacity = stk->capacity << 1;
+    if (new_capacity <= stk->capacity)
+    {
+        ON_DEBUG( stk->error |= STK_WRONG_REALLOC; LOG(ERROR, "STK_WRONG_REALLOC"); )
+        return STK_ERROR;
+    }
+    
     stackElem_T *new_data = (stackElem_T*)realloc(stk->data, (size_t)new_capacity * sizeof(stackElem_T));
-    if(IS_BAD_PTR(new_data)) { ON_DEBUG( stk->error |= STK_WRONG_REALLOC; LOG(ERROR, "STK_WRONG_REALLOC"); ) return STK_ERROR; }
+    if(IS_BAD_PTR(new_data))
+    { 
+        ON_DEBUG( stk->error |= STK_WRONG_REALLOC; LOG(ERROR, "STK_WRONG_REALLOC"); ) 
+        return STK_ERROR; 
+    }
 
-    for (size_t i = (size_t)stk->capacity - sizeof(stk_canary_t) / sizeof(stackElem_T); i < (size_t)new_capacity - sizeof(stk_canary_t) / sizeof(stackElem_T); ++i)
-        new_data[i] = STK_POISON;
+    for (ssize_t i = stk->capacity; i < new_capacity; ++i) { new_data[i] = STK_POISON; }
     
     stk->capacity = new_capacity;
     stk->data     = new_data;
 
-    stk_canary_t end_canary = STK_CANARY_4;
-    memcpy((void*)(&stk->data[(size_t)stk->capacity - sizeof(stk_canary_t) / sizeof(stackElem_T)]), (const void*)(&end_canary), sizeof(stk_canary_t));
-
     ON_DEBUG(
         LOG(INFO, "Stack \"%s\" is reallocated", stk->id.name);
         stk->hash = StkHashFunc(stk);
-        if(stk->hash == 0) { stk->error |= STK_WRONG_HASH; LOG(ERROR, "STK_WRONG_HASH"); return STK_ERROR; }
+        if(stk->hash == 0)
+        { 
+            stk->error |= STK_WRONG_HASH; 
+            LOG(ERROR, "STK_WRONG_HASH"); 
+            return STK_ERROR; 
+        }
         LOG(INFO, "Hash is updated");
     )
 
     return STK_SUCCESS;
 }
-
 
 template <typename stackElem_T>
 StackErr_t StackRevRealloc(stk_t<stackElem_T> *stk)
@@ -197,38 +232,47 @@ StackErr_t StackRevRealloc(stk_t<stackElem_T> *stk)
     ON_ERR_FIND( if (ERR_DETECT(stk, STK_REV_REALLOC)) { LOG(ERROR, "STK_WRONG_REV_REALLOC"); return STK_ERROR; } )
 
     ssize_t new_capacity = stk->capacity >> 1;
-    stackElem_T *new_data = (stackElem_T*)realloc(stk->data, (size_t)new_capacity * sizeof(stackElem_T));
-    if(IS_BAD_PTR(new_data)) { stk->error |= STK_WRONG_REV_REALLOC; LOG(ERROR, "STK_WRONG_REV_REALLOC"); return STK_ERROR; }
-
-    for (size_t i = (size_t)stk->size - sizeof(stk_canary_t) / sizeof(stackElem_T); i < (size_t)new_capacity - sizeof(stk_canary_t) / sizeof(stackElem_T); ++i)
-        new_data[i] = STK_POISON;
+    if (new_capacity < MIN_STK_LEN) { new_capacity = MIN_STK_LEN; }
     
+    if (new_capacity < stk->size) { ON_DEBUG( LOG(WARN, "Cannot shrink below current size"); ) return STK_SUCCESS; }
+    
+    stackElem_T *new_data = (stackElem_T*)realloc(stk->data, (size_t)new_capacity * sizeof(stackElem_T));
+    if(IS_BAD_PTR(new_data))
+    { 
+        stk->error |= STK_WRONG_REV_REALLOC; 
+        LOG(ERROR, "STK_WRONG_REV_REALLOC"); 
+        return STK_ERROR; 
+    }
+
     stk->capacity = new_capacity;
     stk->data     = new_data;
-
-    stk_canary_t end_canary = STK_CANARY_4;
-    memcpy((void*)(&stk->data[(size_t)stk->capacity - sizeof(stk_canary_t) / sizeof(stackElem_T)]), (const void*)(&end_canary), sizeof(stk_canary_t));
 
     ON_DEBUG(
         LOG(INFO, "Stack \"%s\" is reverse reallocated", stk->id.name);
         stk->hash = StkHashFunc(stk);
-        if(stk->hash == 0) { stk->error |= STK_WRONG_HASH; LOG(ERROR, "STK_WRONG_HASH"); return STK_ERROR; }
+        if(stk->hash == 0)
+        { 
+            stk->error |= STK_WRONG_HASH; 
+            LOG(ERROR, "STK_WRONG_HASH"); 
+            return STK_ERROR; 
+        }
         LOG(INFO, "Hash is updated");
     )
 
     return STK_SUCCESS;
 }
 
-
 template <typename stackElem_T>
 stk_hash_t StkHashFunc(stk_t<stackElem_T> *stk)
 {
-    ON_DEBUG( if (IS_BAD_PTR(stk) || IS_BAD_PTR(stk->data)) return 0; )
+    ON_DEBUG( if (IS_BAD_PTR(stk) || IS_BAD_PTR(stk->data)) { return 0; } )
     
     stk_hash_t new_hash = 0;
 
-    for (ssize_t i = 0; i < stk->capacity; ++i)
+    for (ssize_t i = 0; i < stk->size; ++i)
+    {
         new_hash = (new_hash << 5) - new_hash + (stk_hash_t)(stk->data[i]);
+    }
 
     new_hash = (new_hash << 5) - new_hash + (stk_hash_t)(stk->size);
     new_hash = (new_hash << 5) - new_hash + (stk_hash_t)(stk->capacity);

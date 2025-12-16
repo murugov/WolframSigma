@@ -8,7 +8,6 @@ DEF:    "def";
 INIT:   "init";
 EOF:    "EOF";
 UNDEF:  "UNDEF";
-BLOCK:  "$";
 # brackets and separators
 LPAREN:    "(";
 RPAREN:    ")";
@@ -18,11 +17,15 @@ LBRACE:    "{";
 RBRACE:    "}";
 COMMA:     ",";
 SEMICOLON: ";";
+COLON:     ":";
 # bool functions
-EQ:      "=";
-EQEQ:    "==";
-GREATER: ">";
-LESS:    "<";
+EQ:   "=";
+EQEQ: "==";
+NE:   "!=";
+GT:   ">";
+LT:   "<";
+GE:   ">=";
+LE:   "<=";
 # elementary functions
 ADD:  "+";    
 SUB:  "-";    

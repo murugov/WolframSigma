@@ -26,10 +26,10 @@ enum StackErr_t
 enum StackErrCodes_t
 {
     STK_NO_ERRORS         = 0,
-    STK_WRONG_CANARY      = 1 << 0,
-    STK_WRONG_HASH        = 1 << 1,
-    STK_BAD_STK_PTR       = 1 << 2,
-    STK_BAD_DATA_PTR      = 1 << 3,
+    STK_BAD_STK_PTR       = 1 << 0,
+    STK_BAD_DATA_PTR      = 1 << 1,
+    STK_WRONG_CANARY      = 1 << 2,
+    STK_WRONG_HASH        = 1 << 3,
     STK_WRONG_SIZE        = 1 << 4,
     STK_WRONG_CAPACITY    = 1 << 5,
     STK_WRONG_REALLOC     = 1 << 6,
@@ -53,10 +53,8 @@ enum StackFunc
 
 enum StackCanary
 {
-    STK_CANARY_1 = 111,
-    STK_CANARY_2 = 222,
-    STK_CANARY_3 = 333,
-    STK_CANARY_4 = 444
+    STK_CANARY_1 = 0xBADA55,
+    STK_CANARY_2 = 0xB16B00B5
 };
 
 

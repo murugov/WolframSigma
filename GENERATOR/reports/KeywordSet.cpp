@@ -2,7 +2,6 @@
 
 const keyword_t keyword_set[] =
 {
-	{ARG_OP, "$",	1 ,	0x24},
 	{ARG_OP, "(",	1 ,	0x28},
 	{ARG_OP, ")",	1 ,	0x29},
 	{ARG_OP, "*",	1 ,	0x2A},
@@ -10,6 +9,7 @@ const keyword_t keyword_set[] =
 	{ARG_OP, ",",	1 ,	0x2C},
 	{ARG_OP, "-",	1 ,	0x2D},
 	{ARG_OP, "/",	1 ,	0x2F},
+	{ARG_OP, ":",	1 ,	0x3A},
 	{ARG_OP, ";",	1 ,	0x3B},
 	{ARG_OP, "<",	1 ,	0x3C},
 	{ARG_OP, "=",	1 ,	0x3D},
@@ -20,7 +20,10 @@ const keyword_t keyword_set[] =
 	{ARG_OP, "e",	1 ,	0x65},
 	{ARG_OP, "{",	1 ,	0x7B},
 	{ARG_OP, "}",	1 ,	0x7D},
+	{ARG_OP, "!=",	2 ,	0x43C},
+	{ARG_OP, "<=",	2 ,	0x781},
 	{ARG_OP, "==",	2 ,	0x7A0},
+	{ARG_OP, ">=",	2 ,	0x7BF},
 	{ARG_OP, "if",	2 ,	0xD1D},
 	{ARG_OP, "ln",	2 ,	0xD82},
 	{ARG_OP, "EOF",	3 ,	0x10CDC},
