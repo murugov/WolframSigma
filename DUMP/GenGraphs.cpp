@@ -149,6 +149,9 @@ genErr_t GenDot(FILE *src, tree_t *tree, const char *func)
     if (tree->root->type == ARG_NUM)
         fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
             number_nodes, tree->root, tree->root->parent, tree->root->type, tree->root->item, tree->root->left, tree->root->right);
+    else if (tree->root->type == ARG_OP)
+        fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %zu | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+            number_nodes, tree->root, tree->root->parent, tree->root->type, tree->root->item, tree->root->left, tree->root->right);
     else
         fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
             number_nodes, tree->root, tree->root->parent, tree->root->type, tree->root->item, tree->root->left, tree->root->right);
@@ -175,6 +178,9 @@ genErr_t GenDot(FILE *src, tree_t *tree, const char *func)
             if (current_node->left->type == ARG_NUM)
                 fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
                     number_nodes, current_node->left, current_node->left->parent, current_node->left->type, current_node->left->item, current_node->left->left, current_node->left->right);
+            else if (current_node->left->type == ARG_OP)
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %zu | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->left, current_node->left->parent, current_node->left->type, current_node->left->item, current_node->left->left, current_node->left->right);
             else
                 fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
                     number_nodes, current_node->left, current_node->left->parent, current_node->left->type, current_node->left->item, current_node->left->left, current_node->left->right);
@@ -195,6 +201,9 @@ genErr_t GenDot(FILE *src, tree_t *tree, const char *func)
 
             if (current_node->right->type == ARG_NUM)
                 fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %g | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
+                    number_nodes, current_node->right, current_node->right->parent, current_node->right->type, current_node->right->item, current_node->right->left, current_node->right->right);
+            else if (current_node->right->type == ARG_OP)
+                fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %zu | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 
                     number_nodes, current_node->right, current_node->right->parent, current_node->right->type, current_node->right->item, current_node->right->left, current_node->right->right);
             else
                 fprintf(src, "\tn%zu [shape=record, label=\"{ptr = %p | parent = %p | type = %d | data = %s | {<left> left = %p | <right> right = %p}}\", fillcolor=\"#87CEEB\", color=\"black\"]\n", 

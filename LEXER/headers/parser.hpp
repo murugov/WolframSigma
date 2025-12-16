@@ -46,12 +46,14 @@ node_t* ParseNum(parser_t* parser);
 #define CUR_TYPE  (CUR_TOKEN->type)
 #define CUR_HASH  (CUR_TOKEN->hash)
 #define CUR_START (CUR_TOKEN->start)
+#define CUR_LEN   (CUR_TOKEN->length)
 #define CUR_POS   (parser->lexer->cur_token)
 
 #define PREV_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token - 1])
 #define PREV_TYPE  (PREV_TOKEN->type)
 #define PREV_HASH  (PREV_TOKEN->hash)
 #define PREV_START (PREV_TOKEN->start)
+#define PREV_LEN   (PREV_TOKEN->length)
 #define PREV_POS   (parser->lexer->cur_token - 1)
 
 #define CUR_NAME_TABLE (parser->name_tables->data[parser->cur_name_table])

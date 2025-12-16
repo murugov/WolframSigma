@@ -90,8 +90,8 @@ union val
     val(hash_t n) : op(n) {}
 };
 
-val valVAR(const char* s);
-val valFUNC(const char* s);
+val valVAR(const char* ptr, int len);
+val valFUNC(const char* ptr, int len);
 
 struct node_t
 {
@@ -127,10 +127,10 @@ TreeErr_t TreeDtor(tree_t *tree);
 #define TREE_CTOR(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(&(tree))
 #define TREE_DTOR(tree) TreeDtor(tree)
 
-#define NUM_(num)   NewNode(ARG_NUM, (val)(num), NULL, NULL)
-#define OP_(op)     NewNode(ARG_OP, (val)((hash_t)op), NULL, NULL)
-#define VAR_(var)   NewNode(ARG_VAR, valVAR(var), NULL, NULL)
-#define FUNC_(func) NewNode(ARG_FUNC, valFUNC(func), NULL, NULL)
+#define NUM_(num)        NewNode(ARG_NUM, (val)(num), NULL, NULL)
+#define OP_(op)          NewNode(ARG_OP, (val)((hash_t)op), NULL, NULL)
+#define VAR_(var, len)   NewNode(ARG_VAR, valVAR(var, len), NULL, NULL)
+#define FUNC_(func, len) NewNode(ARG_FUNC, valFUNC(func, len), NULL, NULL)
 
 
 #endif

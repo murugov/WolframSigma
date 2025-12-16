@@ -61,8 +61,8 @@ node_t *NewNode(type_t type, val item, node_t *left, node_t *right)
     return new_node;
 }
 
-val valVAR(const char* s)  { val v; v.var  = strdup(s); return v; }
-val valFUNC(const char* s) { val v; v.func = strdup(s); return v; }
+val valVAR(const char* ptr, int len)  { val v; v.var  = strndup(ptr, (size_t)len); return v; }
+val valFUNC(const char* ptr, int len) { val f; f.func = strndup(ptr, (size_t)len); return f; }
 
 
 void set_parents(node_t *node, node_t *parent)
@@ -86,7 +86,7 @@ TreeErr_t TreeDtor(tree_t *tree)
 
 TreeErr_t FreeNodes(node_t *node)
 {
-    ON_DEBUG( if (IS_BAD_PTR(node)) return TREE_ERROR; )
+    if (IS_BAD_PTR(node)) return TREE_ERROR;
 
     if (!IS_BAD_PTR(node->left))  FreeNodes(node->left);
     if (!IS_BAD_PTR(node->right)) FreeNodes(node->right);
