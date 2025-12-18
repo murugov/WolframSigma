@@ -4,17 +4,16 @@ COMMON_INCLUDES		= -I./COMMON/headers
 CONFIG_INCLUDES 	= -I./CONFIG
 STK_INCLUDES		= -I./STACK
 TREE_INCLUDES		= -I./TREE/headers
-HT_INCLUDES			= -I./HASH_TABLE/headers
+HT_INCLUDES			= -I./HASH_TABLE
 GEN_INCLUDES		= -I./GENERATOR/headers -I./GENERATOR/src -I./GENERATOR/reports
 DUMP_INCLUDES		= -I./DUMP/headers
-FRONT_INCLUDES		= -I./FRONTEND/headers
+LEX_INCLUDES		= -I./LEXER/headers
 WOLFRAM_INCLUDES    = -I./WOLFRAM_SIGMA/headers
 
 COMMON_FILES  = COMMON/GetHash.cpp COMMON/IsBadPtr.cpp COMMON/LineCounter.cpp COMMON/logger.cpp COMMON/SizeFile.cpp COMMON/TXTreader.cpp COMMON/math_func.cpp COMMON/is_zero.cpp COMMON/Factorial.cpp
 TREE_FILES 	  = TREE/TreeFunc.cpp
-HT_FILES	  = HASH_TABLE/HashTableFunc.cpp
-DUMP_FILES	  = DUMP/GenGraphs.cpp 
-FRONT_FILES	  = FRONTEND/lexer.cpp FRONTEND/token.cpp FRONTEND/parser.cpp
+DUMP_FILES	  = DUMP/GenGraphs.cpp DUMP/LatexFileOpenClose.cpp DUMP/LatexDump.cpp
+LEX_FILES	  = LEXER/lexer.cpp LEXER/token.cpp LEXER/parser.cpp
 WOLFRAM_FILES = WOLFRAM_SIGMA/VerifyInstrSet.cpp WOLFRAM_SIGMA/WolfFunc.cpp WOLFRAM_SIGMA/CalcFunc.cpp WOLFRAM_SIGMA/SimplifyTree.cpp WOLFRAM_SIGMA/CalcExpression.cpp
 
 DEFAULT_SRC   ?=  src/data.txt
@@ -22,23 +21,16 @@ DEFAULT_LATEX ?=  reports/LatexDump.tex
 
 all: help
 
-wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(FRONT_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(FRONT_FILES) $(WOLFRAM_FILES)
+wolf: WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 	g++ -o wolf_program $(FLAGS) WOLFRAM_SIGMA/main_wolf.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(GEN_INCLUDES) \
-	$(STK_INCLUDES) $(TREE_INCLUDES) $(HT_INCLUDES) $(DUMP_INCLUDES) $(FRONT_INCLUDES) $(WOLFRAM_INCLUDES) \
-	$(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(FRONT_FILES) $(WOLFRAM_FILES)
+	$(STK_INCLUDES) $(TREE_INCLUDES) $(HT_INCLUDES) $(DUMP_INCLUDES) $(LEX_INCLUDES) $(WOLFRAM_INCLUDES) \
+	$(COMMON_FILES) $(TREE_FILES) $(DUMP_FILES) $(LEX_FILES) $(WOLFRAM_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 gen: GENERATOR/main_gen.cpp $(COMMON_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 	g++ -o gen_program $(FLAGS) GENERATOR/main_gen.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) $(STK_INCLUDES) $(GEN_INCLUDES) $(COMMON_FILES)
-	@echo "-----------------------------------------------------------------------------------------"
-
-front: FRONTEND/main_front.cpp $(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(FRONT_FILES)
-	@echo "-----------------------------------------------------------------------------------------"
-	g++ -o front_program $(FLAGS) FRONTEND/main_front.cpp $(COMMON_INCLUDES) $(CONFIG_INCLUDES) \
-	$(STK_INCLUDES) $(TREE_INCLUDES) $(HT_INCLUDES) $(DUMP_INCLUDES) $(GEN_INCLUDES) $(FRONT_INCLUDES) \
-	$(COMMON_FILES) $(TREE_FILES) $(HT_FILES) $(DUMP_FILES) $(FRONT_FILES)
 	@echo "-----------------------------------------------------------------------------------------"
 
 
@@ -54,13 +46,10 @@ run-wolf-args: wolf
 run-gen: gen
 	./gen_program
 
-run-front: front
-	./front_program
-	
 run: run-wolf
 
 clean:
-	rm -f wolf_program gen_program front_program
+	rm -f wolf_program gen_program
 
 help:
 	@echo "Available commands:"
@@ -71,4 +60,4 @@ help:
 	@echo ""
 	@echo "  make clean                    - remove compiled programs"
 
-.PHONY: wolf gen run-wolf run-wolf-args run-gen run-front run clean help
+.PHONY: wolf gen run-wolf run-wolf-args run-gen run clean help

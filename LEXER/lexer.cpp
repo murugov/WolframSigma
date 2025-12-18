@@ -48,7 +48,7 @@ lexerErr_t LexerCtor(lexer_t *lexer, char **lines, int line_count, const char *f
     PeekToken(lexer);
     while ( !IS_BAD_PTR(lexer->peeked_token) && (lexer->peeked_token->type != ARG_OP || lexer->peeked_token->hash != HASH_EOF))
     {
-        // printf("type: [%d];   cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
+        // printf("cur_type: [%d];   cur_hash: [%zu];   cur_pos: [%c];   cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, lexer->peeked_token->hash, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
         if (AdvanceToken(lexer) == LEX_ERROR) return LEX_ERROR;
         
         PeekToken(lexer);
@@ -203,7 +203,7 @@ static token_t *ReadNum(lexer_t *lexer)
     int num_digits = 0;
     if (sscanf(lexer->cur_pos, "%lg%n", &tmp_num, &num_digits) != 1) return NULL;
 
-    token_t* token = NewToken(ARG_NUM, (size_t)tmp_num, lexer->cur_pos, num_digits, lexer->cur_line + 1, lexer->cur_col);
+    token_t* token = NewToken(ARG_NUM, (size_t)(fabs(tmp_num)), lexer->cur_pos, num_digits, lexer->cur_line + 1, lexer->cur_col);
     
     lexer->cur_pos += num_digits;
     lexer->cur_col += num_digits;

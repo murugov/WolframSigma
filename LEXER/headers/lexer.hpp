@@ -1,6 +1,7 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
+#include <math.h>
 #include "token.hpp"
 #include "GetHash.hpp"
 #include "HashOp.hpp"

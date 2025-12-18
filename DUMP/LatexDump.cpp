@@ -1,4 +1,4 @@
-#include "wolfram.h"
+#include "wolfram.hpp"
 #include "OpInstrSet.cpp"
 
 
@@ -17,21 +17,18 @@ bool NeedParentheses(node_t *parent, node_t *child, bool is_left)
     
     if (child->type != ARG_OP) return false;
     
-    hash_t parent_op = HashStr(parent->item.op);
-    hash_t child_op  = HashStr(child->item.op);
-    
-    int parent_priority = GetOpPriority(parent_op);
-    int child_priority  = GetOpPriority(child_op);
+    int parent_priority = GetOpPriority(parent->item.op);
+    int child_priority  = GetOpPriority(child->item.op);
     
     if (child_priority < parent_priority) return true;
     
-    if (parent_op == HASH_DIV || parent_op == HASH_POW)
+    if (parent->item.op == HASH_DIV || parent->item.op == HASH_POW)
     {
-        if (!is_left && parent_op == HASH_POW) return true;
+        if (!is_left && parent->item.op == HASH_POW) return true;
         if (child_priority == parent_priority) return true;
     }
     
-    if ((parent_op == HASH_SUB || parent_op == HASH_DIV) && !is_left)
+    if ((parent->item.op == HASH_SUB || parent->item.op == HASH_DIV) && !is_left)
     {
         if (child_priority == parent_priority) return true;
     }
@@ -58,14 +55,13 @@ void NodeToLatex(node_t *node)
 
         case ARG_OP:
         {
-            hash_t op_hash = HashStr(node->item.op);
             size_t index   = 0;
             
-            if (HashSearch(op_hash, &index) == TREE_SUCCESS)
+            if (HashSearch(node->item.op, &index) == WOLF_SUCCESS)
             {
                 const char* op_symbols = op_instr_set[index].name;
 
-                if (op_hash == HASH_LOG)
+                if (node->item.op == HASH_LOG)
                 {
                     fprintf(file_latex, "\\log_{");
                     NodeToLatex(node->left);
@@ -73,19 +69,19 @@ void NodeToLatex(node_t *node)
                     NodeToLatex(node->right);
                     fprintf(file_latex, "\\right)");
                 }
-                else if (op_hash == HASH_E)
+                else if (node->item.op == HASH_E)
                 {
                     fprintf(file_latex, "e^{");
                     NodeToLatex(node->right);
                     fprintf(file_latex, "}");
                 }
-                else if (op_hash == HASH_SQRT) // TODO: beautiful latex dump
+                else if (node->item.op == HASH_SQRT) // TODO: beautiful latex dump
                 {
                     fprintf(file_latex, "\\sqrt^{");
                     NodeToLatex(node->right);
                     fprintf(file_latex, "}");
                 }
-                else if (op_hash == HASH_DIV)
+                else if (node->item.op == HASH_DIV)
                 {
                     fprintf(file_latex, "\\frac{");
                     NodeToLatex(node->left);
@@ -102,7 +98,7 @@ void NodeToLatex(node_t *node)
                     NodeToLatex(node->left);
                     if (left_paren) fprintf(file_latex, "\\right)");
                     
-                    if (op_hash == HASH_MUL)
+                    if (node->item.op == HASH_MUL)
                         fprintf(file_latex, " \\cdot ");
                     else
                         fprintf(file_latex, " %s ", op_symbols);

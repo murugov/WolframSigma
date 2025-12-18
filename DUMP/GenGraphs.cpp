@@ -241,3 +241,9 @@ genErr_t GenDot(FILE *src, tree_t *tree, const char *func)
     fprintf(src, "}");
     return GEN_SUCCESS;
 }
+
+
+genErr_t GenPlot(FILE *src, )
+{
+
+}

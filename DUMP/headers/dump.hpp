@@ -4,6 +4,9 @@
 #include "CONFIG.hpp"
 
 #include "tree.hpp"
+#include "colors.hpp"
+
+extern FILE *file_latex;
 
 enum genErr_t
 {
@@ -17,18 +20,18 @@ genErr_t GenTrees(node_t *node, const char *func);
 genErr_t GenDot(FILE *src, tree_t *tree, const char *func);
 
 // LATEX dump
-// WolfErr_t LatexFileOpener(const char* path);
-// WolfErr_t LatexFileCloser();
+genErr_t LatexFileOpener(const char* path);
+genErr_t LatexFileCloser();
 
-// void TreeToLatex(node_t *node);
-// void NodeToLatex(node_t *node);
+void TreeToLatex(node_t *node);
+void NodeToLatex(node_t *node);
 
 
-// #define LATEX(node) do{ \
-//                         fprintf(file_latex, "\\[\n"); \
-//                         NodeToLatex(node); \
-//                         fprintf(file_latex, "\n\\]\n\n"); \
-//                     } while(0)
+#define LATEX(node) do{ \
+                        fprintf(file_latex, "\\[\n"); \
+                        NodeToLatex(node); \
+                        fprintf(file_latex, "\n\\]\n\n"); \
+                    } while(0)
 
 
 #endif

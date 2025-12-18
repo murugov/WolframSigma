@@ -19,15 +19,8 @@ enum WolfErr_t
     WOLF_ERROR   = 1
 };
 
-struct var_t
-{
-    hash_t hash;
-    char   name[8];  // это прям bad, зачем мне тоскать и перекопировать эти 8 байт
-    double value;
-    bool   is_used;
-};
-
-extern ht_t *variables;
+extern ht_t<var_t*> *variables;
+extern const char *indep_var;
 
 WolfErr_t VerifyOpInstrSetSort();
 
@@ -36,7 +29,7 @@ node_t *CopyNode(node_t *node);
 
 node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count);
 
-void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order);
+void TaylorSeries(node_t *root, int order);
 node_t* Substitute_x0(node_t *node, hash_t var_hash, node_t *value);
 
 void SimplifyTree(node_t* root);

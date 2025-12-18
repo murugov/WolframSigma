@@ -9,10 +9,18 @@
 #include "dump.hpp"
 
 
+struct var_t
+{
+    const char*  name;
+    double 		 value;
+    double       range_min;
+    double       range_max;
+};
+
 struct parser_t
 {
     lexer_t*      lexer;
-    stk_t<ht_t*>* name_tables;
+    stk_t<ht_t<var_t*>*>* name_tables;
     int           cur_name_table;
 };
 
@@ -26,7 +34,7 @@ struct op_t
 };
 
 
-lexerErr_t parserCtor(parser_t *parser);
+lexerErr_t parserCtor(parser_t *parser, const char *src);
 lexerErr_t parserDtor(parser_t *parser);
 
 int MatchToken(parser_t* parser, hash_t hash);
@@ -34,7 +42,9 @@ int CheckToken(parser_t* parser, hash_t hash);
 token_t* ConsumeToken(parser_t* parser, hash_t hash, const char* error_msg);
 void PrintError(parser_t* parser, token_t* token, const char* message);
 
-node_t* ParseAST(parser_t *parser);
+node_t* ParseWolf(parser_t *parser);
+void ReadVariables(parser_t *parser);
+void ReadBorders(parser_t *parser);
 
 node_t* ParseExpression(parser_t* parser);
 node_t* ParseTerm(parser_t* parser);
@@ -46,6 +56,8 @@ node_t* ParseNum(parser_t* parser);
 
 op_t *FindOpByHash(hash_t hash);
 int CmpForOpSearch(const void *a, const void *b);
+
+const char *htVarToStr(const void *ht_elem);
 
 #define CUR_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token])
 #define CUR_TYPE  (CUR_TOKEN->type)

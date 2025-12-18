@@ -10,6 +10,7 @@
 typedef unsigned long hash_t;
 
 #define PATH_TO_LOGFILE      "reports/LogFile.log"
+#define PATH_TO_LATEX        "reports/DumpLATEX.tex"
 #define PATH_TO_HTML         "reports/DumpHTML.html"
 #define PATH_TO_TREES_FOLDER "reports/trees"
 

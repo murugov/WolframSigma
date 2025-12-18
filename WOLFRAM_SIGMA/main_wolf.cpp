@@ -32,15 +32,16 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-        // LatexFileOpener(PATH_TO_LATEX);
+        LatexFileOpener(PATH_TO_LATEX);
         
         parser_t *parser = (parser_t*)calloc(1, sizeof(parser_t));
-        parserCtor(parser);
+        parserCtor(parser, argv[1]);
 
-        node_t* ast = ParseAST(parser);
+        node_t* ast = ParseWolf(parser);
         if (ast)
         {
             printf(ANSI_COLOR_GREEN "Successfully parsed\n" ANSI_COLOR_RESET);
+            TaylorSeries(ast, 7);
             GenTrees(ast, __func__);
             FreeNodes(ast);
         }
@@ -50,11 +51,9 @@ int main(int argc, char *argv[])
 
 
 
-        // TaylorSeries(wolf_tree, "x", 0.0, 7);
         GenHTML("WolfDump");
 
-        printf("%p\n", htFind(variables, "y"));
-        // LatexFileCloser();
+        LatexFileCloser();
 
         fclose(SourceFile);
         fclose(LatexFile);

@@ -2,17 +2,17 @@
 #include "OpInstrSet.cpp"
 #include "wolfram.hpp"
 
-#define PATH_TO_DATA "src/data.txt"                 // move to folder CONFIG
 
-ht_t *variables = NULL;
+ht_t<var_t*> *variables = NULL;
+const char *indep_var = NULL;
 
 
-lexerErr_t parserCtor(parser_t *parser)
+lexerErr_t parserCtor(parser_t *parser, const char *src)
 {
     ON_DEBUG( if (IS_BAD_PTR(parser)) { return LEX_ERROR; } )
 
-    FILE *SourceFile = fopen(PATH_TO_DATA, "r");
-    if (IS_BAD_PTR(SourceFile)) { printf("Error: Cannot open file %s\n", PATH_TO_DATA); return LEX_ERROR; }
+    FILE *SourceFile = fopen(src, "r");
+    if (IS_BAD_PTR(SourceFile)) { printf("Error: Cannot open file %s\n", src); return LEX_ERROR; }
     
     char *buffer = NULL;
     int count_lines = 0;
@@ -21,7 +21,7 @@ lexerErr_t parserCtor(parser_t *parser)
     if (IS_BAD_PTR(lines)) { printf("Error: Failed to read file\n"); return LEX_ERROR; }
     
     lexer_t *lexer = (lexer_t*)calloc(1, sizeof(lexer_t));
-    LexerCtor(lexer, lines, count_lines, PATH_TO_DATA);
+    LexerCtor(lexer, lines, count_lines, src);
     if (IS_BAD_PTR(lexer))
     {
         printf("Error: Failed to initialize lexer\n");
@@ -31,7 +31,7 @@ lexerErr_t parserCtor(parser_t *parser)
 
     parser->lexer = lexer;
 
-    stk_t<ht_t*>* name_tables = (stk_t<ht_t*>*)calloc(1, sizeof(stk_t<ht_t*>));
+    stk_t<ht_t<var_t*>*>* name_tables = (stk_t<ht_t<var_t*>*>*)calloc(1, sizeof(stk_t<ht_t<var_t*>*>));
     if (IS_BAD_PTR(name_tables))
     { 
         LexerDtor(lexer);
@@ -41,7 +41,7 @@ lexerErr_t parserCtor(parser_t *parser)
 
     STACK_CTOR(name_tables, MIN_STK_LEN);
     
-    ht_t* global_table = (ht_t*)calloc(1, sizeof(ht_t));
+    ht_t<var_t*>* global_table = (ht_t<var_t*>*)calloc(1, sizeof(ht_t<var_t*>));
     if (global_table)
     {
         HT_CTOR(global_table);
@@ -135,7 +135,7 @@ void PrintError(parser_t* parser, token_t* token, const char* message)
 }
 
 
-node_t* ParseAST(parser_t* parser)
+node_t* ParseWolf(parser_t* parser)
 {
     ON_DEBUG( if (IS_BAD_PTR(parser)) { return NULL; } )
 
@@ -161,8 +161,99 @@ node_t* ParseAST(parser_t* parser)
         last_expr = expr;
     }
 
+    if (!ConsumeToken(parser, HASH_SEMICOLON, "Expected ';' after expression")) { return NULL; };
+    
+    ReadVariables(parser);
+    ReadBorders(parser);
+    
     set_parents(program, NULL);
     return program;
+}
+
+
+void ReadVariables(parser_t *parser)
+{
+    while (CUR_TYPE == ARG_VAR && !CheckToken(parser, HASH_EOF))
+    {        
+        int saved_pos = CUR_POS;
+        token_t *var_token = CUR_TOKEN;
+        MatchToken(parser, CUR_HASH);
+
+        if (CheckToken(parser, HASH_COLON)) { CUR_POS = saved_pos; return; }
+
+        if (!ConsumeToken(parser, HASH_EQ, "Expected '=' after variable")) { return; }
+
+        if (CUR_TYPE != ARG_NUM) { PrintError(parser, CUR_TOKEN, "Expected number after '='"); return; }
+        
+        var_t *var = (var_t*)calloc(1, sizeof(var_t));
+        if (IS_BAD_PTR(var)) { PrintError(parser, var_token, "Failed to allocate variable"); return; }
+        
+        var->name = strndup(var_token->start, (size_t)var_token->length);
+        sscanf(CUR_START, "%lg", &(var->value));
+        
+        MatchToken(parser, CUR_HASH);
+        
+        var_t *found_var = htFind(variables, &var, htVarToStr);
+        if (!IS_BAD_PTR(found_var))
+        { 
+            printf(ANSI_COLOR_CYAN "Updating variable %s = %g\n" ANSI_COLOR_RESET, var->name, var->value);
+            found_var->value = var->value;
+            free(var);
+        }
+        else
+        {
+            printf(ANSI_COLOR_CYAN "Adding new variable %s = %g\n" ANSI_COLOR_RESET, var->name, var->value);
+            htInsert(variables, &var, htVarToStr);
+        }
+        
+        if (!ConsumeToken(parser, HASH_SEMICOLON, "Expected ';' after variable")) { free(var); return; }
+    }
+}
+
+
+void ReadBorders(parser_t *parser)
+{
+    while (CUR_TYPE == ARG_VAR && !CheckToken(parser, HASH_EOF))
+    {        
+        token_t *var_token = CUR_TOKEN;
+        MatchToken(parser, CUR_HASH);
+
+        if (!ConsumeToken(parser, HASH_COLON, "Expected ':' after variable")) { return; }
+
+        if (!ConsumeToken(parser, HASH_LBRACKET, "Expected '[' after ':'")) { return; }
+
+        var_t *var = (var_t*)calloc(1, sizeof(var_t));
+        if (IS_BAD_PTR(var)) { PrintError(parser, var_token, "Failed to allocate variable"); return; }
+        
+        var->name = strndup(var_token->start, (size_t)var_token->length);
+        
+        if (CUR_TYPE != ARG_NUM) { free(var); PrintError(parser, CUR_TOKEN, "Expected first border"); return; }
+
+        sscanf(CUR_START, "%lg", &(var->range_min));
+        MatchToken(parser, CUR_HASH);
+
+        if (!ConsumeToken(parser, HASH_COMMA, "Expected ',' between borders")) { free(var); return; }
+
+        sscanf(CUR_START, "%lg", &(var->range_max));
+        MatchToken(parser, CUR_HASH);
+        
+        var_t *found_var = htFind(variables, &var, htVarToStr);
+        if (!IS_BAD_PTR(found_var))
+        { 
+            printf(ANSI_COLOR_CYAN "Updating variable's borders %s: [%g, %g]\n" ANSI_COLOR_RESET, var->name, var->range_min, var->range_max);
+            found_var->value = var->value;
+            free(var);
+        }
+        else
+        {
+            free(var);
+            PrintError(parser, CUR_TOKEN, "Unknown variable");
+        }
+
+        if (!ConsumeToken(parser, HASH_RBRACKET, "Expected ']' after second border")) { free(var); return; }
+        
+        if (!ConsumeToken(parser, HASH_SEMICOLON, "Expected ';' after variable")) { free(var); return; }
+    }
 }
 
 
@@ -237,7 +328,22 @@ node_t* ParseFactor(parser_t* parser)
 
 
 node_t* ParsePrimary(parser_t* parser)
-{
+{    
+    if (CUR_HASH == HASH_LPAREN)
+    {
+        MatchToken(parser, HASH_LPAREN);
+        node_t* expr = ParseExpression(parser);
+        if (IS_BAD_PTR(expr)) { return NULL; }
+        
+        if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after expression")) 
+        { 
+            FreeNodes(expr); 
+            return NULL; 
+        }
+        
+        return expr;
+    }
+    
     switch (CUR_TYPE)
     {
         case ARG_NUM:
@@ -245,24 +351,27 @@ node_t* ParsePrimary(parser_t* parser)
         case ARG_VAR:
             return ParseVar(parser);
         case ARG_OP:
-            if (!IS_BAD_PTR(FindOpByHash(CUR_HASH))) { return ParseFunc(parser); }
+        {
+            op_t* op_info = FindOpByHash(CUR_HASH);
+            if (!IS_BAD_PTR(op_info))
+            {
+                return ParseFunc(parser);
+            }
             else
             {
-                PrintError(parser, CUR_TOKEN, "Unexpected operator");
+                if (CUR_HASH == HASH_LPAREN || CUR_HASH == HASH_RPAREN)
+                {
+                    PrintError(parser, CUR_TOKEN, "Mismatched parentheses");
+                }
+                else
+                {
+                    PrintError(parser, CUR_TOKEN, "Unexpected operator");
+                }
                 return NULL;
             }
+        }
         default:
             break;
-    }
-
-    if (MatchToken(parser, HASH_LPAREN))
-    {
-        node_t* expr = ParseExpression(parser);
-        if (IS_BAD_PTR(expr)) { return NULL; }
-        
-        if (!ConsumeToken(parser, HASH_RPAREN, "Expected ')' after expression")) { FreeNodes(expr); return NULL; }
-        
-        return expr;
     }
     
     PrintError(parser, CUR_TOKEN, "Expected number, variable, function, or '('");
@@ -386,11 +495,22 @@ node_t* ParseVar(parser_t* parser)
     }
     
     node_t* var_node = VAR_(CUR_START, CUR_LEN);
+    if (IS_BAD_PTR(var_node)) { return NULL; }
 
-    if (CUR_NAME_TABLE) { htInsert(CUR_NAME_TABLE, strndup(CUR_START, (size_t)CUR_LEN)); }
+    var_t *var = (var_t*)calloc(1, sizeof(var_t));
+    if (IS_BAD_PTR(var)) { FreeNodes(var_node); return NULL; }
+
+    var->name      = strndup(CUR_START, (size_t)CUR_LEN);
+    var->value     = 0;
+    var->range_min = 0;
+    var->range_max = 0;
+    
+    if (CUR_NAME_TABLE) { htInsert(CUR_NAME_TABLE, &var, htVarToStr); }
 
     MatchToken(parser, CUR_HASH);
     
+    if (IS_BAD_PTR(indep_var)) { indep_var = var->name; }
+
     return var_node;
 }
 
@@ -432,4 +552,12 @@ int CmpForOpSearch(const void *a, const void *b)
     if (*hash_a < op_b->hash)
         return -1;
     return 0;
+}
+
+
+const char *htVarToStr(const void *ht_elem)
+{
+   const var_t *var = (const var_t*)ht_elem;
+
+    return var->name;
 }

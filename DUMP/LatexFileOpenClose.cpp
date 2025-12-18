@@ -1,17 +1,18 @@
 #include "dump.hpp"
 
 #define INSERT_TO_LATEX(str) fprintf(file_latex, "%s", str)
+FILE *file_latex = NULL;
 
 
 genErr_t LatexFileOpener(const char* path)
 {
     if (IS_BAD_PTR(path)) return GEN_ERROR;
 
-    FILE *file_latex = fopen(path, "w");
+    file_latex = fopen(path, "w");
     if (IS_BAD_PTR(file_latex))
     { 
         printf(ANSI_COLOR_RED "Error: Cannot open file %s\n" ANSI_COLOR_RESET, path); 
-        return WOLF_ERROR; 
+        return GEN_ERROR; 
     }
 
     INSERT_TO_LATEX("\\documentclass[a4paper,10pt]{extarticle}\n");
@@ -86,10 +87,10 @@ genErr_t LatexFileOpener(const char* path)
     INSERT_TO_LATEX("\\section{Теоретическая часть}\n");
     INSERT_TO_LATEX("\\normalsize\n");
 
-    return WOLF_SUCCESS;
+    return GEN_SUCCESS;
 }
 
-WolfErr_t LatexFileCloser()
+genErr_t LatexFileCloser()
 {
     INSERT_TO_LATEX("\\endgroup\n");
     INSERT_TO_LATEX("\n");
@@ -111,5 +112,5 @@ WolfErr_t LatexFileCloser()
 
     fclose(file_latex);
 
-    return WOLF_SUCCESS;
+    return GEN_SUCCESS;
 }

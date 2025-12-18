@@ -81,7 +81,7 @@ TreeErr_t FreeNodes(node_t *node)
         case ARG_VAR:
             if (!IS_BAD_PTR(node->item.var))
             {
-                free(node->item.var);
+                // free(node->item.var);
                 node->item.var = NULL;
             }
             break;

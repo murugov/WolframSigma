@@ -2,20 +2,11 @@
 #include "OpInstrSet.cpp"
 
 
-// var_t variables[MAX_NUM_VAR] = //stack как вектор чтобы можно было for
-// {
-//     {119, "w", 0, false},
-//     {120, "x", 0, false},
-//     {121, "y", 0, false},
-//     {122, "z", 0, false}
-// };
-
-
 node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 {
     if (node == NULL) return NULL;
     
-    node_t *tmp = NULL; // rename
+    node_t *tmp = NULL;
 
     switch (node->type)
     {
@@ -30,7 +21,6 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 
                 // must simplify tree here
                 SimplifyTree(tmp);
-
                 return tmp;
             }
             
@@ -64,7 +54,6 @@ node_t * NDerivativeNode(node_t *node, hash_t hash_indep_var, int count)
     {
         node_t *next = DerivativeNode(CopyNode(current), hash_indep_var);
         SimplifyTree(next);
-        // LATEX(current);
 
         FreeNodes(current);
         current = next;        
@@ -92,18 +81,27 @@ node_t *CopyNode(node_t *node)
 }
 
 
-void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
+void TaylorSeries(node_t *root, int order)
 {   
-    ON_DEBUG( if (IS_BAD_PTR(tree)) return; )
-    
+    ON_DEBUG( if (IS_BAD_PTR(root)) return; )
+
     size_t len_indep_var = strlen(indep_var);
 
     node_t *series_sum = NUM_(0.0);
     hash_t hash_indep_var = GetHash(indep_var);
-    node_t *x0 = NUM_(point);
 
-    node_t *current_derivative = CopyNode(tree->root);
-    
+    var_t var = {};
+    var.name = indep_var;
+    var_t *var_ptr = &var;
+
+    var_t *found_var = htFind(variables, &(var_ptr), htVarToStr);
+    if (IS_BAD_PTR(found_var)) { FreeNodes(series_sum); return; }
+
+    node_t *x0 = NUM_(found_var->value);
+
+    node_t *current_derivative = CopyNode(root);
+    TreeToLatex(current_derivative);
+
     for (int n = 0; n <= order; ++n)
     {        
         node_t *derivative_at_point = Substitute_x0(current_derivative, hash_indep_var, x0);
@@ -120,12 +118,14 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
         
         FreeNodes(derivative_at_point);
         
+
         if (n < order)
         {
-            // SimplifyTree(current_derivative);
             node_t *next_derivative = DerivativeNode(current_derivative, hash_indep_var);
             FreeNodes(current_derivative);
             current_derivative = next_derivative;
+            SimplifyTree(next_derivative);
+            TreeToLatex(next_derivative);
         }        
     }
     FreeNodes(current_derivative);
@@ -134,8 +134,8 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
     set_parents(series_sum, NULL);
     SimplifyTree(series_sum);
     
-    // GenGraphs(series_sum, __func__);
-    // TreeToLatex(series_sum);
+    GenTrees(series_sum, __func__);
+    TreeToLatex(series_sum);
     
     FreeNodes(series_sum);
 }

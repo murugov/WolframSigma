@@ -35,12 +35,12 @@ double CalcExpression(node_t *node)
         }
         case ARG_VAR:
         {
-            // hash_t node_hash = GetHash(node->item.var);
-            // for (int i = 0; i < MAX_NUM_VAR; ++i)
-            // {
-            //     if (variables[i].hash == node_hash)
-            //         return variables[i].value;
-            // }
+            var_t var = {};
+            var.name = node->item.var;
+            var_t *var_ptr = &var;
+
+            var_t *found_var = htFind(variables, &(var_ptr), htVarToStr);
+            if (!IS_BAD_PTR(found_var)) return found_var->value;
 
             return NAN;
         }
