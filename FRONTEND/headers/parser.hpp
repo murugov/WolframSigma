@@ -16,6 +16,16 @@ struct parser_t
     int           cur_name_table;
 };
 
+struct op_t
+{
+	hash_t hash;
+	char   name[8];
+	int    num_args;
+	calc_t calc;
+	diff_t diff;
+};
+
+
 lexerErr_t parserCtor(parser_t *parser);
 lexerErr_t parserDtor(parser_t *parser);
 
@@ -25,22 +35,17 @@ token_t* ConsumeToken(parser_t* parser, hash_t hash, const char* error_msg);
 void PrintError(parser_t* parser, token_t* token, const char* message);
 
 node_t* ParseAST(parser_t *parser);
-node_t* ParseFunc(parser_t* parser);
-node_t* ParseStatement(parser_t *parser);
+
 node_t* ParseExpression(parser_t* parser);
 node_t* ParseTerm(parser_t* parser);
 node_t* ParseFactor(parser_t* parser);
 node_t* ParsePrimary(parser_t* parser);
-node_t* ParseIf(parser_t* parser);
-node_t* ParseWhile(parser_t* parser);
-node_t* ParseVarDecl(parser_t* parser);
-node_t* ParseAssignment(parser_t* parser);
-node_t* ParseReturn(parser_t* parser);
-node_t* ParseFuncCall(parser_t* parser);
-node_t* ParseCondition(parser_t* parser);
-node_t* ParseBlock(parser_t* parser);
+node_t* ParseFunc(parser_t* parser);
 node_t* ParseVar(parser_t* parser);
 node_t* ParseNum(parser_t* parser);
+
+op_t *FindOpByHash(hash_t hash);
+int CmpForOpSearch(const void *a, const void *b);
 
 #define CUR_TOKEN (parser->lexer->tokens->data[parser->lexer->cur_token])
 #define CUR_TYPE  (CUR_TOKEN->type)

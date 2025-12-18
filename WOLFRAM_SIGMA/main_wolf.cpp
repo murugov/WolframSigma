@@ -33,21 +33,27 @@ int main(int argc, char *argv[])
         }
 
         // LatexFileOpener(PATH_TO_LATEX);
-
-        tree_t *wolf_tree = NULL;
-        TREE_CTOR(wolf_tree);
         
-        parseWolfTree(argv[1], wolf_tree);
+        parser_t *parser = (parser_t*)calloc(1, sizeof(parser_t));
+        parserCtor(parser);
 
+        node_t* ast = ParseAST(parser);
+        if (ast)
+        {
+            printf(ANSI_COLOR_GREEN "Successfully parsed\n" ANSI_COLOR_RESET);
+            GenTrees(ast, __func__);
+            FreeNodes(ast);
+        }
+        else
+            printf(ANSI_COLOR_RED "Parsing failed!\n" ANSI_COLOR_RESET);    
+    
 
-        GenTrees(wolf_tree->root, __func__);
 
 
         // TaylorSeries(wolf_tree, "x", 0.0, 7);
-
-        TREE_DTOR(wolf_tree);    
         GenHTML("WolfDump");
 
+        printf("%p\n", htFind(variables, "y"));
         // LatexFileCloser();
 
         fclose(SourceFile);

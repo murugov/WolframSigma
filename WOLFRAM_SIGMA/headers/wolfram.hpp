@@ -27,23 +27,10 @@ struct var_t
     bool   is_used;
 };
 
-
-struct op_t
-{
-	hash_t hash;
-	char   name[8];  // это прям bad, зачем мне тоскать и перекопировать эти 8 байт
-	int    num_args;
-	calc_t calc;
-	diff_t diff;
-};
-
-
-// extern var_t variables[MAX_NUM_VAR];
-
+extern ht_t *variables;
 
 WolfErr_t VerifyOpInstrSetSort();
 
-void EnterVar();
 node_t *DerivativeNode(node_t *node, hash_t hash_indep_var);
 node_t *CopyNode(node_t *node);
 
@@ -59,8 +46,6 @@ void ReplaceNode(node_t *old_node, node_t *new_node);
 node_t *SwapParentAndChild(node_t *parent, node_t *child);
 
 double CalcExpression(node_t *node);
-
-lexerErr_t parseWolfTree(const char* src, tree_t *tree);
 
 WolfErr_t HashSearch(hash_t hash, size_t *index);
 int CmpForBinSearch(const void *a, const void *b);

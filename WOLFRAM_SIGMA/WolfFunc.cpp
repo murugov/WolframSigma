@@ -11,19 +11,6 @@
 // };
 
 
-void EnterVar()
-{
-    for (int i = 0; i < MAX_NUM_VAR; ++i)
-    {
-        if (variables[i].is_used)
-        {
-            printf("Enter the value of the %s: ", variables[i].name);
-            scanf("%lg", &(variables[i].value));
-        }
-    }
-}
-
-
 node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
 {
     if (node == NULL) return NULL;
@@ -34,10 +21,8 @@ node_t *DerivativeNode(node_t *node, hash_t hash_indep_var)
     {
         case ARG_OP:
         {   
-            hash_t op_hash = GetHash(node->item.op);
             size_t index   = 0;
-
-            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
+            if (HashSearch(node->item.op, &index) == WOLF_SUCCESS)
             {
                 diff_context context = {node->left, node->right, hash_indep_var};
                 tmp = op_instr_set[index].diff(&context);
@@ -111,6 +96,8 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
 {   
     ON_DEBUG( if (IS_BAD_PTR(tree)) return; )
     
+    size_t len_indep_var = strlen(indep_var);
+
     node_t *series_sum = NUM_(0.0);
     hash_t hash_indep_var = GetHash(indep_var);
     node_t *x0 = NUM_(point);
@@ -121,12 +108,10 @@ void TaylorSeries(tree_t *tree, const char* indep_var, double point, int order)
     {        
         node_t *derivative_at_point = Substitute_x0(current_derivative, hash_indep_var, x0);
         double derivative_value = CalcExpression(derivative_at_point);   
-        // printf("derivative_value = %g\n", derivative_value);     
         double coeff_value = derivative_value / (double)Factorial(n);
-        // printf("coeff_value = %g\n", coeff_value);
         node_t *coeff = NUM_(coeff_value);
         
-        node_t *x_minus_x0 = SUB_(VAR_(indep_var), CopyNode(x0));
+        node_t *x_minus_x0 = SUB_(VAR_(indep_var, (int)len_indep_var), CopyNode(x0));
         node_t *power_term = POW_(x_minus_x0, NUM_((double)n));
         node_t *new_term = MUL_(coeff, power_term);
         

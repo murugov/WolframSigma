@@ -1,5 +1,8 @@
 #include "generator.hpp"
 
+// есть проблема со scanf для ';', '[', ']' 
+
+
 hash_t bad_hash[] = {  
                         GetHash("("),      GetHash(")"),
                         GetHash("["),      GetHash("]"),
@@ -18,19 +21,20 @@ hash_t bad_hash[] = {
 
 static const size_t NUM_BAD_SYMS = sizeof(bad_hash) / sizeof(bad_hash[0]);
 
+
 int main()
 {
     FILE *SourceKeyFile  = fopen(PATH_TO_SRC_KEY_FILE, "r");
     if (IS_BAD_PTR(SourceKeyFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_KEY_FILE); return EXIT_FAILURE; }
 
-    FILE *WolfOpFile     = fopen(PATH_TO_WOLF_OP_H, "w");
-    if (IS_BAD_PTR(WolfOpFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_WOLF_OP_H); return EXIT_FAILURE; }
+    FILE *HashOpFile     = fopen(PATH_TO_HASH_OP_FILE, "w");
+    if (IS_BAD_PTR(HashOpFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_HASH_OP_FILE); return EXIT_FAILURE; }
     
     FILE *OpInstrSetFile = fopen(PATH_TO_OP_INSTR_SET, "w");
-    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_OP_INSTR_SET); return EXIT_FAILURE; }
+    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_OP_INSTR_SET); return EXIT_FAILURE; }
 
     FILE *KeywordSetFile = fopen(PATH_TO_KEYWORD_SET, "w");
-    if (IS_BAD_PTR(KeywordSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET); return EXIT_FAILURE; }
+    if (IS_BAD_PTR(KeywordSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET); return EXIT_FAILURE; }
 
     char* buffer = NULL;
     size_t len_buffer = 0;
@@ -40,37 +44,77 @@ int main()
 
     RemoveComments(arr_ptr, &count_line);
 
-    if (GenHashOp(WolfOpFile, arr_ptr, count_line))
-        printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_WOLF_OP_H);
+    if (GenHashOp(HashOpFile, arr_ptr, count_line))
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_HASH_OP_FILE);
     else
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
 
     if (GenOpInstrSet(OpInstrSetFile, arr_ptr, count_line))
-        printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_OP_INSTR_SET);
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_OP_INSTR_SET);
     else
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
 
     if (GenKeywordSet(KeywordSetFile, arr_ptr, count_line))
-        printf(ANSI_COLOR_RED "Error creating %s!" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET);
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_KEYWORD_SET);
+    else
+        printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+
+    FreeLines(arr_ptr, count_line);
+    fclose(SourceKeyFile);
+    fclose(HashOpFile);
+    fclose(OpInstrSetFile);
+    fclose(KeywordSetFile);
+
+
+
+    FILE *SourceSpuFile = fopen(PATH_TO_SRC_SPU_FILE, "r");
+    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_SPU_FILE); return EXIT_FAILURE; }
+
+    FILE *CmdEnumsFile = fopen(PATH_TO_CMD_CODES_FILE, "w");
+    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_CMD_CODES_FILE); return EXIT_FAILURE; }
+
+    FILE *AsmInstrSetFile = fopen(PATH_TO_ASM_INSTR_SET, "w");
+    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_ASM_INSTR_SET); return EXIT_FAILURE; }
+
+    FILE *SpuInstrSetFile = fopen(PATH_TO_SPU_INSTR_SET, "w");
+    if (IS_BAD_PTR(OpInstrSetFile)) { printf(ANSI_COLOR_RED "Bad pointer %s!\n" ANSI_COLOR_RESET, PATH_TO_SPU_INSTR_SET); return EXIT_FAILURE; }
+
+    char* buffer_2 = NULL;
+    size_t len_buffer_2 = 0;
+    int count_line_2 = 0;
+    char **arr_ptr_2 = TXTreader(SourceSpuFile, buffer_2, &len_buffer_2, &count_line_2, NULL);
+    if (IS_BAD_PTR(arr_ptr_2)) printf(ANSI_COLOR_RED "Error reading %s!\n" ANSI_COLOR_RESET, PATH_TO_SRC_SPU_FILE);
+
+    RemoveComments(arr_ptr_2, &count_line_2);
+
+    if (GenCmdEnum(CmdEnumsFile, arr_ptr_2, (size_t)count_line_2))
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_CMD_CODES_FILE);
+    else
+        printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+    if (GenAsmInstrSet(AsmInstrSetFile, arr_ptr_2, (size_t)count_line_2))
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_ASM_INSTR_SET);
+    else
+        printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+    if (GenSpuInstrSet(SpuInstrSetFile, arr_ptr_2, (size_t)count_line_2))
+        printf(ANSI_COLOR_RED "Error creating %s!\n" ANSI_COLOR_RESET, PATH_TO_SPU_INSTR_SET);
     else
         printf(ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
 
 
-    free(arr_ptr);
-    fclose(SourceKeyFile);
-    fclose(WolfOpFile);
-    fclose(OpInstrSetFile);
-    fclose(KeywordSetFile);
+    FreeLines(arr_ptr_2, count_line_2);
+    fclose(SourceSpuFile);
+    fclose(AsmInstrSetFile);
+    fclose(SpuInstrSetFile);
 
     return 0;
 }
 
 
-GenErr_t GenHashOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
+GenErr_t GenHashOp(FILE *HashOpFile, char **arr_ptr, int count_line)
 {
-    if (IS_BAD_PTR(WolfOpFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
+    if (IS_BAD_PTR(HashOpFile) || IS_BAD_PTR(arr_ptr) || count_line < 0) return GEN_ERROR;
         
-    fprintf(WolfOpFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n");
+    fprintf(HashOpFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n");
     
     qsort(bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash);
 
@@ -104,50 +148,50 @@ GenErr_t GenHashOp(FILE *WolfOpFile, char **arr_ptr, int count_line)
         }
     }
 
-    fprintf(WolfOpFile, "#ifndef HASH_OP_HPP\n"
+    fprintf(HashOpFile, "#ifndef HASH_OP_HPP\n"
                         "#define HASH_OP_HPP\n\n\n");
 
-    fprintf(WolfOpFile, "enum HashOp\n");
-    fprintf(WolfOpFile, "{\n");
+    fprintf(HashOpFile, "enum HashOp\n");
+    fprintf(HashOpFile, "{\n");
 
     for (int i = 0; i < actual_count - 1; ++i)
-        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX,\n", max_name_len, func_infos[i].name, func_infos[i].hash);
+        fprintf(HashOpFile, "\tHASH_%-*s = 0x%lX,\n", max_name_len, func_infos[i].name, func_infos[i].hash);
     
     if (actual_count > 0)
-        fprintf(WolfOpFile, "\tHASH_%-*s = 0x%lX\n", max_name_len, func_infos[actual_count - 1].name, func_infos[actual_count - 1].hash);
+        fprintf(HashOpFile, "\tHASH_%-*s = 0x%lX\n", max_name_len, func_infos[actual_count - 1].name, func_infos[actual_count - 1].hash);
     
 
-    fprintf(WolfOpFile, "};\n\n");
+    fprintf(HashOpFile, "};\n\n");
 
-    fprintf(WolfOpFile, "struct calc_context\n");
-    fprintf(WolfOpFile, "{\n");
-    fprintf(WolfOpFile, "    double left_val;\n");
-    fprintf(WolfOpFile, "    double right_val;\n");
-    fprintf(WolfOpFile, "};\n\n");
+    fprintf(HashOpFile, "struct calc_context\n");
+    fprintf(HashOpFile, "{\n");
+    fprintf(HashOpFile, "    double left_val;\n");
+    fprintf(HashOpFile, "    double right_val;\n");
+    fprintf(HashOpFile, "};\n\n");
     
-    fprintf(WolfOpFile, "struct diff_context\n");
-    fprintf(WolfOpFile, "{\n");
-    fprintf(WolfOpFile, "    node_t *node_left;\n");
-    fprintf(WolfOpFile, "    node_t *node_right;\n");
-    fprintf(WolfOpFile, "    hash_t hash_indep_var;\n");
-    fprintf(WolfOpFile, "};\n\n\n");
+    fprintf(HashOpFile, "struct diff_context\n");
+    fprintf(HashOpFile, "{\n");
+    fprintf(HashOpFile, "    node_t *node_left;\n");
+    fprintf(HashOpFile, "    node_t *node_right;\n");
+    fprintf(HashOpFile, "    hash_t hash_indep_var;\n");
+    fprintf(HashOpFile, "};\n\n\n");
     
     for (int i = 0; i < actual_count; ++i)
     {
         hash_t target_hash = GetHash(func_infos[i].op);
         if (!bsearch(&target_hash, bad_hash, NUM_BAD_SYMS, sizeof(hash_t), CmpByHash))
         {
-            fprintf(WolfOpFile, "double calc%s(calc_context *calc_params);\n", 
+            fprintf(HashOpFile, "double calc%s(calc_context *calc_params);\n", 
                     func_infos[i].name);
-            fprintf(WolfOpFile, "node_t *diff%s(diff_context *diff_params);\n\n", 
+            fprintf(HashOpFile, "node_t *diff%s(diff_context *diff_params);\n\n", 
                     func_infos[i].name);
         }
     }
 
-    fprintf(WolfOpFile, "typedef double (*calc_t)(calc_context *calc_params);\n");
-    fprintf(WolfOpFile, "typedef node_t *(*diff_t)(diff_context *diff_params);\n\n\n");
+    fprintf(HashOpFile, "typedef double (*calc_t)(calc_context *calc_params);\n");
+    fprintf(HashOpFile, "typedef node_t *(*diff_t)(diff_context *diff_params);\n\n\n");
     
-    fprintf(WolfOpFile, "#endif\n");
+    fprintf(HashOpFile, "#endif\n");
 
     free(func_infos);
     return GEN_SUCCESS;
@@ -165,8 +209,8 @@ GenErr_t GenOpInstrSet(FILE *OpInstrSetFile, char **arr_ptr, int count_line)
     fprintf(OpInstrSetFile, "const op_t op_instr_set[] =\n");
     fprintf(OpInstrSetFile, "{\n");
 
-    static const hash_t HASH_LOG  = GetHash("LOG");
-    static const hash_t HASH_PLUS = GetHash("+");
+    static const hash_t HASH_LOG   = GetHash("LOG");
+    static const hash_t HASH_PLUS  = GetHash("+");
     static const hash_t HASH_MINUS = GetHash("-");
     static const hash_t HASH_MUL   = GetHash("*");
     static const hash_t HASH_DIV   = GetHash("/");
@@ -327,6 +371,178 @@ GenErr_t GenKeywordSet(FILE *KeywordSetFile, char **arr_ptr, int count_line)
 }
 
 
+GenErr_t GenCmdEnum(FILE *CmdEnumsFile, char **arr_ptr, size_t count_line)
+{
+    if (IS_BAD_PTR(CmdEnumsFile) || IS_BAD_PTR(arr_ptr)) return GEN_ERROR;
+        
+    fprintf(CmdEnumsFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n\n");
+
+    unsigned int max_num_cmd = 0;
+    unsigned int min_num_cmd = 32;
+
+    char *cmd = (char*)calloc(MAX_LEN_STR_FOR_HASH, sizeof(char));
+    if (IS_BAD_PTR(cmd)) return GEN_ERROR;
+
+    unsigned char num_cmd   = 0;
+    unsigned char count_arg = 0;
+
+    fprintf(CmdEnumsFile, "enum CmdCodes\n");
+    fprintf(CmdEnumsFile, "{\n");
+    for (size_t line = 0; line < count_line - 1; ++line)
+    {
+        if (sscanf(arr_ptr[line], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+        {
+            fprintf(CmdEnumsFile, "\tCMD_%s%*s = 0x%02X,\n", cmd, MAX_LEN_STR_FOR_HASH - (int)strlen(cmd), "", num_cmd);
+            max_num_cmd = (num_cmd > max_num_cmd) ? num_cmd: max_num_cmd;
+            min_num_cmd = (num_cmd < min_num_cmd) ? num_cmd: min_num_cmd;
+        }
+        else
+            return GEN_ERROR;
+    }
+    if (sscanf(arr_ptr[count_line - 1], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+    {
+        fprintf(CmdEnumsFile, "\tCMD_%s%*s = 0x%02X\n", cmd, MAX_LEN_STR_FOR_HASH - (int)strlen(cmd), "", num_cmd);
+        max_num_cmd = (num_cmd > max_num_cmd) ? num_cmd: max_num_cmd;
+        min_num_cmd = (num_cmd < min_num_cmd) ? num_cmd: min_num_cmd;
+    }
+    else
+    {
+        return GEN_ERROR;
+    }
+
+    fprintf(CmdEnumsFile, "};\n\n");
+
+    fprintf(CmdEnumsFile, "#define MAX_NUM_CMD %u\n", max_num_cmd);
+    fprintf(CmdEnumsFile, "#define MIN_NUM_CMD %u\n", min_num_cmd);
+    
+    free(cmd);
+    return GEN_SUCCESS;
+}
+
+
+GenErr_t GenAsmInstrSet(FILE *AsmInstrSetFile, char **arr_ptr, size_t count_line)
+{
+    if (IS_BAD_PTR(AsmInstrSetFile) || IS_BAD_PTR(arr_ptr)) return GEN_ERROR;
+
+    asm_instr_t *arr_instr = (asm_instr_t*)calloc(count_line, sizeof(asm_instr_t));
+    if (IS_BAD_PTR(arr_instr)) return GEN_ERROR;
+        
+    char *cmd = (char*)calloc(MAX_LEN_STR_FOR_HASH, sizeof(char));
+    if (IS_BAD_PTR(cmd)) { free(arr_instr); return GEN_ERROR; }
+
+    unsigned char num_cmd = 0;
+    unsigned char count_arg = 0;
+
+    for (size_t line = 0; line < count_line - 1; ++line)
+    {
+        if (sscanf(arr_ptr[line], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+        {
+            arr_instr[line].count = count_arg;
+            arr_instr[line].hash = GetHash(cmd);
+            arr_instr[line].cmd = strdup(cmd);
+        }
+        else
+            return GEN_ERROR;
+    }
+    if (sscanf(arr_ptr[count_line - 1], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+    {
+        arr_instr[count_line - 1].count = count_arg;
+        arr_instr[count_line - 1].hash = GetHash(cmd);
+        arr_instr[count_line - 1].cmd = strdup(cmd);
+    }
+    else
+        return GEN_ERROR;
+
+    qsort(arr_instr, count_line, sizeof(asm_instr_t), CmpAsmInstrSetByHash);
+
+
+    fprintf(AsmInstrSetFile, "// Automatically generated by Andrey Murugov's code-generator. Do not edit!!!\n\n\n");
+
+    fprintf(AsmInstrSetFile, "const WrapCmd asm_instr_set[] =\n");
+    fprintf(AsmInstrSetFile, "{\n");
+    for (size_t line = 0; line < count_line - 1; ++line)
+    {
+        cmd = arr_instr[line].cmd;
+        unsigned int len_cmd_spec = (arr_instr[line].count > 1) ? strlen("ReadOpcode16"): strlen("ReadOpcode8");
+        fprintf(AsmInstrSetFile, "\t{%s,%*s %hhu,\t 0x%02X,%*s CMD_%s},\n", \
+            (arr_instr[line].count > 1) ? "ReadOpcode16": "ReadOpcode8", \
+            MAX_LEN_STR_FOR_HASH - len_cmd_spec, "", arr_instr[line].count, \
+            (unsigned int)GetHash(cmd), MAX_LEN_STR_FOR_HASH  - (int)strlen(cmd), "", cmd);
+    }
+    cmd = arr_instr[count_line - 1].cmd;
+    unsigned int len_cmd_spec = (arr_instr[count_line - 1].count > 1) ? strlen("ReadOpcode16"): strlen("ReadOpcode8");
+    fprintf(AsmInstrSetFile, "\t{%s,%*s %hhu,\t 0x%02X,%*s CMD_%s}\n", \
+        (arr_instr[count_line - 1].count > 1) ? "ReadOpcode16": "ReadOpcode8", \
+        MAX_LEN_STR_FOR_HASH - len_cmd_spec, "", arr_instr[count_line - 1].count, \
+        (unsigned int)GetHash(cmd), MAX_LEN_STR_FOR_HASH  - (int)strlen(cmd), "", cmd);
+    fprintf(AsmInstrSetFile, "};\n\n");
+
+    fprintf(AsmInstrSetFile, "#define LEN_INSTR_SET sizeof(asm_instr_set) / sizeof(*asm_instr_set)");
+
+    free(cmd);
+    free(arr_instr);
+    return GEN_SUCCESS;
+}
+
+
+GenErr_t GenSpuInstrSet(FILE *SpuInstrSetFile, char **arr_ptr, size_t count_line)
+{
+    if (IS_BAD_PTR(SpuInstrSetFile) || IS_BAD_PTR(arr_ptr)) return GEN_ERROR;
+
+    spu_instr_t *arr_instr = (spu_instr_t*)calloc(count_line, sizeof(spu_instr_t));
+    if (IS_BAD_PTR(arr_instr)) return GEN_ERROR;
+        
+    char *cmd = (char*)calloc(MAX_LEN_STR_FOR_HASH, sizeof(char));
+    if (IS_BAD_PTR(cmd)) return GEN_ERROR;
+
+    unsigned char num_cmd   = 0;
+    unsigned char count_arg = 0;
+
+    for (size_t line = 0; line < count_line - 1; ++line)
+    {
+        if (sscanf(arr_ptr[line], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+        {
+            arr_instr[line].count = count_arg;
+            arr_instr[line].num = num_cmd;
+            arr_instr[line].cmd = strdup(cmd);
+        }
+        else
+            return GEN_ERROR;
+    }
+    if (sscanf(arr_ptr[count_line - 1], "%s %hhu %hhu", cmd, &num_cmd, &count_arg) == 3)
+    {
+        arr_instr[count_line - 1].count = count_arg;
+        arr_instr[count_line - 1].num = num_cmd;
+        arr_instr[count_line - 1].cmd = strdup(cmd);
+    }
+    else
+        return GEN_ERROR;
+
+    qsort(arr_instr, count_line, sizeof(spu_instr_t), CmpSpuInstrSetByNum);
+        
+    fprintf(SpuInstrSetFile, "// Automatically generated by Andrey Murugov's code generator. Do not edit!!!\n\n\n");
+
+    fprintf(SpuInstrSetFile, "const WrapCmd spu_instr_set[] =\n");
+    fprintf(SpuInstrSetFile, "{\n");
+    for (size_t line = 0; line < count_line - 1; ++line)
+    {
+        cmd = arr_instr[line].cmd;
+        count_arg = arr_instr[line].count;
+        fprintf(SpuInstrSetFile, "\t{FUNC_CMD_%s,%*s %u,\t CMD_%s},\n", cmd, MAX_LEN_STR_FOR_HASH - (int)strlen(cmd), "", count_arg, cmd);
+    }
+    count_arg = arr_instr[count_line - 1].count;
+    cmd = arr_instr[count_line - 1].cmd;
+    fprintf(SpuInstrSetFile, "\t{FUNC_CMD_%s,%*s %u,\t CMD_%s}\n", cmd, MAX_LEN_STR_FOR_HASH - (int)strlen(cmd), "", count_arg, cmd);
+    fprintf(SpuInstrSetFile, "};\n\n");
+
+    fprintf(SpuInstrSetFile, "#define LEN_INSTR_SET sizeof(spu_instr_set) / sizeof(*spu_instr_set)");
+
+    free(cmd);
+    free(arr_instr);
+    return GEN_SUCCESS;
+}
+
+
 int CmpOpInstrSetByHash(const void *a, const void *b)
 {
     const op_instr_t *op_instr_a = (const op_instr_t*)a;
@@ -361,6 +577,32 @@ int CmpByHash(const void *a, const void *b)
     if (*hash_a > *hash_b)
         return 1;
     if (*hash_a == *hash_b)
+        return 0;
+    return -1;
+}
+
+
+int CmpAsmInstrSetByHash(const void *a, const void *b)
+{
+    const asm_instr_t *arr_instr_a = (const asm_instr_t*)a;
+    const asm_instr_t *arr_instr_b = (const asm_instr_t*)b;
+
+    if (arr_instr_a->hash > arr_instr_b->hash)
+        return 1;
+    if (arr_instr_a->hash == arr_instr_b->hash)
+        return 0;
+    return -1;
+}
+
+
+int CmpSpuInstrSetByNum(const void *a, const void *b)
+{
+    const spu_instr_t *arr_instr_a = (const spu_instr_t*)a;
+    const spu_instr_t *arr_instr_b = (const spu_instr_t*)b;
+
+    if (arr_instr_a->num > arr_instr_b->num)
+        return 1;
+    if (arr_instr_a->num == arr_instr_b->num)
         return 0;
     return -1;
 }

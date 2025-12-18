@@ -19,15 +19,12 @@ typedef size_t tree_canary_t;
 typedef size_t tree_err_t;
 typedef size_t hash_t;
 
-enum ArgTypes
+enum type_t
 {
     ARG_NUM  = 0x00,
     ARG_OP   = 0x01,
     ARG_VAR  = 0x02,
-    ARG_FUNC = 0x03
 };
-
-typedef ArgTypes type_t;
 
 enum TreeErr_t
 {
@@ -83,15 +80,11 @@ union val
     double num;
     hash_t op;
     char*  var;
-    char*  func;
-
-    val() : num(0) {}
-    val(double n) : num(n) {}
-    val(hash_t n) : op(n) {}
 };
 
+val valNUM(double n);
+val valOP(hash_t o);
 val valVAR(const char* ptr, int len);
-val valFUNC(const char* ptr, int len);
 
 struct node_t
 {
@@ -113,6 +106,13 @@ struct tree_t
     tree_canary_t canary_2;
 };
 
+struct keyword_t
+{
+    type_t      type;
+    const char* name;
+    int         len;
+    hash_t      hash;
+};
 
 TreeErr_t TreeInit(tree_t *tree, const char *name, const char *file, const char *func, size_t line);
 TreeErr_t TreeCtor(tree_t *tree);
@@ -124,13 +124,13 @@ TreeErr_t FreeNodes(node_t *node);
 TreeErr_t TreeDtor(tree_t *tree);
 
 
-#define TREE_CTOR(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(&(tree))
+#define TREE_CTOR(tree) TreeInit(tree, #tree, __FILE__, __func__, __LINE__); TreeCtor(tree)
 #define TREE_DTOR(tree) TreeDtor(tree)
 
-#define NUM_(num)        NewNode(ARG_NUM, (val)(num), NULL, NULL)
-#define OP_(op)          NewNode(ARG_OP, (val)((hash_t)op), NULL, NULL)
-#define VAR_(var, len)   NewNode(ARG_VAR, valVAR(var, len), NULL, NULL)
+#define LINK_(link)      NewNode(ARG_LINK, valLINK(link), NULL, NULL)
+#define NUM_(num)        NewNode(ARG_NUM,  valNUM(num), NULL, NULL)
+#define OP_(op)          NewNode(ARG_OP,   valOP((hash_t)op), NULL, NULL)
+#define VAR_(var, len)   NewNode(ARG_VAR,  valVAR(var, len), NULL, NULL)
 #define FUNC_(func, len) NewNode(ARG_FUNC, valFUNC(func, len), NULL, NULL)
-
 
 #endif

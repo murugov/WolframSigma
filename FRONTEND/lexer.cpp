@@ -46,9 +46,9 @@ lexerErr_t LexerCtor(lexer_t *lexer, char **lines, int line_count, const char *f
     if (LexerInit(lexer, lines, line_count, file_name) != LEX_SUCCESS) { free(lexer); return LEX_ERROR; }
 
     PeekToken(lexer);
-    while (!IS_BAD_PTR(lexer->peeked_token) && (lexer->peeked_token->type != ARG_OP || lexer->peeked_token->hash != HASH_EOF))
+    while ( !IS_BAD_PTR(lexer->peeked_token) && (lexer->peeked_token->type != ARG_OP || lexer->peeked_token->hash != HASH_EOF))
     {
-        printf("type: [%d];   cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
+        // printf("type: [%d];   cur_pos: [%c];  cur_line = [%d];   cur_col = [%d];\n", lexer->peeked_token->type, *lexer->peeked_token->start, lexer->cur_line, lexer->cur_col);
         if (AdvanceToken(lexer) == LEX_ERROR) return LEX_ERROR;
         
         PeekToken(lexer);
@@ -232,10 +232,14 @@ static token_t *ReadName(lexer_t *lexer)
     lexer->cur_col = saved_col;
     lexer->cur_line = saved_line;
 
+    char* tmp_str = strndup(start, (size_t)length);
+    hash_t tmp_hash = GetHash(tmp_str);
+    free(tmp_str);
+
     if (!IS_BAD_PTR(next_token) && next_token->type == ARG_OP && next_token->hash == HASH_LPAREN)
-        return NewToken(ARG_FUNC, GetHash(start), start, length, line, col);
+        return NewToken(ARG_OP, tmp_hash, start, length, line, col);
     else
-        return NewToken(ARG_VAR, GetHash(start), start, length, line, col);
+        return NewToken(ARG_VAR, tmp_hash, start, length, line, col);
 }
 
 

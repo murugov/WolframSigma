@@ -1,9 +1,3 @@
-def sort(init a, init b)
-{
-    if (a < b)
-    {
-        init t = a;
-        a = b;
-        b = t;
-    }
-}
+sin(x^2 + 2 - 9^x) + cos(15*x^3)^3;
+x = 10;
+y = 20;

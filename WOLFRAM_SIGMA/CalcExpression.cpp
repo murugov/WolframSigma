@@ -10,10 +10,8 @@ double CalcExpression(node_t *node)
     {
         case ARG_OP:
         {
-            hash_t op_hash = GetHash(node->item.op);
             size_t index   = 0;
-
-            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
+            if (HashSearch(node->item.op, &index) == WOLF_SUCCESS)
             {
                 double left_val = NAN, right_val = NAN;
                 
@@ -37,12 +35,12 @@ double CalcExpression(node_t *node)
         }
         case ARG_VAR:
         {
-            hash_t node_hash = GetHash(node->item.var);
-            for (int i = 0; i < MAX_NUM_VAR; ++i)
-            {
-                if (variables[i].hash == node_hash)
-                    return variables[i].value;
-            }
+            // hash_t node_hash = GetHash(node->item.var);
+            // for (int i = 0; i < MAX_NUM_VAR; ++i)
+            // {
+            //     if (variables[i].hash == node_hash)
+            //         return variables[i].value;
+            // }
 
             return NAN;
         }

@@ -25,7 +25,6 @@ double ConstFold(node_t *node)
     
     NODE_DEBUG(node);
 
-    // printf(ANSI_COLOR_BLUE "NODE: [%p]\n" ANSI_COLOR_RESET, node);
     switch (node->type) 
     {
         case ARG_OP:
@@ -33,12 +32,10 @@ double ConstFold(node_t *node)
             double left_val  = ConstFold(node->left);
             double right_val = ConstFold(node->right);
 
-            hash_t op_hash = GetHash(node->item.op);
             size_t index   = 0;
-            
             if ((op_instr_set[index].num_args == 2 && isnan(left_val)) || isnan(right_val)) return NAN;
             
-            if (HashSearch(op_hash, &index) == WOLF_SUCCESS)
+            if (HashSearch(node->item.op, &index) == WOLF_SUCCESS)
             {
                 calc_context context = {left_val, right_val};
                 double result = op_instr_set[index].calc(&context);
@@ -64,18 +61,15 @@ node_t *RemoveNeutralElem(node_t *node)
 {
     if (node == NULL) return NULL;
     
-    // NODE_DEBUG(node->left);
     node->left  = RemoveNeutralElem(node->left);
     node->right = RemoveNeutralElem(node->right);
     
     if (node->type != ARG_OP) return node;
-    
-    hash_t op_hash = GetHash(node->item.op);
-    
+        
     int left_is_num  = (node->left  != NULL && node->left->type  == ARG_NUM);
     int right_is_num = (node->right != NULL && node->right->type == ARG_NUM);
    
-    switch (op_hash)
+    switch (node->item.op)
     {
         case HASH_MUL:
             if (left_is_num && is_zero(node->left->item.num - 1.0))

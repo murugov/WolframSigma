@@ -32,28 +32,12 @@ TreeErr_t TreeCtor(tree_t *tree)
 
 node_t *NewNode(type_t type, val item, node_t *left, node_t *right)
 {
+    if (type != ARG_NUM && type != ARG_OP && type != ARG_VAR) { return NULL; }
+
     node_t *new_node = (node_t*)calloc(1, sizeof(node_t));
     if (IS_BAD_PTR(new_node)) { return NULL; }
 
-    switch (type)
-    {
-        case ARG_NUM:
-            new_node->item.num = item.num;
-            break;
-        case ARG_OP:
-            new_node->item.op = item.op;
-            break;
-        case ARG_VAR:
-            new_node->item.var = item.var;
-            break;    
-        case ARG_FUNC:
-            new_node->item.func = item.func;
-            break;   
-        default:
-            free(new_node);
-            return NULL;
-    }
-
+    new_node->item   = item;
     new_node->type   = type;
     new_node->parent = NULL;
     new_node->left   = left;
@@ -61,8 +45,9 @@ node_t *NewNode(type_t type, val item, node_t *left, node_t *right)
     return new_node;
 }
 
+val valNUM(double n) { val v; v.num = n; return v; }
+val valOP(hash_t o)  { val v; v.op = o; return v; }
 val valVAR(const char* ptr, int len)  { val v; v.var  = strndup(ptr, (size_t)len); return v; }
-val valFUNC(const char* ptr, int len) { val f; f.func = strndup(ptr, (size_t)len); return f; }
 
 
 void set_parents(node_t *node, node_t *parent)
@@ -100,15 +85,7 @@ TreeErr_t FreeNodes(node_t *node)
                 node->item.var = NULL;
             }
             break;
-            
-        case ARG_FUNC:
-            if (!IS_BAD_PTR(node->item.func))
-            {
-                free(node->item.func);
-                node->item.func = NULL;
-            }
-            break;
-            
+        
         case ARG_NUM:
         case ARG_OP:
             break;
